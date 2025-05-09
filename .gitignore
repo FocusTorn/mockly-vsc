@@ -1,0 +1,18 @@
+
+
+# Ignored by Notes Hub extension
+.notesHub
+
+/node_modules
+/dist
+/_removed
+/.Prompts
+
+
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+

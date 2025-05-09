@@ -1,0 +1,163 @@
+/* eslint-disable jsonc/object-property-newline */
+{
+    "version": "2.0.0",
+    "tasks": [
+
+
+        {   "label": "watch", "dependsOn": ["transfer_package_json", "npm: watch:tsc", "npm: watch:esbuild"],
+            "icon": { "id": "sync" } ,
+            "presentation": { "reveal": "never" },
+            "group": { "kind": "build", "isDefault": true }
+        }   ,
+
+        {   "label": "transfer_package_json",
+            "hide": true,
+            "type": "npm",
+            "script": "Utility:Transfer_Package_Parts",
+            "group": { "kind": "build" },
+            "presentation": { "group": "watch", "reveal": "never" }
+        }   ,
+
+        {   "label": "npm: watch:esbuild",
+            "hide": true,
+            "type": "npm",
+            "script": "Watch:Esbuild_Watch",
+            "group": "build",
+            "problemMatcher": "$esbuild-watch",
+            "isBackground": true,
+            "presentation": { "group": "watch", "reveal": "never" }
+        }   ,
+
+        {   "label": "npm: watch:tsc",
+            "hide": true,
+            "type": "npm",
+            "script": "Watch:TSC_Watch",
+            "group": "build",
+            "problemMatcher": "$tsc-watch",
+            "isBackground": true,
+            "presentation": { "group": "watch", "reveal": "never" }
+        }   ,
+
+
+
+
+        {
+            "label": "Debug ESLint",
+            "type": "shell",
+            "command": "yarn lint:debug", // Assuming your package.json script is "lint:debug"
+            "isBackground": true, // Keep ESLint running in the background
+            "problemMatcher": [] // Prevent ESLint output from being treated as errors
+        },
+
+        {
+            "label": "Attach to ESLint",
+            "type": "shell", // Change type to "shell"
+            "command": "node attach --debug-port=9229", // Use "node attach"
+            "dependsOn": ["Debug ESLint"],
+            "isBackground": true, // Optional: Keep the task running
+            "problemMatcher": [] // Optional: Prevent output from being treated as errors
+        }
+
+
+
+
+    ]
+}
+
+
+
+
+// {
+//     "label": "build",
+
+//     "icon": {"id": "symbol-method"},
+//     "type": "shell",
+//     "command": "yarn wpb",
+//     "problemMatcher": [],
+//     "group": "build"
+// },
+
+// {
+//     "label": "watch",
+//     "icon": {"id": "repo-sync"},
+//     "type": "shell",
+//     "command": "yarn wpb",
+//     "isBackground": true,
+//     "problemMatcher": [],
+//     "group": "build",
+//     "presentation": {
+//         "reveal": "silent",
+//         "panel": "dedicated",
+//         "group": "watchers"
+//     },
+// }
+
+
+
+
+// {
+//     "label": "ESwatch",
+//     "type": "npm",
+//
+//     "script": "w1",
+//     "group": "build",
+//     "icon": {"id": "repo-sync"},
+
+//     "isBackground": true,
+//     "options": { "cwd": "${workspaceFolder}" },
+//     "problemMatcher": [], // "$ts-esbuild-watch",
+//     "presentation": {
+//         "reveal": "silent",
+//         "panel": "dedicated",
+//         "group": "watchers"
+//     },
+
+//     // workbench.action.terminal.newWithProfile
+// },
+// {
+//  eslint-disable-next-line style/spaced-comment
+//  "label": "ES-Build2",
+//  "type": "npm",
+//  "script": "ES-Build2",
+//  "group": "build",
+//  "problemMatcher": "$ts-esbuild"
+//  },
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+// {
+//     "label": "ES-Watch1.5",
+//     "type": "npm",
+//     "script": "ES-Watch2",
+//     "group": "build",
+//     "problemMatcher": "$ts-esbuild-watch",
+//     "isBackground": true,
+//     "presentation": {
+//         "reveal": "never",
+//         "group": "watchers"
+//     }
+// },
+
+// {
+//     "label": "ES-Watch",
+//     "type": "npm",
+//     "script": "ES-Watch",
+//     "group": {
+//         "kind": "build",
+//         "isDefault": true
+//     },
+//     "problemMatcher": "$ts-esbuild-watch",
+// "isBackground": true,
+//     "presentation": {
+//         "reveal": "never",
+//         "group": "watchers"
+//     }
+// },

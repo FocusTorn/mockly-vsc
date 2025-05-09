@@ -1,0 +1,143 @@
+/* eslint-disable antfu/consistent-list-newline */
+
+// A launch configuration that compiles the extension and then opens it inside a new window
+// Use IntelliSense to learn about possible attributes.
+// Hover to view descriptions of existing attributes.
+// For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+
+{
+    "version": "0.2.0",
+    "configurations": [
+
+        {
+            "name": "ES: Debug",
+            "type": "extensionHost",
+            "request": "launch",
+            "args": ["--profile=Clean", "--extensionDevelopmentPath=${workspaceFolder}"],
+            "sourceMaps": true,
+            "preLaunchTask": "${defaultBuildTask}"
+        },
+    
+        
+        // {
+        //     "name": "Vitest: Debug Current Test File",
+        //     "type": "node",
+        //     "request": "launch",
+        //     "skipFiles": ["<node_internals>/**"],
+        //     "runtimeExecutable": "npm",
+        //     "runtimeArgs": ["run", "test:debug", "--", "--run"], //changed
+        //     "console": "integratedTerminal",
+        //     "stopOnEntry": true
+        // },
+        {
+            "name": "Vitest: Debug Current Test File",
+            "type": "node",
+            "request": "launch",
+            "skipFiles": ["<node_internals>/**"],
+            "runtimeExecutable": "npm",
+            "runtimeArgs": ["run", "test:debug"],
+            "console": "integratedTerminal",
+            "stopOnEntry": true
+        },
+          
+        
+        
+        
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Debug Current Test File",
+            "autoAttachChildProcesses": true,
+            "skipFiles": ["<node_internals>/**", "**/node_modules/**"],
+            "program": "${workspaceRoot}/node_modules/vitest/vitest.mjs",
+            "args": ["run", "${relativeFile}"],
+            "smartStep": true,
+            "console": "integratedTerminal"
+        },
+          
+          
+          
+          
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Mocha Tests",
+            "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
+            "args": [
+                "--timeout",
+                "10000",
+                "--require",
+                "ts-node/register",
+                "--recursive",
+                "${workspaceFolder}/test/*.ts" // Path to your test files
+            ],
+            "cwd": "${workspaceFolder}", // Ensure correct working directory
+            "internalConsoleOptions": "openOnSessionStart"
+        },
+        
+        
+
+        {
+            "type": "extensionHost", // Use 'extensionHost'
+            "request": "launch",
+            "name": "Run Extension Tests",
+            "runtimeExecutable": "${execPath}",
+            "args": [
+                "--extensionDevelopmentPath=${workspaceFolder}",
+                "--extensionTestsPath=${workspaceFolder}/test/index.ts" // Path to your test runner
+            ],
+            "outFiles": [
+                "${workspaceFolder}/test/out/**/*.js"
+            ],
+            "preLaunchTask": "npm: watch-tests" // Optional: for automatic test runs
+        },
+
+
+
+        {
+            "name": "Yarn: Debug JS",
+            "type": "node",
+            "request": "launch",
+            "runtimeExecutable": "yarn",
+            "runtimeArgs": ["node", "${relativeFile}"],
+            "skipFiles": ["<node_internals>/**"]
+        },
+        
+        {
+            "name": "Debug ESLint Plugin",
+            "type": "node",
+            "request": "launch",
+            "runtimeExecutable": "yarn",
+            "stopOnEntry": false,
+            "runtimeArgs": [
+                "run",
+                "lint:debug:vsc",
+                "--"
+                // Add any specific arguments you need for ESLint here
+            ],
+            // "port": 9229, // Optional: If you need to specify the port
+            "skipFiles": [
+                "<node_internals>/**",
+                "${workspaceFolder}/.pnp.cjs",
+                "${workspaceFolder}/.yarn/__virtual__/eslint-virtual-*/0/cache/**/*.js"
+            ]
+            
+        }
+        
+        
+        
+        // {
+        //     "name": "Debug ESLint Plugin OG",
+        //     "type": "node",
+        //     "request": "attach",
+        //     "port": 9229,
+        //     "skipFiles": [
+        //         "<node_internals>/**"
+        //     ]
+        // }
+    
+    ]
+}
+
+
+
