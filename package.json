@@ -59,6 +59,12 @@
         "Validate:Packages": "npm run Validate:View_Excess_Dependencies && npm run Validate:Dependencies:View_Depreciated_Packages",
         "Validate:View_Excess_Dependencies": "node src/scripts/js/check_excess_packages.js",
         "Validate:Dependencies:View_Depreciated_Packages": "npm run clear && node src/scripts/js/check_depreciated.js",
+        
+        "docs:dev": "vitepress dev docs",
+        "docs:build": "vitepress build docs",
+        "docs:preview": "vitepress preview docs",
+        
+        
         "clear": "powershell -Command Clear-Host",
         "cleanNode": "npm prune; npm dedupe; npm audit fix"
     },
@@ -81,6 +87,7 @@
         "rimraf": "^6.0.1",
         "tsyringe": "^4.10.0",
         "typescript": "^5.8.3",
+        "vitepress": "^1.6.3",
         "vitest": "^3.1.2",
         "vscode-uri": "^3.1.0"
     }

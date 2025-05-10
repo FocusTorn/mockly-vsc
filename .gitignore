@@ -1,8 +1,5 @@
-
-
 # Ignored by Notes Hub extension
 .notesHub
-*.bak*
 
 /node_modules
 /dist
@@ -10,9 +7,14 @@
 /.Prompts
 
 
+
+#= VSCode =========================================================================================== 
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
 
+#= VitePress ======================================================================================== 
+docs/.vitepress/cache
+docs/.vitepress/dist
