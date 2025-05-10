@@ -2,6 +2,7 @@
 
 # Ignored by Notes Hub extension
 .notesHub
+*.bak*
 
 /node_modules
 /dist
@@ -14,5 +15,4 @@
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
-
 
