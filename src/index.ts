@@ -11,8 +11,6 @@ import type { IVSCodeAPISimulatorService } from './core/_interfaces/IVSCodeAPISi
  * Resolves the main simulator service from the DI container and exposes
  * the public `mockly` namespace (simulating `vscode`) and a `reset` method for test control.
  */
-
-// Resolve the main simulator service from the container
 const simulator = container.resolve<IVSCodeAPISimulatorService>('IVSCodeAPISimulatorService')
 
 // Construct the public 'mockly' object by exposing properties from the simulator
@@ -54,9 +52,13 @@ const mockly = {
 	// Other top-level properties from the simulator
 	version: simulator.version,
 
+	// Node.js like utilities
+	node: {
+		path: simulator.nodePathService,
+		fs: simulator.nodeFsService, // Add the fs service
+	},
+
 }
 
 // Export the public mockly object and the simulator instance (for reset and internal access in tests)
 export { mockly, simulator as vscodeSimulator }
-
-// Note: The `reset` method is available on the exported `vscodeSimulator` object.

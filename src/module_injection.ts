@@ -35,6 +35,7 @@ import type { IWorkspaceModule } from './modules/workspace/_interfaces/IWorkspac
 import type { IWorkspaceNamespace } from './modules/workspace/_interfaces/IWorkspaceNamespace.ts'
 import type { ITextDocumentService } from './modules/workspace/_interfaces/ITextDocumentService.ts'
 import type { IWorkspaceStateService } from './modules/workspace/_interfaces/IWorkspaceStateService.ts'
+import type { INodeFsService } from './modules/nodeFs/_interfaces/INodeFsService.ts'
 
 //= IMPLEMENTATIONS ===========================================================================================
 import { VSCodeAPISimulatorService } from './core/implementations/vscodeAPISimulatorService.ts'
@@ -64,6 +65,7 @@ import { WorkspaceModule } from './modules/workspace/implementations/workspace.m
 import { WorkspaceNamespace } from './modules/workspace/implementations/workspaceNamespace.ts'
 import { TextDocumentService } from './modules/workspace/services/textDocument.service.ts'
 import { WorkspaceStateService } from './modules/workspace/services/workspaceState.service.ts'
+import { NodeFsService } from './modules/nodeFs/services/nodeFs.service.ts'
 
 //--------------------------------------------------------------------------------------------------------------<<
 
@@ -84,6 +86,11 @@ container.registerSingleton<IUriService>('IUriService', UriService)
 container.registerSingleton<IFileSystemService>('IFileSystemService', FileSystemService)
 
 container.registerSingleton<IFileSystemModule>('IFileSystemModule', FileSystemModule)
+
+// ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+// │  NODE FS (Mock of Node.js 'fs')                                                                  │
+// └──────────────────────────────────────────────────────────────────────────────────────────────────┘
+container.registerSingleton<INodeFsService>('INodeFsService', NodeFsService)
 
 // ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
 // │  WORKSPACE                                                                                       │

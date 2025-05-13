@@ -36,7 +36,7 @@ Calling `reset()` clears and resets virtually all aspects of the mock VSCode env
 
 **Usage Example:**
 
-```typescript
+~~~typescript
 import { mockly, vscodeSimulator } from 'mockly-vsc';
 import { beforeEach, describe, expect, it } from 'vitest';
 
@@ -62,9 +62,55 @@ describe('My Feature Tests', () => {
 // afterEach(async () => {
 //   await vscodeSimulator.reset();
 // });
-```
+~~~
 
 Using `beforeEach` is generally recommended as it ensures a clean state _before_ your test logic runs.
+
+## Accessing Path Utilities with `vscodeSimulator.path`
+
+For test helper functions or scenarios where you need Node.js-like path manipulation (e.g., `join`, `dirname`, `basename`, `normalize`), `vscodeSimulator` provides a convenient `path` accessor. This service simulates the Node.js `path` module.
+
+- `vscodeSimulator.path`: An instance of `IMockNodePathService` that provides methods like:
+  - `join(...paths: string[]): string`
+  - `normalize(p: string): string`
+  - `basename(p: string, ext?: string): string`
+  - `dirname(p: string): string`
+  - `relative(from: string, to: string): string`
+  - `resolve(...pathSegments: string[]): string`
+  - `sep: '/' | '\\'` (platform-specific separator, defaults to POSIX `/`)
+  - `setMode('posix' | 'win32')`: To switch between POSIX and Windows path styles.
+
+**Purpose and Differentiation:**
+
+- **`vscodeSimulator.path`**: Use this for string-based path manipulations, typically within your test utility functions or when constructing path strings that are *not* directly passed to `mockly` API methods that expect `mockly.Uri` objects. It's for working with path *strings*.
+- **`mockly.Uri`**: Continue to use `mockly.Uri.file()`, `mockly.Uri.parse()`, and `mockly.Uri.joinPath()` when you need to create or manipulate `Uri` objects that will be used with the `mockly` API (e.g., `mockly.workspace.fs.writeFile(uri, ...)`).
+
+**Example Usage of `vscodeSimulator.path`:**
+
+~~~typescript
+import { vscodeSimulator } from 'mockly-vsc';
+import { describe, expect, it } from 'vitest';
+
+describe('Path Utilities via vscodeSimulator.path', () => {
+	it('should join path segments correctly (POSIX default)', () => {
+		const result = vscodeSimulator.path.join('/users/test', 'project', 'file.txt');
+		expect(result).toBe('/users/test/project/file.txt');
+	});
+
+	it('should get the basename of a path', () => {
+		const result = vscodeSimulator.path.basename('/users/test/project/file.txt');
+		expect(result).toBe('file.txt');
+	});
+
+	it('should switch to win32 mode and join paths', () => {
+		vscodeSimulator.path.setMode('win32'); // Switch to Windows path style
+		const result = vscodeSimulator.path.join('C:\\Users\\Test', 'Project', 'file.txt');
+		expect(result).toBe('C:\\Users\\Test\\Project\\file.txt');
+		expect(vscodeSimulator.path.sep).toBe('\\');
+		vscodeSimulator.path.setMode('posix'); // Reset to default for other tests
+	});
+});
+~~~
 
 ## Accessing Internal Modules and Services (Advanced)
 
@@ -91,15 +137,15 @@ For highly specific test scenarios, such as setting up a complex initial state t
   - `_extensionsService`: Manages the registry of mock extensions.
 - `vscodeSimulator._fileSystemModule`:
   - `_fileSystemStateService`: The core in-memory file system data store.
-  - `_uriService`: (Typically re-exports `vscode-uri` functionality).
-  - `_nodePathService`: (If path manipulation utilities are exposed).
+  - `_uriService`: (This is the `IUriService` instance, same as `mockly.Uri`).
+  - `_nodePathService`: (This is the `IMockNodePathService` instance, same as `vscodeSimulator.path`).
   - `fs`: This is the same instance as `mockly.workspace.fs` (the `IFileSystemService` implementation).
 
 **Example: Directly Manipulating File System State (Illustrative)**
 
 While `mockly.workspace.fs.writeFile()` is the preferred way to add files, you _could_ (though rarely needed) interact with the `_fileSystemStateService`:
 
-```typescript
+~~~typescript
 import { mockly, vscodeSimulator } from 'mockly-vsc';
 import { beforeEach, describe, expect, it } from 'vitest';
 
@@ -114,12 +160,10 @@ describe('Advanced State Management Example', () => {
 
 		// Access internal FileSystemStateService via FileSystemModule
 		// This bypasses events like onDidCreateFiles that mockly.workspace.fs.writeFile would trigger.
-		vscodeSimulator._fileSystemModule._fileSystemStateService.addFile(fileUri, content, {
-			type: mockly.FileType.File,
-			ctime: Date.now(),
-			mtime: Date.now(),
-			size: content.length,
-		});
+		// Note: addFile in FileSystemStateService might expect different parameters or return type
+		// than the example shown in the original docs. Refer to IFileSystemStateService.
+		await vscodeSimulator._fileSystemModule._fileSystemStateService.addFile(fileUri, { content });
+
 
 		// Verify via public API
 		const stat = await mockly.workspace.fs.stat(fileUri);
@@ -139,7 +183,7 @@ describe('Advanced State Management Example', () => {
 		expect(mockly.window.activeTextEditor).toBeUndefined();
 	});
 });
-```
+~~~
 
 **Caution and Best Practices:**
 

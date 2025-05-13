@@ -48,6 +48,27 @@ export interface IPasteOptions { //>
 } //<
 
 /**
+ * Defines an entry for populating the file system, allowing specification of content and optional metadata.
+ */
+export interface IFileSystemPopulateEntry { //>
+    content?: string | Uint8Array; // For files
+    // Optional: type?: 'file' | 'directory'; // Could be explicit, or inferred
+    // Optional: mtime?: number; ctime?: number; // For advanced metadata setup
+} //<
+
+/**
+ * Defines the structure for populating the virtual file system.
+ * Keys are paths, and values can be content (string or Uint8Array for files),
+ * null (for directories), or an IFileSystemPopulateEntry for more detailed specification.
+ */
+export interface IFileSystemStructure { //>
+    [path: string]: string | Uint8Array | null | IFileSystemPopulateEntry;
+    // string | Uint8Array: file with content
+    // null: directory
+    // IFileSystemPopulateEntry: file or directory with specific attributes
+} //<
+
+/**
  * Interface for the Virtual File System State Service.
  * Manages the in-memory representation of the file system and its state.
  * This service is an internal component used by the FileSystemModule.
@@ -62,7 +83,7 @@ export interface IFileSystemStateService {
 	readonly clipboardOperation: 'copy' | 'cut' | null
 
 	// ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
-	// │  Methods                                                                                         │
+	// │  Methods (Async)                                                                                 │
 	// └──────────────────────────────────────────────────────────────────────────────────────────────────┘
 
 	/**
@@ -220,4 +241,30 @@ export interface IFileSystemStateService {
 	 */
 	setIsRemote: (path: string | Uri, value: boolean, recursive?: boolean) => Promise<void>
 
+	// ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+	// │  Methods (Sync)                                                                                  │
+	// └──────────────────────────────────────────────────────────────────────────────────────────────────┘
+	
+    getNodeSync: (path: string | Uri) => IVirtualFSNode | undefined;
+	
+    statSync: (path: string | Uri) => vt.FileStat;
+	
+    readFileSync: (path: string | Uri) => Uint8Array;
+	
+    writeFileSync: (path: string | Uri, content: Uint8Array, options?: IAddNodeOptions) => IVirtualFSNode;
+	
+    readDirectorySync: (path: string | Uri) => [string, FileType][];
+	
+    existsSync: (path: string | Uri) => boolean;
+	
+    deleteFileSync: (path: string | Uri, options?: { useTrash?: boolean }) => void;
+	
+    deleteFolderSync: (path: string | Uri, options?: { recursive?: boolean, useTrash?: boolean }) => void;
+	
+    addFolderSync: (path: string | Uri, options?: IAddNodeOptions) => IVirtualFSNode;
+	
+    renameSync: (oldPath: string | Uri, newPath: string | Uri, options?: { overwrite?: boolean }) => void;
+
+    populate: (structure: IFileSystemStructure) => Promise<void>;
+    populateSync: (structure: IFileSystemStructure) => void;
 }

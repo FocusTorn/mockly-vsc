@@ -18,6 +18,10 @@ import {
 	TreeItemCollapsibleState,
 	EndOfLine,
 } from '../../_vscCore/vscEnums.ts'
+
+import type {
+	CancellationTokenSource as LocalCancellationTokenSource,
+} from '../../_vscCore/vscClasses.ts'
 import {
 	Position,
 	Range,
@@ -31,9 +35,13 @@ import {
 	TreeItem,
 	WorkspaceEdit,
 	RelativePattern,
-	TextEdit as LocalTextEdit, // Renamed to avoid conflict
+	TextEdit as LocalTextEdit, // Alias local mock
 } from '../../_vscCore/vscClasses.ts'
 import type { MockFileSystemErrorNamespace, TextEditFactory } from '../../_vscCore/_vscInterfaces.ts'
+
+import type { FileSystemError as LocalFileSystemError } from '../../_vscCore/vscFileSystemError.ts'
+
+// Alias local mock
 
 //= INJECTED TYPES ============================================================================================
 import type { ICoreUtilitiesService } from '../_interfaces/ICoreUtilitiesService.ts'
@@ -43,7 +51,7 @@ import type { IEventBusService } from '../_interfaces/IEventBusService.ts'
 import type { IUriService } from '../../modules/fileSystem/_interfaces/IUriService.ts'
 
 // Path updated
-import type { IVSCodeAPISimulatorService } from '../_interfaces/IVSCodeAPISimulatorService.ts'
+import type { IVSCodeAPISimulatorService, IVSCodeAPISimulatorVFSHelpers } from '../_interfaces/IVSCodeAPISimulatorService.ts'
 import type { ICommandsModule } from '../../modules/commands/_interfaces/ICommandsModule.ts'
 import type { IEnvModule } from '../../modules/env/_interfaces/IEnvModule.ts'
 import type { IExtensionsModule } from '../../modules/extensions/_interfaces/IExtensionsModule.ts'
@@ -53,6 +61,9 @@ import type { IWorkspaceModule } from '../../modules/workspace/_interfaces/IWork
 import type { IFileSystemModule } from '../../modules/fileSystem/_interfaces/IFileSystemModule.ts'
 
 // Added
+import type { IMockNodePathService } from '../../modules/fileSystem/_interfaces/IMockNodePathService.ts'
+import type { INodeFsService } from '../../modules/nodeFs/_interfaces/INodeFsService.ts'
+import type { IFileSystemStructure } from '../../modules/fileSystem/_interfaces/IFileSystemStateService.ts'
 
 //= IMPLEMENTATION TYPES ======================================================================================
 import type { IWindowNamespace } from '../../modules/window/_interfaces/IWindowNamespace.ts'
@@ -82,18 +93,20 @@ export class VSCodeAPISimulatorService implements IVSCodeAPISimulatorService {
 	readonly _commandsModule: ICommandsModule
 	readonly _envModule: IEnvModule
 	readonly _extensionsModule: IExtensionsModule
-	readonly _fileSystemModule: IFileSystemModule // Added
+	readonly _fileSystemModule: IFileSystemModule
+	readonly _nodeFsService: INodeFsService // Added private field
+	readonly vfs: IVSCodeAPISimulatorVFSHelpers;
 
 	constructor(
 		@inject('ICoreUtilitiesService') private utils: ICoreUtilitiesService,
 		@inject('IEventBusService') private eventBus: IEventBusService,
-		// IMockNodePathService removed from direct injection
 		@inject('IWorkspaceModule') workspaceModule: IWorkspaceModule,
 		@inject('IWindowModule') windowModule: IWindowModule,
 		@inject('ICommandsModule') commandsModule: ICommandsModule,
 		@inject('IEnvModule') envModule: IEnvModule,
 		@inject('IExtensionsModule') extensionsModule: IExtensionsModule,
-		@inject('IFileSystemModule') fileSystemModule: IFileSystemModule, // Injected
+		@inject('IFileSystemModule') fileSystemModule: IFileSystemModule,
+		@inject('INodeFsService') nodeFsService: INodeFsService, // Injected
 	) {
 		this.utils.log(LogLevel.Debug, 'VSCodeAPISimulatorService initializing...')
 		this._workspaceModule = workspaceModule
@@ -101,9 +114,20 @@ export class VSCodeAPISimulatorService implements IVSCodeAPISimulatorService {
 		this._commandsModule = commandsModule
 		this._envModule = envModule
 		this._extensionsModule = extensionsModule
-		this._fileSystemModule = fileSystemModule // Assigned
+		this._fileSystemModule = fileSystemModule
+		this._nodeFsService = nodeFsService // Assigned
+
+		this.vfs = {
+			populate: async (structure: IFileSystemStructure): Promise<void> => {
+				await this._fileSystemModule._fileSystemStateService.populate(structure)
+			},
+			populateSync: (structure: IFileSystemStructure): void => {
+				this._fileSystemModule._fileSystemStateService.populateSync(structure)
+			},
+		}
+
 		this.utils.log(LogLevel.Debug, 'VSCodeAPISimulatorService initialized.')
-	
+
 	}
 
 	// ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
@@ -119,10 +143,10 @@ export class VSCodeAPISimulatorService implements IVSCodeAPISimulatorService {
 	// │  Public API Types, Classes, Enums                                                                │
 	// └──────────────────────────────────────────────────────────────────────────────────────────────────┘
 	get Uri(): IUriService { return this._fileSystemModule.Uri } // Sourced from FileSystemModule
-	get FileSystemError(): MockFileSystemErrorNamespace { return this._workspaceModule.FileSystemError } // WorkspaceModule still exposes this (from _vscCore)
+	get FileSystemError(): typeof LocalFileSystemError { return this._workspaceModule.FileSystemError } // Corrected type hint
 	get FileType(): typeof LocalFileType { return this._workspaceModule.FileType } // WorkspaceModule still exposes this (from _vscCore)
-	get CancellationTokenSource(): typeof vt.CancellationTokenSource { return this._workspaceModule.CancellationTokenSource } // WorkspaceModule still exposes this (from _vscCore)
-	get TextEdit(): TextEditFactory { return LocalTextEdit } // Directly use the imported class/factory
+	get CancellationTokenSource(): typeof LocalCancellationTokenSource { return this._workspaceModule.CancellationTokenSource } // Corrected type hint
+	get TextEdit(): typeof LocalTextEdit { return LocalTextEdit } // Corrected type hint
 
 	get Position(): typeof Position { return Position }
 	get Range(): typeof Range { return Range }
@@ -145,6 +169,13 @@ export class VSCodeAPISimulatorService implements IVSCodeAPISimulatorService {
 	get EndOfLine(): typeof EndOfLine { return EndOfLine }
 
 	// ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+	// │  Public Path Service Accessor (for test helpers)                                                 │
+	// └──────────────────────────────────────────────────────────────────────────────────────────────────┘
+	get path(): IMockNodePathService { return this._fileSystemModule.path }
+	get nodePathService(): IMockNodePathService { return this._fileSystemModule.path; }
+	get nodeFsService(): INodeFsService { return this._nodeFsService; } // Implement getter
+
+	// ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
 	// │  Other Public API Properties                                                                     │
 	// └──────────────────────────────────────────────────────────────────────────────────────────────────┘
 	get version(): string { return 'mock-1.90.0' }
@@ -164,12 +195,16 @@ export class VSCodeAPISimulatorService implements IVSCodeAPISimulatorService {
 		await this._commandsModule.reset()
 		await this._envModule.reset()
 		await this._extensionsModule.reset()
-		await this._fileSystemModule.reset() // Added reset for FileSystemModule
+		await this._fileSystemModule.reset()
+		// Assuming INodeFsService might have a reset method if it becomes stateful
+		// For now, if it's purely delegating to VFSStateService, its state is reset via VFSStateService.
+		// If NodeFsService itself had internal state (e.g. open file descriptors mock), it would need:
+		// await (this._nodeFsService as any)._reset?.()
 
 		this.eventBus.reset()
 
 		this.utils.log(LogLevel.Debug, 'VSCodeAPISimulatorService reset complete.')
-	
+
 	} //<
 
 }

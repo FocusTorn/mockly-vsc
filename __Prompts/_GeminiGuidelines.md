@@ -1,0 +1,1 @@
+C:/Users/slett/.notesHub/globalNotes/Promting/_GeminiGuidelines.md

@@ -4,45 +4,36 @@
         "target": "ES2022",
         "moduleResolution": "NodeNext",
         "module": "NodeNext",
-        
+
         "allowImportingTsExtensions": true,
         // "isolatedModules": true,
         "noEmitOnError": true,
-        
-        
+
+
         "baseUrl": "./",
-        "rootDir": ".",
-        
+        "rootDir": "src",
+
         "emitDeclarationOnly": true,
         "declaration": true,
-        
-        
+        "declarationDir": "dist", // Explicitly set declaration output directory
+
         "esModuleInterop": true,
-        
-        "outDir": "dist",
-        "paths": {
-            
-            "@test/*": ["src/test/*"],
-            "@types/*": ["src/types/*"],
-            "@cmd/*": ["src/core/commands/*"],
-            "@chelp/*": ["src/core/helpers/*"],
-            "@jhelp/*": ["src/helpers/js/*"],
-            "@thelp/*": ["src/helpers/ts/*"]
-        },
-        
+
+        "paths": { },
+
         "types": ["node","vscode", "vitest/globals" ],
         "allowJs": true,
         "strict": true,
         "forceConsistentCasingInFileNames": true,
-        
+
         "sourceMap": true,
         "skipLibCheck": true,
-        
+
         "experimentalDecorators": true,
         "emitDecoratorMetadata": true,
     },
-    
-    "include": [ 
+
+    "include": [
         "src/**/*.ts"],
     "exclude": ["**/*removed*/**/*"]
 

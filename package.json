@@ -41,7 +41,7 @@
     },
     "scripts": {
         "prepublishOnly": "npm run build",
-        "build": "npm run clean && node ./build/ESBuild/esbuild.config.js && npm run build:types",
+        "build": "npm run clean && node ./build/ESBuild/esbuildDual.config.mjs && npm run build:types",
         "build:types": "tsc --emitDeclarationOnly --outDir dist",
         "build:dev": "npm run clean && node ./esbuild.config.mjs --dev",
         "watch": "node ./esbuild.config.mjs --watch",

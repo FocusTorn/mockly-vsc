@@ -23,7 +23,7 @@ When writing tests, any part of your extension code that would normally import a
 
 Imagine you have a function in your extension like this:
 
-```typescript
+~~~typescript
 // In your extension code (e.g., myExtensionUtils.ts)
 import * as vscode from 'vscode';
 
@@ -35,11 +35,11 @@ export async function createAndOpenFile(filePath: string, content: string) {
 	await vscode.window.showTextDocument(document);
 	vscode.window.showInformationMessage(`Opened ${filePath}`);
 }
-```
+~~~
 
 In your test file, you would call this function, and it would automatically use `mockly`'s implementations:
 
-```typescript
+~~~typescript
 // myExtensionUtils.test.ts
 import { mockly, vscodeSimulator } from 'mockly-vsc';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -76,7 +76,7 @@ describe('createAndOpenFile', () => {
 		expect(showMessageSpy).toHaveBeenCalledWith(`Opened ${filePath}`);
 	});
 });
-```
+~~~
 
 ## The `vscodeSimulator` Object (Test Control)
 
@@ -86,7 +86,8 @@ The `vscodeSimulator` object provides utilities specifically for controlling and
 
 - **State Management:**
   - `vscodeSimulator.reset()`: This is arguably the most crucial method. It resets the entire mock VSCode environment to its initial, clean state. This is essential for ensuring test isolation, as it clears all mock workspace folders, open documents, registered commands, queued user interactions, mock file system content, etc. You should typically call this in a `beforeEach` or `afterEach` block in your test suites.
-
+- **Path Utilities:**
+  - `vscodeSimulator.path`: Provides convenient access to an `IMockNodePathService` instance, simulating Node.js `path` module functionalities (e.g., `join`, `normalize`, `basename`). This is useful for string-based path manipulations in test helpers. It should be preferred over accessing `_fileSystemModule._nodePathService`.
 - **Access to Internal Modules/Services (Advanced):**
   For advanced testing scenarios or for verifying internal states of the mock, `vscodeSimulator` provides access to the underlying modules and services that power `mockly`. For example:
   - `vscodeSimulator._workspaceModule`
@@ -98,7 +99,7 @@ The `vscodeSimulator` object provides utilities specifically for controlling and
 
 **Example Usage of `vscodeSimulator`:**
 
-```typescript
+~~~typescript
 import { mockly, vscodeSimulator } from 'mockly-vsc';
 import { beforeEach, describe, expect, it } from 'vitest';
 
@@ -110,6 +111,11 @@ describe('My Extension with Simulator Control', () => {
 
 	it('should start with no workspace folders', () => {
 		expect(mockly.workspace.workspaceFolders).toBeUndefined();
+	});
+
+	it('can use path utilities for test logic', () => {
+		const joinedPath = vscodeSimulator.path.join('my', 'test', 'path.txt');
+		expect(joinedPath).toBe('my/test/path.txt'); // Assuming POSIX mode default
 	});
 
 	it('can access internal services for advanced setup or assertions', async () => {
@@ -146,12 +152,11 @@ describe('My Extension with Simulator Control', () => {
 		expect(actualResponse).toBe(expectedResponse);
 	});
 });
-```
+~~~
 
 ## Architecture Overview (Brief)
 
 Mockly-VSC is built with TypeScript and leverages `tsyringe` (a lightweight dependency injection library from Microsoft) for its internal architecture. This promotes a modular and maintainable codebase by decoupling different parts of the VSCode API simulation (e.g., workspace management, window UI elements, file system).
 
 While you typically won't interact with `tsyringe` directly when using Mockly-VSC, it's the reason for needing the `reflect-metadata` import in your test setup, as `tsyringe` relies on it for metadata reflection.
-
 ---

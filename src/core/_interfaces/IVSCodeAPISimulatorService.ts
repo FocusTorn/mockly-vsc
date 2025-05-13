@@ -1,119 +1,111 @@
 // ESLint & Imports -->>
 
 //= VSCODE TYPES & MOCKED INTERNALS ===========================================================================
-import type * as vt from 'vscode'
-import type { MockFileSystemErrorNamespace, TextEditFactory } from '../../_vscCore/_vscInterfaces.ts'
 import type {
-	Position as LocalPosition,
-	Range as LocalRange,
-	Selection as LocalSelection,
-	Location as LocalLocation,
-	RelativePattern as LocalRelativePattern,
-	Diagnostic as LocalDiagnostic,
-	Disposable as LocalDisposable,
-	EventEmitter as LocalEventEmitter,
-	ThemeColor as LocalThemeColor,
-	ThemeIcon as LocalThemeIcon,
-	TreeItem as LocalTreeItem,
-	WorkspaceEdit as LocalWorkspaceEdit,
+	Position,
+	Range,
+	Selection,
+	Location,
+	RelativePattern,
+	Diagnostic,
+	Disposable,
+	EventEmitter,
+	ThemeColor,
+	ThemeIcon,
+	TreeItem,
+	WorkspaceEdit,
+	CancellationTokenSource,
+	TextEdit,
 } from '../../_vscCore/vscClasses.ts'
 import type {
-	DiagnosticSeverity as LocalDiagnosticSeverity,
-	QuickPickItemKind as LocalQuickPickItemKind,
-	ViewColumn as LocalViewColumn,
-	StatusBarAlignment as LocalStatusBarAlignment,
-	TreeItemCollapsibleState as LocalTreeItemCollapsibleState,
-	UIKind as LocalUIKind,
-	FileType as LocalFileType,
-	EndOfLine as LocalEndOfLine,
+	FileType,
+	DiagnosticSeverity,
+	QuickPickItemKind,
+	ViewColumn,
+	StatusBarAlignment,
+	TreeItemCollapsibleState,
+	UIKind,
+	EndOfLine,
 } from '../../_vscCore/vscEnums.ts'
+import type { FileSystemError } from '../../_vscCore/vscFileSystemError.ts'
 
 //= INJECTED TYPES ============================================================================================
-import type { IWindowModule } from '../../modules/window/_interfaces/IWindowModule.ts'
-import type { IWindowNamespace } from '../../modules/window/_interfaces/IWindowNamespace.ts'
-import type { ICommandsModule } from '../../modules/commands/_interfaces/ICommandsModule.ts'
 import type { ICommandsNamespace } from '../../modules/commands/_interfaces/ICommandsNamespace.ts'
-import type { IEnvModule } from '../../modules/env/_interfaces/IEnvModule.ts'
 import type { IEnvNamespace } from '../../modules/env/_interfaces/IEnvNamespace.ts'
-import type { IExtensionsModule } from '../../modules/extensions/_interfaces/IExtensionsModule.ts'
 import type { IExtensionsNamespace } from '../../modules/extensions/_interfaces/IExtensionsNamespace.ts'
-import type { IWorkspaceModule } from '../../modules/workspace/_interfaces/IWorkspaceModule.ts'
-import type { IWorkspaceNamespace } from '../../modules/workspace/_interfaces/IWorkspaceNamespace.ts'
-import type { IFileSystemModule } from '../../modules/fileSystem/_interfaces/IFileSystemModule.ts'
+import type { IMockNodePathService } from '../../modules/fileSystem/_interfaces/IMockNodePathService.ts'
 import type { IUriService } from '../../modules/fileSystem/_interfaces/IUriService.ts'
+import type { IWindowNamespace } from '../../modules/window/_interfaces/IWindowNamespace.ts'
+import type { IWorkspaceNamespace } from '../../modules/workspace/_interfaces/IWorkspaceNamespace.ts'
+import type { ICommandsModule } from '../../modules/commands/_interfaces/ICommandsModule.ts'
+import type { IEnvModule } from '../../modules/env/_interfaces/IEnvModule.ts'
+import type { IExtensionsModule } from '../../modules/extensions/_interfaces/IExtensionsModule.ts'
+import type { IFileSystemModule } from '../../modules/fileSystem/_interfaces/IFileSystemModule.ts'
+import type { IWindowModule } from '../../modules/window/_interfaces/IWindowModule.ts'
+import type { IWorkspaceModule } from '../../modules/workspace/_interfaces/IWorkspaceModule.ts'
+import type { INodeFsService } from '../../modules/nodeFs/_interfaces/INodeFsService.ts'
+import type { IFileSystemStructure } from '../../modules/fileSystem/_interfaces/IFileSystemStateService.ts'
 
 //--------------------------------------------------------------------------------------------------------------<<
 
-/**
- * Provides the mock implementations for the core VS Code API namespaces
- * like vscode.window, vscode.workspace, vscode.commands, etc.
- * Acts as the main facade for the `mockly.vscode` object, using
- * other services internally to manage state and behavior.
- * Exposes internal modules for testing and state inspection.
- */
-export interface IVSCodeAPISimulatorService {
+export interface IVSCodeAPISimulatorVFSHelpers { //>
+    populate: (structure: IFileSystemStructure) => Promise<void>;
+    populateSync: (structure: IFileSystemStructure) => void;
+    // Future VFS helpers can be added here
+} //<
 
-	// ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
-	// │  Public API Namespaces                                                                           │
-	// └──────────────────────────────────────────────────────────────────────────────────────────────────┘
+export interface IVSCodeAPISimulatorService {
+	// Namespaces
 	readonly workspace: IWorkspaceNamespace
 	readonly window: IWindowNamespace
 	readonly commands: ICommandsNamespace
 	readonly extensions: IExtensionsNamespace
 	readonly env: IEnvNamespace
 
-	// ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
-	// │  Public API Types, Classes, Enums (sourced from _vscCore or specific modules)                    │
-	// └──────────────────────────────────────────────────────────────────────────────────────────────────┘
-	readonly FileSystemError: MockFileSystemErrorNamespace // From _vscCore via WorkspaceModule or FileSystemModule
-	readonly TextEdit: TextEditFactory // From _vscInterfaces via WorkspaceModule or directly
-	readonly Uri: IUriService // From FileSystemModule
+	// Core VSCode Types & Classes (re-exported for convenience)
+	readonly Uri: IUriService // Use the correct service interface type
+	readonly Position: typeof Position
+	readonly Range: typeof Range
+	readonly Selection: typeof Selection
+	readonly Location: typeof Location
+	readonly RelativePattern: typeof RelativePattern
+	readonly Diagnostic: typeof Diagnostic
+	readonly Disposable: typeof Disposable
+	readonly EventEmitter: typeof EventEmitter
+	readonly ThemeColor: typeof ThemeColor
+	readonly ThemeIcon: typeof ThemeIcon
+	readonly TreeItem: typeof TreeItem
+	readonly WorkspaceEdit: typeof WorkspaceEdit
+	readonly CancellationTokenSource: typeof CancellationTokenSource
+	readonly TextEdit: typeof TextEdit
+	readonly FileSystemError: typeof FileSystemError
 
-	readonly FileType: typeof LocalFileType // From _vscCore via WorkspaceModule or FileSystemModule
-	readonly CancellationTokenSource: typeof vt.CancellationTokenSource // From _vscCore via WorkspaceModule
-	readonly Position: typeof LocalPosition // From _vscCore
-	readonly Range: typeof LocalRange // From _vscCore
-	readonly Selection: typeof LocalSelection // From _vscCore
-	readonly Location: typeof LocalLocation // From _vscCore
-	readonly RelativePattern: typeof LocalRelativePattern // From _vscCore
-	readonly Diagnostic: typeof LocalDiagnostic // From _vscCore
-	readonly Disposable: typeof LocalDisposable // From _vscCore
-	readonly EventEmitter: typeof LocalEventEmitter // From _vscCore
-	readonly ThemeColor: typeof LocalThemeColor // From _vscCore
-	readonly ThemeIcon: typeof LocalThemeIcon // From _vscCore
-	readonly TreeItem: typeof LocalTreeItem // From _vscCore
-	readonly WorkspaceEdit: typeof LocalWorkspaceEdit // From _vscCore
-	readonly DiagnosticSeverity: typeof LocalDiagnosticSeverity // From _vscCore
-	readonly QuickPickItemKind: typeof LocalQuickPickItemKind // From _vscCore
-	readonly ViewColumn: typeof LocalViewColumn // From _vscCore
-	readonly StatusBarAlignment: typeof LocalStatusBarAlignment // From _vscCore
-	readonly TreeItemCollapsibleState: typeof LocalTreeItemCollapsibleState // From _vscCore
-	readonly UIKind: typeof LocalUIKind // From _vscCore
-	readonly EndOfLine: typeof LocalEndOfLine // From _vscCore
+	// Core VSCode Enums (re-exported for convenience)
+	readonly FileType: typeof FileType
+	readonly DiagnosticSeverity: typeof DiagnosticSeverity
+	readonly QuickPickItemKind: typeof QuickPickItemKind
+	readonly ViewColumn: typeof ViewColumn
+	readonly StatusBarAlignment: typeof StatusBarAlignment
+	readonly TreeItemCollapsibleState: typeof TreeItemCollapsibleState
+	readonly UIKind: typeof UIKind
+	readonly EndOfLine: typeof EndOfLine
 
-	// ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
-	// │  Other Public API Properties                                                                     │
-	// └──────────────────────────────────────────────────────────────────────────────────────────────────┘
+	// Version
 	readonly version: string
 
-	// ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
-	// │  Internal Module Access (for testing and advanced integration)                                   │
-	// └──────────────────────────────────────────────────────────────────────────────────────────────────┘
-	readonly _commandsModule: ICommandsModule
-	readonly _envModule: IEnvModule
-	readonly _extensionsModule: IExtensionsModule
-	readonly _windowModule: IWindowModule
+	// Internal Modules (for advanced test control and verification)
 	readonly _workspaceModule: IWorkspaceModule
-	readonly _fileSystemModule: IFileSystemModule // Added
+	readonly _windowModule: IWindowModule
+	readonly _commandsModule: ICommandsModule
+	readonly _extensionsModule: IExtensionsModule
+	readonly _envModule: IEnvModule
+	readonly _fileSystemModule: IFileSystemModule
 
-	// ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
-	// │  Methods                                                                                         │
-	// └──────────────────────────────────────────────────────────────────────────────────────────────────┘
+	// Public Path Service Accessor (for test helpers)
+	readonly path: IMockNodePathService
+	readonly nodePathService: IMockNodePathService;
+	readonly nodeFsService: INodeFsService;
+	readonly vfs: IVSCodeAPISimulatorVFSHelpers; // New property
 
-	/**
-	 * Resets the state of all mocked VS Code API components.
-	 * @returns A promise that resolves when the reset is complete.
-	 */
 	reset: () => Promise<void>
-
 }

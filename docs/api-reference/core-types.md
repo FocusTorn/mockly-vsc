@@ -28,7 +28,7 @@ Mockly-VSC uses the `vscode-uri` library internally for URI manipulation and exp
 
 **Example:**
 
-```typescript
+~~~typescript
 import { mockly } from 'mockly-vsc';
 import { describe, expect, it } from 'vitest';
 
@@ -58,7 +58,10 @@ describe('Uri Type Tests', () => {
 		expect(joinedUri.path).toBe('/base/project/src/component.ts');
 	});
 });
-```
+~~~
+
+**Note on Path Manipulation:**
+While `mockly.Uri` is used for creating and managing `Uri` objects (which are expected by many `mockly` API methods), for general string-based path manipulation (like joining path segments as strings, getting basenames, normalizing string paths, etc.) in your test helpers, prefer using `vscodeSimulator.path`. See the [Test Control documentation](/test-control#accessing-path-utilities-with-vscodesimulator-path) for more details on `vscodeSimulator.path`.
 
 ## Positional Types (`Position`, `Range`, `Selection`, `Location`)
 
@@ -76,7 +79,7 @@ These are fundamental types for representing locations and areas within text doc
 
 **Example:**
 
-```typescript
+~~~typescript
 import { mockly } from 'mockly-vsc';
 import { describe, expect, it } from 'vitest';
 
@@ -120,7 +123,7 @@ describe('Positional Types Tests', () => {
 		expect(location.range.isEqual(range)).toBe(true);
 	});
 });
-```
+~~~
 
 ## Eventing Types (`Disposable`, `EventEmitter`)
 
@@ -135,7 +138,7 @@ These are crucial for managing resources and handling events.
 
 **Example:**
 
-```typescript
+~~~typescript
 import { mockly } from 'mockly-vsc';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -180,7 +183,7 @@ describe('Eventing Types Tests', () => {
 		expect(listener2).toHaveBeenCalledTimes(2); // listener2 not called again
 	});
 });
-```
+~~~
 
 ## Cancellation (`CancellationTokenSource`, `CancellationToken`)
 
@@ -196,7 +199,7 @@ Used for signaling that an operation should be cancelled.
 
 **Example:**
 
-```typescript
+~~~typescript
 import { mockly } from 'mockly-vsc';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -223,7 +226,7 @@ describe('Cancellation Token Tests', () => {
 		});
 	});
 });
-```
+~~~
 
 ## Edit Types (`TextEdit`, `WorkspaceEdit`)
 
@@ -243,7 +246,7 @@ Used for describing text changes and file operations.
 
 **Example:**
 
-```typescript
+~~~typescript
 import { mockly, Position, Range } from 'mockly-vsc';
 import { describe, expect, it } from 'vitest';
 
@@ -291,7 +294,7 @@ describe('Edit Types Tests', () => {
 		// The important part is that `applyEdit` handles it.
 	});
 });
-```
+~~~
 
 ## Errors and Enums
 
@@ -317,7 +320,7 @@ Mockly-VSC exposes core error classes like `FileSystemError` and numerous enums 
 
 **Example:**
 
-```typescript
+~~~typescript
 import { FileSystemError, FileType, LogLevel, mockly } from 'mockly-vsc'; // Import specific enums/errors
 import { describe, expect, it } from 'vitest';
 
@@ -350,6 +353,6 @@ describe('Errors and Enums Tests', () => {
 		expect(mockly.ViewColumn.One).toBe(1);
 	});
 });
-```
+~~~
 
 This covers many of the essential core types. For types not explicitly detailed here, they generally follow the structure and behavior of their counterparts in the official `vscode` API, adapted for a mock environment.

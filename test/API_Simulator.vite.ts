@@ -23,6 +23,7 @@ import type { IWindowNamespace } from '../src/modules/window/_interfaces/IWindow
 import type { ICommandsNamespace } from '../src/modules/commands/_interfaces/ICommandsNamespace'
 import type { IEnvNamespace } from '../src/modules/env/_interfaces/IEnvNamespace'
 import type { IExtensionsNamespace } from '../src/modules/extensions/_interfaces/IExtensionsNamespace'
+import type { IMockNodePathService } from '../src/modules/fileSystem/_interfaces/IMockNodePathService'
 
 //= IMPLEMENTATIONS ===========================================================================================
 import { setupWindowTests } from './window/_setup'
@@ -44,6 +45,7 @@ describe('API Sim', () => {
 	let commandsModule: ICommandsModule
 	let envModule: IEnvModule
 	let extensionsModule: IExtensionsModule
+	let pathService: IMockNodePathService // Added for path testing
 	/* eslint-enable unused-imports/no-unused-vars */
 
 	beforeEach(() => { //>
@@ -56,6 +58,7 @@ describe('API Sim', () => {
 		commandsModule = simulator._commandsModule
 		envModule = simulator._envModule
 		extensionsModule = simulator._extensionsModule
+		pathService = simulator._fileSystemModule.path // Get instance for spying
 	
 	}) //<
 
@@ -69,6 +72,7 @@ describe('API Sim', () => {
 			expect(simulator.commands).toBeDefined()
 			expect(simulator.env).toBeDefined()
 			expect(simulator.Uri).toBeDefined()
+			expect(simulator.path).toBeDefined() // Verify path exists
 		
 		}) //<
 
@@ -124,6 +128,7 @@ describe('API Sim', () => {
 
 			// Spy on the Workspace Module's reset method
 			const workspaceModuleResetSpy = vi.spyOn(workspaceModule, 'reset')
+			const fileSystemModuleResetSpy = vi.spyOn(simulator._fileSystemModule, 'reset') // Spy on FileSystemModule reset
 
 			// Act
 			await simulator.reset() // This is also called by setup.afterEach
@@ -135,6 +140,7 @@ describe('API Sim', () => {
 			expect(commandsModuleResetSpy).toHaveBeenCalledOnce()
 			expect(envModuleResetSpy).toHaveBeenCalledOnce()
 			expect(extensionsModuleResetSpy).toHaveBeenCalledOnce()
+			expect(fileSystemModuleResetSpy).toHaveBeenCalledOnce() // Verify FileSystemModule reset is called
 
 
 			// Module resets should call their internal services' reset/clear
@@ -163,6 +169,7 @@ describe('API Sim', () => {
 			commandsModuleResetSpy.mockRestore()
 			envModuleResetSpy.mockRestore()
 			extensionsModuleResetSpy.mockRestore()
+			fileSystemModuleResetSpy.mockRestore() // Restore FileSystemModule spy
 		
 		}) //<
 	
@@ -190,59 +197,75 @@ describe('API Sim', () => {
 		//-----------------------------------------------------------------------------------<<
 
 		it('simulator.workspace should delegate calls to WorkspaceNamespace', async () => { //>
+			// Arrange
 			const fileUri = simulator.Uri.file('/test/delegate-ws.txt')
 			const openTextDocumentSpy = vi.spyOn(workspaceNamespace, 'openTextDocument')
 
+			// Act
 			await simulator.workspace.openTextDocument(fileUri)
 
+			// Assert
 			expect(openTextDocumentSpy).toHaveBeenCalledOnce()
 			expect(openTextDocumentSpy).toHaveBeenCalledWith(fileUri)
 			openTextDocumentSpy.mockRestore()
 		
 		}) //<
 		it('simulator.window should delegate calls to WindowNamespace', async () => { //>
+			// Arrange
 			const fileUri = simulator.Uri.file('/test/delegate-window.txt')
 			await simulator.workspace.fs.writeFile(fileUri, new TextEncoder().encode('test'))
 			const doc = await simulator.workspace.openTextDocument(fileUri)
 			const showTextDocumentSpy = vi.spyOn(windowNamespace, 'showTextDocument')
 
+			// Act
 			await simulator.window.showTextDocument(doc)
 
+			// Assert
 			expect(showTextDocumentSpy).toHaveBeenCalledOnce()
 			expect(showTextDocumentSpy).toHaveBeenCalledWith(doc)
 			showTextDocumentSpy.mockRestore()
 		
 		}) //<
 		it('simulator.commands should delegate calls to CommandsNamespace', async () => { //>
+			// Arrange
 			const cmdId = 'test.delegateCommand'
 			const handler = vi.fn()
 			const registerCommandSpy = vi.spyOn(commandsNamespace, 'registerCommand')
 
+			// Act
 			simulator.commands.registerCommand(cmdId, handler, undefined)
 
+			// Assert
 			expect(registerCommandSpy).toHaveBeenCalledOnce()
 			expect(registerCommandSpy).toHaveBeenCalledWith(cmdId, handler, undefined)
 			registerCommandSpy.mockRestore()
 		
 		}) //<
 		it('simulator.env should delegate calls to EnvNamespace', async () => { //>
+			// Arrange
 			const testText = 'delegate clipboard test'
 			const writeTextSpy = vi.spyOn(envNamespace.clipboard, 'writeText')
 
+			// Act
 			await simulator.env.clipboard.writeText(testText)
 
+			// Assert
 			expect(writeTextSpy).toHaveBeenCalledOnce()
 			expect(writeTextSpy).toHaveBeenCalledWith(testText)
 			writeTextSpy.mockRestore()
 		
 		}) //<
 		it('simulator.extensions should delegate calls to ExtensionsNamespace', async () => { //>
+			// Arrange
 			const testExtension: any = { id: 'test.extension', packageJSON: {}, isActive: false, extensionUri: simulator.Uri.file('/ext'), extensionPath: '/ext/', exports: undefined, activate: async () => {} }
 			extensionsModule._extensionsService._addExtension(testExtension) // Use internal service to add
 
 			const getExtensionSpy = vi.spyOn(extensionsNamespace, 'getExtension')
+
+			// Act
 			const result = simulator.extensions.getExtension(testExtension.id)
 
+			// Assert
 			expect(getExtensionSpy).toHaveBeenCalledOnce()
 			expect(getExtensionSpy).toHaveBeenCalledWith(testExtension.id)
 			expect(result).toBe(testExtension)
@@ -250,15 +273,95 @@ describe('API Sim', () => {
 		
 		}) //<
 		it('window.showTextDocument should call workspace.openTextDocument', async () => { //>
+			// Arrange
 			const fileUri = simulator.Uri.file('/test/window-calls-workspace.txt')
 			await simulator.workspace.fs.writeFile(fileUri, new TextEncoder().encode('content'))
 			const openTextDocumentSpy = vi.spyOn(workspaceNamespace, 'openTextDocument')
 
+			// Act
 			await simulator.window.showTextDocument(fileUri)
 
+			// Assert
 			expect(openTextDocumentSpy).toHaveBeenCalledOnce()
 			expect(openTextDocumentSpy).toHaveBeenCalledWith(fileUri)
 			openTextDocumentSpy.mockRestore()
+		
+		}) //<
+	
+	}) //<
+
+	describe('Path Accessor (simulator.path)', () => { //>
+		it('should provide access to the path service', () => { //>
+			// Assert
+			expect(simulator.path).toBeDefined()
+			expect(simulator.path).toBe(pathService) // Check if it's the same instance
+			expect(typeof simulator.path.join).toBe('function')
+			expect(typeof simulator.path.normalize).toBe('function')
+			expect(typeof simulator.path.basename).toBe('function')
+			expect(typeof simulator.path.dirname).toBe('function')
+			expect(typeof simulator.path.relative).toBe('function')
+			expect(typeof simulator.path.resolve).toBe('function')
+			expect(simulator.path.sep).toBeDefined()
+			expect(simulator.path.delimiter).toBeDefined()
+			expect(simulator.path.posix).toBeDefined()
+			expect(simulator.path.win32).toBeDefined()
+		
+		}) //<
+
+		it('should delegate calls to the underlying path service', () => { //>
+			// Arrange
+			const joinSpy = vi.spyOn(pathService, 'join')
+			const normalizeSpy = vi.spyOn(pathService, 'normalize')
+			const basenameSpy = vi.spyOn(pathService, 'basename')
+
+			// Act
+			simulator.path.join('a', 'b', 'c')
+			simulator.path.normalize('/a/b/../c')
+			simulator.path.basename('/a/b/file.txt', '.txt')
+
+			// Assert
+			expect(joinSpy).toHaveBeenCalledOnce()
+			expect(joinSpy).toHaveBeenCalledWith('a', 'b', 'c')
+			expect(normalizeSpy).toHaveBeenCalledOnce()
+			expect(normalizeSpy).toHaveBeenCalledWith('/a/b/../c')
+			expect(basenameSpy).toHaveBeenCalledOnce()
+			expect(basenameSpy).toHaveBeenCalledWith('/a/b/file.txt', '.txt')
+
+			// Cleanup
+			joinSpy.mockRestore()
+			normalizeSpy.mockRestore()
+			basenameSpy.mockRestore()
+		
+		}) //<
+
+		it('should return correct results for basic path operations (posix mode)', () => { //>
+			// Arrange (ensure posix mode if necessary, though it's default)
+			pathService.setMode('posix')
+
+			// Act & Assert
+			expect(simulator.path.join('/foo', 'bar', 'baz/asdf', 'quux', '..')).toBe('/foo/bar/baz/asdf')
+			expect(simulator.path.normalize('/foo/bar//baz/asdf/quux/..')).toBe('/foo/bar/baz/asdf')
+			expect(simulator.path.basename('/foo/bar/baz/asdf/quux.html')).toBe('quux.html')
+			expect(simulator.path.basename('/foo/bar/baz/asdf/quux.html', '.html')).toBe('quux')
+			expect(simulator.path.dirname('/foo/bar/baz/asdf/quux.html')).toBe('/foo/bar/baz/asdf')
+			expect(simulator.path.sep).toBe('/')
+		
+		}) //<
+
+		it('should return correct results for basic path operations (win32 mode)', () => { //>
+			// Arrange
+			pathService.setMode('win32')
+
+			// Act & Assert
+			expect(simulator.path.join('C:\\foo', 'bar', 'baz\\asdf', 'quux', '..')).toBe('C:\\foo\\bar\\baz\\asdf')
+			expect(simulator.path.normalize('C:\\foo\\bar\\\\baz\\asdf\\quux\\..')).toBe('C:\\foo\\bar\\baz\\asdf')
+			expect(simulator.path.basename('C:\\foo\\bar\\baz\\asdf\\quux.html')).toBe('quux.html')
+			expect(simulator.path.basename('C:\\foo\\bar\\baz\\asdf\\quux.html', '.html')).toBe('quux')
+			expect(simulator.path.dirname('C:\\foo\\bar\\baz\\asdf\\quux.html')).toBe('C:\\foo\\bar\\baz\\asdf')
+			expect(simulator.path.sep).toBe('\\')
+
+			// Cleanup - Reset to default mode after test
+			pathService.setMode('posix')
 		
 		}) //<
 	

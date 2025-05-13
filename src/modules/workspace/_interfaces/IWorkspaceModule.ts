@@ -4,6 +4,7 @@
 import type * as vt from 'vscode'
 import type { MockFileSystemErrorNamespace } from '../../../_vscCore/_vscInterfaces.ts'
 import type { CancellationTokenSource } from '../../../_vscCore/vscClasses.ts'
+import type { FileSystemError as LocalFileSystemError } from '../../../_vscCore/vscFileSystemError.ts'
 import type { FileType } from '../../../_vscCore/vscEnums.ts'
 
 //= INJECTED TYPES ============================================================================================
@@ -31,7 +32,7 @@ export interface IWorkspaceModule {
 	// Expose necessary types/enums/classes that are part of the workspace namespace or closely related
 	// These are typically accessed via `vscode.Uri`, `vscode.FileType`, etc.
 	readonly Uri: IUriService
-	readonly FileSystemError: MockFileSystemErrorNamespace
+	readonly FileSystemError: typeof LocalFileSystemError // Corrected type to the actual class constructor
 	readonly FileType: typeof FileType
 	readonly CancellationTokenSource: typeof CancellationTokenSource
 	// Removed: readonly TextEdit: TextEditFactory // TextEdit class should be exposed by the simulator directly
