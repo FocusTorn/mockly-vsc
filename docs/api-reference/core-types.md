@@ -61,7 +61,7 @@ describe('Uri Type Tests', () => {
 ~~~
 
 **Note on Path Manipulation:**
-While `mockly.Uri` is used for creating and managing `Uri` objects (which are expected by many `mockly` API methods), for general string-based path manipulation (like joining path segments as strings, getting basenames, normalizing string paths, etc.) in your test helpers, prefer using `vscodeSimulator.path`. See the [Test Control documentation](/test-control#accessing-path-utilities-with-vscodesimulator-path) for more details on `vscodeSimulator.path`.
+While `mockly.Uri` is used for creating and managing `Uri` objects (which are expected by many `mockly` API methods), for general string-based path manipulation (like joining path segments as strings, getting basenames, normalizing string paths, etc.) in your test helpers, prefer using `vscodeSimulator.path` or `mockly.node.path`. See the [Path Manipulation section in Test Control](/test-control#path-manipulation-mockly-node-path-and-vscodesimulator-path) for more details.
 
 ## Positional Types (`Position`, `Range`, `Selection`, `Location`)
 

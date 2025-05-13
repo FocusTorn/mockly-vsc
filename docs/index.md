@@ -27,9 +27,12 @@ features:
   - icon: 💡
     title: Comprehensive API Mocking
     details: Faithfully simulates `vscode.workspace`, `vscode.window`, `vscode.commands`, `vscode.env`, and `vscode.extensions`, providing a realistic testing ground.
+  - icon: 📦
+    title: Node.js Utilities
+    details: Includes mocks for Node.js `path` and `fs` modules (`mockly.node.path`, `mockly.node.fs`) for testing extensions that use them directly.
   - icon: 🛠️
     title: Realistic Editor Simulation
-    details: Features an in-memory file system, full text document and editor lifecycle management, and accurate event simulation.
+    details: Features an in-memory file system with easy population (`vscodeSimulator.vfs.populateSync`), full text document and editor lifecycle management, and accurate event simulation.
   - icon: 🎮
     title: Robust Test Control
     details: Easily manage and reset the mock environment's state between tests using `vscodeSimulator.reset()` for perfect test isolation.

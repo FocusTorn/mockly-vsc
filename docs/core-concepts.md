@@ -10,14 +10,15 @@ When writing tests, any part of your extension code that would normally import a
 
 **Key Characteristics:**
 
-- **API Parity:** Strives to mirror the properties, methods, and events of the official `vscode` namespace. While not every single API member might be implemented, the most commonly used and essential ones are covered.
-- **Namespaces:** Provides access to mocked namespaces, including:
-  - `mockly.workspace`
-  - `mockly.window`
-  - `mockly.commands`
-  - `mockly.env`
-  - `mockly.extensions`
-- **Core Types:** Exposes mock implementations of core VSCode types such as `mockly.Uri`, `mockly.Position`, `mockly.Range`, `mockly.Selection`, `mockly.Disposable`, `mockly.EventEmitter`, `mockly.CancellationTokenSource`, various enums (e.g., `mockly.FileType`, `mockly.LogLevel`), and more.
+-   **API Parity:** Strives to mirror the properties, methods, and events of the official `vscode` namespace. While not every single API member might be implemented, the most commonly used and essential ones are covered.
+-   **Namespaces:** Provides access to mocked namespaces, including:
+    -   `mockly.workspace`
+    -   `mockly.window`
+    -   `mockly.commands`
+    -   `mockly.env`
+    -   `mockly.extensions`
+    -   `mockly.node` (for Node.js `fs` and `path` mocks)
+-   **Core Types:** Exposes mock implementations of core VSCode types such as `mockly.Uri`, `mockly.Position`, `mockly.Range`, `mockly.Selection`, `mockly.Disposable`, `mockly.EventEmitter`, `mockly.CancellationTokenSource`, various enums (e.g., `mockly.FileType`, `mockly.LogLevel`), and more.
 
 **Example Usage:**
 
@@ -84,18 +85,20 @@ The `vscodeSimulator` object provides utilities specifically for controlling and
 
 **Key Characteristics:**
 
-- **State Management:**
-  - `vscodeSimulator.reset()`: This is arguably the most crucial method. It resets the entire mock VSCode environment to its initial, clean state. This is essential for ensuring test isolation, as it clears all mock workspace folders, open documents, registered commands, queued user interactions, mock file system content, etc. You should typically call this in a `beforeEach` or `afterEach` block in your test suites.
-- **Path Utilities:**
-  - `vscodeSimulator.path`: Provides convenient access to an `IMockNodePathService` instance, simulating Node.js `path` module functionalities (e.g., `join`, `normalize`, `basename`). This is useful for string-based path manipulations in test helpers. It should be preferred over accessing `_fileSystemModule._nodePathService`.
-- **Access to Internal Modules/Services (Advanced):**
-  For advanced testing scenarios or for verifying internal states of the mock, `vscodeSimulator` provides access to the underlying modules and services that power `mockly`. For example:
-  - `vscodeSimulator._workspaceModule`
-  - `vscodeSimulator._windowModule`
-  - `vscodeSimulator._commandsModule`
-  - `vscodeSimulator._fileSystemModule`
-  - And through these modules, access to their respective internal services (e.g., `_workspaceModule._textDocumentService`, `_windowModule._userInteractionService`).
-    This allows for fine-grained control and assertions if needed. However, prefer using the public `mockly` API for interactions whenever possible to avoid tests becoming brittle to internal changes.
+-   **State Management:**
+    -   `vscodeSimulator.reset()`: This is arguably the most crucial method. It resets the entire mock VSCode environment to its initial, clean state. This is essential for ensuring test isolation, as it clears all mock workspace folders, open documents, registered commands, queued user interactions, mock file system content, etc. You should typically call this in a `beforeEach` or `afterEach` block in your test suites.
+-   **VFS Population Utilities (`vscodeSimulator.vfs`)**:
+    Offers `populate(structure)` and `populateSync(structure)` methods to declaratively set up the virtual file system with a predefined structure of files and directories. This simplifies test setup significantly.
+-   **Path Utilities (`vscodeSimulator.path`)**:
+    Provides convenient access to an `IMockNodePathService` instance, simulating Node.js `path` module functionalities (e.g., `join`, `normalize`, `basename`). This is useful for string-based path manipulations in test helpers. It is the same instance as `mockly.node.path` (which is intended for testing extension code that uses Node's `path`).
+-   **Access to Internal Modules/Services (Advanced):**
+    For advanced testing scenarios or for verifying internal states of the mock, `vscodeSimulator` provides access to the underlying modules and services that power `mockly`. For example:
+    -   `vscodeSimulator._workspaceModule`
+    -   `vscodeSimulator._windowModule`
+    -   `vscodeSimulator._commandsModule`
+    -   `vscodeSimulator._fileSystemModule`
+    -   And through these modules, access to their respective internal services (e.g., `_workspaceModule._textDocumentService`, `_windowModule._userInteractionService`).
+        This allows for fine-grained control and assertions if needed. However, prefer using the public `mockly` API for interactions whenever possible to avoid tests becoming brittle to internal changes.
 
 **Example Usage of `vscodeSimulator`:**
 
@@ -113,6 +116,14 @@ describe('My Extension with Simulator Control', () => {
 		expect(mockly.workspace.workspaceFolders).toBeUndefined();
 	});
 
+    it('can populate the VFS for setup', () => {
+        vscodeSimulator.vfs.populateSync({
+            '/my/project/file.txt': 'Initial content',
+            '/my/project/data/': null
+        });
+        expect(mockly.node.fs.existsSync('/my/project/file.txt')).toBe(true);
+    });
+
 	it('can use path utilities for test logic', () => {
 		const joinedPath = vscodeSimulator.path.join('my', 'test', 'path.txt');
 		expect(joinedPath).toBe('my/test/path.txt'); // Assuming POSIX mode default
@@ -123,7 +134,8 @@ describe('My Extension with Simulator Control', () => {
 
 		// Directly use an internal service to set up workspace state
 		// Note: Adding a folder requires it to exist in the mock file system first.
-		await vscodeSimulator._fileSystemModule.fs.createDirectory(testUri); // Create the directory using the public FS API
+        // We can use vfs.populateSync for that:
+        vscodeSimulator.vfs.populateSync({ '/my/project': null });
 
 		// Now use the internal service to add it as a workspace folder
 		await vscodeSimulator._workspaceModule._workspaceStateService.addWorkspaceFolder(

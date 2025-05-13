@@ -11,7 +11,7 @@ Let's say you have a command in your extension that creates a new file with some
 **Extension Code Snippet (Conceptual):**
 Assume you have a function like this in your extension:
 
-```typescript
+~~~typescript
 // src/myFileCommands.ts
 import * as vscode from 'vscode';
 
@@ -36,11 +36,11 @@ export async function createFileWithDefaultContentCommand() {
 		vscode.window.showErrorMessage(`Failed to create file: ${error.message || error}`);
 	}
 }
-```
+~~~
 
 **Test Code (`test/myFileCommands.test.ts`):**
 
-```typescript
+~~~typescript
 import { FileType, mockly, vscodeSimulator } from 'mockly-vsc';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 // Assuming createFileWithDefaultContentCommand is exported from your extension code
@@ -53,9 +53,12 @@ describe('createFileWithDefaultContentCommand', () => {
 		await vscodeSimulator.reset();
 
 		// Setup a workspace folder for the command to use
+		// The directory for the workspace folder must exist in the VFS.
+        // We can use vfs.populateSync for this:
+        vscodeSimulator.vfs.populateSync({
+            '/project-root': null // Creates the directory
+        });
 		const workspaceUri = mockly.Uri.file('/project-root');
-		// Ensure the directory exists in the mock file system
-		await vscodeSimulator._fileSystemModule.fs.createDirectory(workspaceUri);
 		// Add it as a workspace folder
 		await vscodeSimulator._workspaceModule._workspaceStateService.addWorkspaceFolder(
 			workspaceUri,
@@ -116,7 +119,7 @@ describe('createFileWithDefaultContentCommand', () => {
 		// (This depends on how robust the check in the command is; if it doesn't check workspace.fs directly)
 	});
 });
-```
+~~~
 
 ## Example 2: Simulating User Input via Quick Pick
 
@@ -124,7 +127,7 @@ Testing a function that asks the user for a choice using `window.showQuickPick`.
 
 **Extension Code Snippet (Conceptual):**
 
-```typescript
+~~~typescript
 // src/myUserInteractions.ts
 import * as vscode from 'vscode';
 
@@ -141,11 +144,11 @@ export async function askUserForFruitPreference(): Promise<string | undefined> {
 	}
 	return selection;
 }
-```
+~~~
 
 **Test Code (`test/myUserInteractions.test.ts`):**
 
-```typescript
+~~~typescript
 import { mockly, vscodeSimulator } from 'mockly-vsc';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { askUserForFruitPreference } from '../src/myUserInteractions';
@@ -200,7 +203,7 @@ describe('askUserForFruitPreference', () => {
 		expect(infoSpy).not.toHaveBeenCalled();
 	});
 });
-```
+~~~
 
 ## Example 3: Reading a Configuration File from the Workspace
 
@@ -208,7 +211,7 @@ Testing a function that reads a specific configuration file (e.g., `.mytoolrc`) 
 
 **Extension Code Snippet (Conceptual):**
 
-```typescript
+~~~typescript
 // src/myConfigReader.ts
 import * as vscode from 'vscode';
 
@@ -239,23 +242,28 @@ export async function readMyToolConfig(): Promise<MyConfig | null> {
 		throw error; // Re-throw unexpected errors
 	}
 }
-```
+~~~
 
 **Test Code (`test/myConfigReader.test.ts`):**
 
-```typescript
+~~~typescript
 import { mockly, vscodeSimulator } from 'mockly-vsc';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { MyConfig, readMyToolConfig } from '../src/myConfigReader';
 
 describe('readMyToolConfig', () => {
-	const workspaceUri = mockly.Uri.file('/project');
-	const configFileUri = mockly.Uri.joinPath(workspaceUri, '.mytoolrc');
+	const workspacePath = '/project';
+	const workspaceUri = mockly.Uri.file(workspacePath);
+	const configFileName = '.mytoolrc';
+	const configFileUri = mockly.Uri.joinPath(workspaceUri, configFileName);
 
 	beforeEach(async () => {
 		await vscodeSimulator.reset();
-		// Setup workspace folder
-		await vscodeSimulator._fileSystemModule.fs.createDirectory(workspaceUri);
+		// Setup workspace folder and VFS.
+        // vfs.populateSync can create the directory for the workspace.
+        vscodeSimulator.vfs.populateSync({
+            [workspacePath]: null
+        });
 		await vscodeSimulator._workspaceModule._workspaceStateService.addWorkspaceFolder(workspaceUri);
 	});
 
@@ -265,9 +273,13 @@ describe('readMyToolConfig', () => {
 
 	it('should read and parse the config file if it exists and is valid JSON', async () => {
 		const configContent: MyConfig = { settingA: true, settingB: 'customValue' };
-		await mockly.workspace.fs.writeFile(configFileUri, Buffer.from(JSON.stringify(configContent)));
-		const warningSpy = vi.spyOn(mockly.window, 'showWarningMessage');
+        // Use vfs.populateSync to add the config file for this specific test case
+        vscodeSimulator.vfs.populateSync({
+            [configFileUri.path]: JSON.stringify(configContent)
+        });
+		// Or use: await mockly.workspace.fs.writeFile(configFileUri, Buffer.from(JSON.stringify(configContent)));
 
+		const warningSpy = vi.spyOn(mockly.window, 'showWarningMessage');
 		const result = await readMyToolConfig();
 
 		expect(result).toEqual(configContent);
@@ -275,10 +287,8 @@ describe('readMyToolConfig', () => {
 	});
 
 	it('should return null and show warning if config file does not exist', async () => {
-		// Ensure file does not exist (reset does this, but good to be explicit if needed)
-		// await mockly.workspace.fs.delete(configFileUri).catch(() => {});
+		// Ensure file does not exist (reset + selective population in beforeEach handles this)
 		const warningSpy = vi.spyOn(mockly.window, 'showWarningMessage');
-
 		const result = await readMyToolConfig();
 
 		expect(result).toBeNull();
@@ -286,9 +296,12 @@ describe('readMyToolConfig', () => {
 	});
 
 	it('should return null and show warning if config file is invalid JSON', async () => {
-		await mockly.workspace.fs.writeFile(configFileUri, Buffer.from('this is not json'));
+		// Use vfs.populateSync to create an invalid JSON file
+        vscodeSimulator.vfs.populateSync({
+            [configFileUri.path]: 'this is not json'
+        });
+		// Or use: await mockly.workspace.fs.writeFile(configFileUri, Buffer.from('this is not json'));
 		const warningSpy = vi.spyOn(mockly.window, 'showWarningMessage');
-
 		const result = await readMyToolConfig();
 
 		expect(result).toBeNull();
@@ -298,13 +311,107 @@ describe('readMyToolConfig', () => {
 	it('should return null and show error if no workspace folder is open', async () => {
 		await vscodeSimulator.reset(); // No workspace folder
 		const errorSpy = vi.spyOn(mockly.window, 'showErrorMessage');
-
 		const result = await readMyToolConfig();
 
 		expect(result).toBeNull();
 		expect(errorSpy).toHaveBeenCalledWith('No workspace folder found to look for .mytoolrc.');
 	});
 });
-```
+~~~
+
+## Example 4: Testing Extension Code Using Node.js `fs` and `path`
+
+This example demonstrates testing an extension function that uses Node.js `fs` (synchronous methods) and `path` modules, mocked by `mockly.node.fs` and `mockly.node.path` respectively. We'll use `vscodeSimulator.vfs.populateSync` for easy test setup.
+
+**Extension Code Snippet (Conceptual):**
+
+~~~typescript
+// src/nodeFsUtils.ts
+import * as fs from 'fs'; // In extension, this is actual Node.js fs
+import * as path from 'path'; // In extension, this is actual Node.js path
+
+export function analyzeProjectFile(projectDir: string, fileName: string): string {
+	const filePath = path.join(projectDir, fileName);
+
+	if (!fs.existsSync(filePath)) {
+		return `File not found: ${fileName}`;
+	}
+
+	const stats = fs.statSync(filePath);
+	if (stats.isDirectory()) {
+		return `${fileName} is a directory.`;
+	}
+
+	const content = fs.readFileSync(filePath, 'utf-8');
+	if (content.includes('ERROR')) {
+		return `File ${fileName} contains errors. Size: ${stats.size} bytes.`;
+	}
+
+	return `File ${fileName} is OK. Size: ${stats.size} bytes.`;
+}
+~~~
+
+**Test Code (`test/nodeFsUtils.test.ts`):**
+
+~~~typescript
+import { mockly, vscodeSimulator } from 'mockly-vsc';
+// In your test, your extension code (analyzeProjectFile) will automatically use
+// mockly.node.fs and mockly.node.path due to the test environment.
+import { analyzeProjectFile } from '../src/nodeFsUtils';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+describe('analyzeProjectFile with mockly.node.fs and mockly.node.path', () => {
+	const projectDir = '/usr/app';
+
+	beforeEach(async () => {
+		await vscodeSimulator.reset();
+		// Populate the VFS using the new utility
+		vscodeSimulator.vfs.populateSync({
+			[`${projectDir}/main.ts`]: 'console.log("OK");',
+			[`${projectDir}/errors.log`]: 'CRITICAL ERROR: System failure.',
+			[`${projectDir}/src`]: null, // A directory
+		});
+	});
+
+	afterEach(() => {
+		vi.restoreAllMocks();
+	});
+
+	it('should report OK for a valid file', () => {
+		const result = analyzeProjectFile(projectDir, 'main.ts');
+		// Size of 'console.log("OK");' is 17
+		expect(result).toBe('File main.ts is OK. Size: 17 bytes.');
+	});
+
+	it('should report error content for a file containing "ERROR"', () => {
+		const result = analyzeProjectFile(projectDir, 'errors.log');
+		// Size of 'CRITICAL ERROR: System failure.' is 30
+		expect(result).toBe('File errors.log contains errors. Size: 30 bytes.');
+	});
+
+	it('should report if a path is a directory', () => {
+		const result = analyzeProjectFile(projectDir, 'src');
+		expect(result).toBe('src is a directory.');
+	});
+
+	it('should report if a file is not found', () => {
+		const result = analyzeProjectFile(projectDir, 'nonexistent.js');
+		expect(result).toBe('File not found: nonexistent.js');
+	});
+
+	it('demonstrates using mockly.node.fs directly in test for setup (alternative)', () => {
+		// This shows using mockly.node.fs for setup, though populateSync is often easier.
+		const tempFilePath = mockly.node.path.join(projectDir, 'temp.txt');
+		mockly.node.fs.writeFileSync(tempFilePath, 'Temporary content');
+
+		const stats = mockly.node.fs.statSync(tempFilePath);
+		expect(stats.isFile()).toBe(true);
+		expect(stats.size).toBe(17);
+
+		mockly.node.fs.rmSync(tempFilePath);
+		expect(mockly.node.fs.existsSync(tempFilePath)).toBe(false);
+	});
+});
+~~~
 
 These examples should provide a good starting point for testing various aspects of your VSCode extension with Mockly-VSC. Remember to adapt them to your specific extension's logic and structure.
