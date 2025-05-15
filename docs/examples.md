@@ -2,7 +2,7 @@
 
 This section provides practical examples demonstrating how to use Mockly-VSC to test common VSCode extension scenarios. These examples showcase how different parts of the `mockly` API and `vscodeSimulator` work together.
 
-For API-specific examples, please refer to the individual pages in the [API Reference](./api-reference/).
+For API-specific examples, please refer to the individual pages in the [API Reference](./api-reference/workspace).
 
 ## Example 1: Testing a Command that Creates and Opens a File
 
