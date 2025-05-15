@@ -15,7 +15,7 @@ import type { IEventBusService } from '../../../core/_interfaces/IEventBusServic
 
 //--------------------------------------------------------------------------------------------------------------<<
 
-export class TextDocument implements vt.TextDocument {
+export class TextDocument implements vt.TextDocument { //>
 
 	// ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
 	// │  PROPERTIES                                                                                      │
@@ -28,25 +28,28 @@ export class TextDocument implements vt.TextDocument {
 	private _lines: string[] = []
 
 	readonly uri: vt.Uri
-	fileName: string // Made mutable for potential rename operations if URI is not changed directly
-	isUntitled: boolean // Made mutable
-	languageId: string // Made mutable
+	fileName: string
+	isUntitled: boolean
+	languageId: string
 	readonly eol: vt.EndOfLine = EndOfLine.LF
+	readonly encoding: string = 'utf8'; // ADDED
 	private _linesInitialized: boolean = false
 
-	constructor(
+	constructor( //>
 		uri: vt.Uri,
 		initialContent: string,
 		languageId: string = 'plaintext',
 		private utils: ICoreUtilitiesService,
 		private eventBus?: IEventBusService,
+		// encoding: string = 'utf8' // Optional: if encoding can be set at construction
 	) {
 		this.uri = uri
-		this.fileName = uri.fsPath 
+		this.fileName = uri.fsPath
 		this.isUntitled = uri.scheme === 'untitled'
 		this.languageId = languageId
+		// this.encoding = encoding; // If passed in constructor
 		this._updateContentInternal(initialContent, false)
-	}
+	} //<
 
 	// ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
 	// │  GET / SET                                                                                       │

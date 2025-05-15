@@ -15,7 +15,7 @@ import { TextEncoder, TextDecoder } from 'util'
 //= INJECTED TYPES ============================================================================================
 import type { ICoreUtilitiesService } from '../../../core/_interfaces/ICoreUtilitiesService.ts'
 import type { IFileSystemStateService, IVirtualFSNode, IAddNodeOptions, IPasteOptions, IFileSystemStructure, IFileSystemPopulateEntry } from '../_interfaces/IFileSystemStateService.ts'
-import type { IMockNodePathService } from '../_interfaces/IMockNodePathService.ts'
+import type { IMockNodePathService } from '../../nodePath/_interfaces/IMockNodePathService.ts'
 
 //--------------------------------------------------------------------------------------------------------------<<
 
@@ -733,8 +733,8 @@ export class FileSystemStateService implements IFileSystemStateService {
 	// ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
 	// │  Methods (Sync)                                                                                  │
 	// └──────────────────────────────────────────────────────────────────────────────────────────────────┘
-
-	getNodeSync(path: string | Uri): IVirtualFSNode | undefined { //>
+	
+    getNodeSync(path: string | Uri): IVirtualFSNode | undefined { //>
 		const uri = this._pathToUri(path)
 		this.utils.log(LogLevel.Trace, `VFSState: getNodeSync called for: ${uri.toString()}`)
 		return this._findNode(uri) // _findNode is already synchronous
@@ -1210,27 +1210,24 @@ export class FileSystemStateService implements IFileSystemStateService {
 
 	private _pathToUri(path: string | Uri): Uri { //>
 		if (typeof path === 'string') {
-			if (/^[a-z][a-z0-9+.-]*:/i.test(path)) { // Check if it looks like a URI scheme
+			// Use normalize instead of resolve to keep trailing slashes for directories,
+			// which helps consistency with how paths might be queried.
+			const normalizedStrPath = this.pathService.normalize(path);
+			if (/^[a-z][a-z0-9+.-]*:/i.test(normalizedStrPath)) {
 				try {
-					return Uri.parse(path, true) // Strict parsing
-				
+					return Uri.parse(normalizedStrPath, true)
 				}
 				catch (e) {
-					this.utils.warn(`VFSState: Failed to parse potential URI string '${path}', assuming file path. Error: ${e}`)
-					return Uri.file(this.pathService.resolve(path)) // Fallback to file path
-				
+					this.utils.warn(`VFSState: Failed to parse potential URI string '${normalizedStrPath}', assuming file path. Error: ${e}`)
+					return Uri.file(normalizedStrPath)
 				}
-			
 			}
 			else {
-				return Uri.file(this.pathService.resolve(path)) // Assume file path
-			
+				return Uri.file(normalizedStrPath)
 			}
-		
 		}
-		// Ensure path component of Uri is normalized
+		// Ensure path component of Uri is normalized if it's already a Uri object
 		return path.with({ path: this.pathService.normalize(path.path) })
-	
 	} //<
 
 	private _createDirectoryNodeInternal(fullPath: string, parent: IVirtualFSNode | null, options?: IAddNodeOptions): IVirtualFSNode { //>

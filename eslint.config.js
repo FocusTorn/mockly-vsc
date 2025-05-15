@@ -40,11 +40,14 @@ const focusTornConfig = {
 		'no-unused-vars': 'off',
 		'require-resolve-not-external': 'off',
 
+        
+        
+        
 		//= ANTFU =============================================================================================
 		'antfu/curly': 'off',
 
 		//= ESLINT-PLUGIN-IMPORT ==============================================================================
-		'import/newline-after-import': ['error', { count: 1, exactCount: true, considerComments: true }],
+		// 'import/newline-after-import': ['error', { count: 1, exactCount: true, considerComments: true }],
 
 		//= JSONC ============================================================================================= 
 		// 'jsonc/indent': ['warn', 4],

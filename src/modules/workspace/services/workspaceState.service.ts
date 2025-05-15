@@ -15,7 +15,7 @@ import type { ICoreUtilitiesService } from '../../../core/_interfaces/ICoreUtili
 //= IMPLEMENTATION TYPES ======================================================================================
 import { WorkspaceType } from '../_interfaces/IWorkspaceStateService.ts'
 import type { IFileSystemService } from 'src/modules/fileSystem/_interfaces/IFileSystemService.ts'
-import type { IMockNodePathService } from 'src/modules/fileSystem/_interfaces/IMockNodePathService.ts'
+import type { IMockNodePathService } from 'src/modules/nodePath/_interfaces/IMockNodePathService.ts'
 
 //--------------------------------------------------------------------------------------------------------------<<
 

@@ -3,7 +3,6 @@
 //= INJECTED TYPES ============================================================================================
 import type { IFileSystemService } from './IFileSystemService.ts'
 import type { IUriService } from './IUriService.ts'
-import type { IMockNodePathService } from './IMockNodePathService.ts'
 import type { IFileSystemStateService } from './IFileSystemStateService.ts'
 
 //--------------------------------------------------------------------------------------------------------------<<
@@ -28,10 +27,6 @@ export interface IFileSystemModule {
 	 */
 	readonly Uri: IUriService
 
-	/**
-	 * The mock Node.js `path` module service.
-	 */
-	readonly path: IMockNodePathService
 
 	// ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
 	// │  Methods                                                                                         │

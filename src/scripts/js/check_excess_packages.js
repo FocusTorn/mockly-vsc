@@ -10,9 +10,12 @@ const ignoreDirs = ['dist', 'dll', 'release', 'src/dist']
 const ignoreMatches = [
     'wireit',
     'gulp',
+    'rimraf',
 
     //- TYPESCRIPT HELPERS --------------------------------------------------
     'typescript-eslint',
+    '@typescript-eslint/eslint-plugin', // ADD THIS
+    '@typescript-eslint/parser', // ADD THIS
     'ts-node',
     'tsconfig-paths',
 
@@ -27,15 +30,16 @@ const ignoreMatches = [
     //- ESLINT DEPENDENCIES -------------------------------------------------
     '@eslint/config-inspector', // ESLint tool
     'eslint-rule-tester', // ESLint tool
-
+    
+    // ESLINT PLUGINS
     'eslint-plugin-chai-friendly', // Chai rule skips
     'eslint-plugin-unicorn', // unicorn() in use
     'eslint-plugin-unused-imports', // Rules used
 
+    // AntFu
     '@eslint/js', // @antfu: javascript()
     '@stylistic/eslint-plugin', // @antfu: stylistic()
     'eslint-plugin-jsdoc', // @antfu: jsdoc()
-    'eslint-plugin-jsonc', // @antfu: jsonc()
     'eslint-plugin-import', // @antfu: imports()
 ]
 
@@ -51,7 +55,11 @@ async function checkUnusedDependencies() { //>
 
     if (options.ignoreMatches && options.ignoreMatches.length > 0) { //>
         // Join patterns with commas for the --ignore argument
-        command += ` --ignore="${options.ignoreMatches.join(',')}"`
+        // command += ` --ignore="${options.ignoreMatches.join(',')}"`
+        options.ignoreMatches.forEach(match => {
+            command += ` --ignore="${match}"`
+        });
+        
     } //<
 
     if (options.ignoreDirs && options.ignoreDirs.length > 0) { //>
@@ -63,6 +71,10 @@ async function checkUnusedDependencies() { //>
     let stderr = ''
     let unused
 
+    console.log('')
+    console.log('Command ran:', command)
+    console.log('')
+    
     try {
         const result = await exec(command)
         stdout = result.stdout

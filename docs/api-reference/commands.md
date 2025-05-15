@@ -1,4 +1,4 @@
-# API Reference: `mockly.commands`
+# API Reference: mockly.commands
 
 The `mockly.commands` object simulates the `vscode.commands` API, which is used for registering, executing, and discovering commands within the VSCode environment.
 

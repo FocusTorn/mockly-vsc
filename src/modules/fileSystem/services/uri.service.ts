@@ -8,7 +8,7 @@ import { URI as vUri } from 'vscode-uri'
 
 //= INJECTED TYPES ============================================================================================
 import type { IUriService } from '../_interfaces/IUriService.ts'
-import type { IMockNodePathService } from '../_interfaces/IMockNodePathService.ts'
+import type { IMockNodePathService } from '../../nodePath/_interfaces/IMockNodePathService.ts'
 
 //--------------------------------------------------------------------------------------------------------------<<
 

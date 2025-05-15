@@ -1,4 +1,4 @@
-# API Reference: `mockly.window`
+# API Reference: mockly.window
 
 The `mockly.window` object simulates the `vscode.window` API, which is used for UI interactions such as showing text editors, displaying messages, creating terminals, managing status bar items, and handling window-related events.
 
@@ -30,8 +30,8 @@ The `TextEditor` object provided by `mockly` has properties and methods like:
 
 **Example:**
 
-```typescript
-import { mockly, Position, Range, vscodeSimulator } from 'mockly-vsc';
+~~~typescript
+import { mockly, vscodeSimulator } from 'mockly-vsc'; // Position and Range are available via mockly
 import { beforeEach, describe, expect, it } from 'vitest';
 
 describe('Window Text Editors Tests', () => {
@@ -78,7 +78,7 @@ describe('Window Text Editors Tests', () => {
 		expect(document.isDirty).toBe(true); // Edits make the document dirty
 	});
 });
-```
+~~~
 
 ## User Interactions (Messages, Quick Picks, Input Boxes)
 
@@ -108,7 +108,7 @@ If no expectation is set using `vscodeSimulator` for a method that awaits user i
 
 **Example:**
 
-```typescript
+~~~typescript
 import { mockly, vscodeSimulator } from 'mockly-vsc';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -171,7 +171,7 @@ describe('User Interactions Tests', () => {
 		expect(selection).toBeUndefined();
 	});
 });
-```
+~~~
 
 ## Output Channels
 
@@ -192,8 +192,8 @@ Extends `OutputChannel` and adds logging methods like `trace()`, `debug()`, `inf
 
 **Example:**
 
-```typescript
-import { LogLevel, mockly, vscodeSimulator } from 'mockly-vsc';
+~~~typescript
+import { mockly, vscodeSimulator } from 'mockly-vsc'; // LogLevel is accessed via mockly.LogLevel
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 describe('Output Channels Tests', () => {
@@ -233,7 +233,7 @@ describe('Output Channels Tests', () => {
 		const logChannel = mockly.window.createOutputChannel(logChannelName, { log: true });
 
 		expect(logChannel.name).toBe(logChannelName);
-		expect(logChannel.logLevel).toBe(LogLevel.Info); // Default LogLevel
+		expect(logChannel.logLevel).toBe(mockly.LogLevel.Info); // Default LogLevel, use mockly.LogLevel
 
 		logChannel.info('This is an informational message.');
 		expect(consoleSpy).toHaveBeenCalledWith(
@@ -252,10 +252,10 @@ describe('Output Channels Tests', () => {
 		// Simulate log level change (e.g., if your extension has a command to do this)
 		// For testing, you might need an internal way if not exposed, or test the command.
 		// Mockly's LogOutputChannel allows direct setting for test purposes:
-		(logChannel as any)._setLogLevel(LogLevel.Debug); // Internal method for test control
+		(logChannel as any)._setLogLevel(mockly.LogLevel.Debug); // Internal method for test control, use mockly.LogLevel
 
-		expect(logChannel.logLevel).toBe(LogLevel.Debug);
-		expect(onDidChangeLogLevelSpy).toHaveBeenCalledWith(LogLevel.Debug);
+		expect(logChannel.logLevel).toBe(mockly.LogLevel.Debug); // Use mockly.LogLevel
+		expect(onDidChangeLogLevelSpy).toHaveBeenCalledWith(mockly.LogLevel.Debug); // Use mockly.LogLevel
 
 		logChannel.debug('This is a debug message (should now be visible).');
 		expect(consoleSpy).toHaveBeenCalledWith(
@@ -266,7 +266,7 @@ describe('Output Channels Tests', () => {
 		logChannel.dispose();
 	});
 });
-```
+~~~
 
 ## Terminals
 
@@ -285,7 +285,7 @@ Terminal interactions (like `sendText`) are typically logged to the `console`.
 
 **Example:**
 
-```typescript
+~~~typescript
 import { mockly, vscodeSimulator } from 'mockly-vsc';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -348,7 +348,7 @@ describe('Terminals Tests', () => {
 		);
 	});
 });
-```
+~~~
 
 ## Status Bar
 
@@ -360,8 +360,8 @@ Interactions (like `show`, `hide`, setting text) are typically logged to the `co
 
 **Example:**
 
-```typescript
-import { mockly, StatusBarAlignment, vscodeSimulator } from 'mockly-vsc';
+~~~typescript
+import { mockly, vscodeSimulator } from 'mockly-vsc'; // StatusBarAlignment is accessed via mockly.StatusBarAlignment
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 describe('Status Bar Item Tests', () => {
@@ -377,10 +377,10 @@ describe('Status Bar Item Tests', () => {
 	});
 
 	it('should create a status bar item, allow setting properties, and simulate show/hide/dispose', () => {
-		const statusBarItem = mockly.window.createStatusBarItem(StatusBarAlignment.Left, 100);
+		const statusBarItem = mockly.window.createStatusBarItem(mockly.StatusBarAlignment.Left, 100); // Use mockly.StatusBarAlignment
 		// An ID is auto-generated if not provided.
 		expect(statusBarItem.id).toBeDefined();
-		expect(statusBarItem.alignment).toBe(StatusBarAlignment.Left);
+		expect(statusBarItem.alignment).toBe(mockly.StatusBarAlignment.Left); // Use mockly.StatusBarAlignment
 		expect(statusBarItem.priority).toBe(100);
 
 		statusBarItem.text = '$(sync~spin) Syncing...';
@@ -410,13 +410,13 @@ describe('Status Bar Item Tests', () => {
 
 	it('should create a status bar item with a specific ID', () => {
 		const itemId = 'myExtension.customStatus';
-		const statusBarItemWithId = mockly.window.createStatusBarItem(itemId, StatusBarAlignment.Right, -10);
+		const statusBarItemWithId = mockly.window.createStatusBarItem(itemId, mockly.StatusBarAlignment.Right, -10); // Use mockly.StatusBarAlignment
 		expect(statusBarItemWithId.id).toBe(itemId);
-		expect(statusBarItemWithId.alignment).toBe(StatusBarAlignment.Right);
+		expect(statusBarItemWithId.alignment).toBe(mockly.StatusBarAlignment.Right); // Use mockly.StatusBarAlignment
 		expect(statusBarItemWithId.priority).toBe(-10);
 	});
 });
-```
+~~~
 
 ## Tree Data Providers
 
@@ -431,20 +431,20 @@ The mock implementation primarily logs the registration and disposal of the tree
 
 **Example:**
 
-```typescript
-import { EventEmitter, mockly, TreeItem, TreeItemCollapsibleState, vscodeSimulator } from 'mockly-vsc';
+~~~typescript
+import { mockly, vscodeSimulator } from 'mockly-vsc'; // EventEmitter, TreeItem, TreeItemCollapsibleState are via mockly
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // A simple mock TreeDataProvider implementation for testing
 class MyMockTreeDataProvider implements mockly.TreeDataProvider<string> {
-	private _onDidChangeTreeData: EventEmitter<string | undefined | null | void> = new EventEmitter();
+	private _onDidChangeTreeData: mockly.EventEmitter<string | undefined | null | void> = new mockly.EventEmitter(); // Use mockly.EventEmitter
 	readonly onDidChangeTreeData: mockly.Event<string | undefined | null | void> =
 		this._onDidChangeTreeData.event;
 
 	data: string[] = ['Item 1', 'Item 2'];
 
-	getTreeItem(element: string): TreeItem | Thenable<TreeItem> {
-		const item = new TreeItem(element, TreeItemCollapsibleState.None);
+	getTreeItem(element: string): mockly.TreeItem | Thenable<mockly.TreeItem> { // Use mockly.TreeItem
+		const item = new mockly.TreeItem(element, mockly.TreeItemCollapsibleState.None); // Use mockly.TreeItem and mockly.TreeItemCollapsibleState
 		item.id = element.replace(' ', '').toLowerCase();
 		return item;
 	}
@@ -499,12 +499,12 @@ describe('Tree Data Provider Registration Tests', () => {
 		const children = await provider.getChildren(); // Get root children
 		expect(children).toEqual(['Alpha', 'Beta']);
 
-		const treeItemAlpha = await provider.getTreeItem('Alpha') as TreeItem;
+		const treeItemAlpha = await provider.getTreeItem('Alpha') as mockly.TreeItem; // Use mockly.TreeItem
 		expect(treeItemAlpha.label).toBe('Alpha');
-		expect(treeItemAlpha.collapsibleState).toBe(TreeItemCollapsibleState.None);
+		expect(treeItemAlpha.collapsibleState).toBe(mockly.TreeItemCollapsibleState.None); // Use mockly.TreeItemCollapsibleState
 	});
 });
-```
+~~~
 
 ## Window Events
 
@@ -527,8 +527,8 @@ These events are fired automatically by Mockly-VSC when corresponding actions oc
 
 **Example:**
 
-```typescript
-import { mockly, Position, Selection, vscodeSimulator } from 'mockly-vsc';
+~~~typescript
+import { mockly, vscodeSimulator } from 'mockly-vsc'; // Position and Selection are available via mockly
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 describe('Window Events Tests', () => {
@@ -593,14 +593,14 @@ describe('Window Events Tests', () => {
 		disposables.push(mockly.window.onDidChangeTextEditorSelection(onSelectionChangeSpy));
 
 		// Change selection
-		editor.selection = new mockly.Selection(new Position(0, 0), new Position(0, 6)); // Select "Select"
+		editor.selection = new mockly.Selection(new mockly.Position(0, 0), new mockly.Position(0, 6)); // Select "Select"
 
 		expect(onSelectionChangeSpy).toHaveBeenCalledTimes(1);
 		const eventArg = onSelectionChangeSpy.mock.calls[0][0]; // TextEditorSelectionChangeEvent
 		expect(eventArg.textEditor).toBe(editor);
 		expect(eventArg.selections.length).toBe(1);
-		expect(eventArg.selections[0].active.isEqual(new Position(0, 6))).toBe(true);
+		expect(eventArg.selections[0].active.isEqual(new mockly.Position(0, 6))).toBe(true);
 		expect(eventArg.kind).toBeDefined(); // e.g., TextEditorSelectionChangeKind.Command, .Keyboard, .Mouse (mock might simplify this)
 	});
 });
-```
+~~~

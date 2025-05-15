@@ -16,7 +16,9 @@ import { TextDecoder, TextEncoder } from 'node:util'
 //= INJECTED TYPES ============================================================================================
 import type { ICoreUtilitiesService } from '../../../core/_interfaces/ICoreUtilitiesService.ts'
 import type { IEventBusService } from '../../../core/_interfaces/IEventBusService.ts'
-import type { IFileSystemModule } from '../../fileSystem/_interfaces/IFileSystemModule.ts'
+import type { IFileSystemService } from '../../fileSystem/_interfaces/IFileSystemService.ts'
+import type { IMockNodePathService } from '../../nodePath/_interfaces/IMockNodePathService.ts'
+import type { IUriService } from '../../fileSystem/_interfaces/IUriService.ts'
 import type { ITextDocumentService } from '../_interfaces/ITextDocumentService.ts'
 import type { IWorkspaceStateService } from '../_interfaces/IWorkspaceStateService.ts'
 
@@ -26,7 +28,6 @@ import type { IWorkspaceNamespace } from '../_interfaces/IWorkspaceNamespace.ts'
 //= IMPLEMENTATIONS ===========================================================================================
 import { TextDocument } from './textDocument.ts'
 import micromatch from 'micromatch'
-import type { IFileSystemService } from 'src/modules/fileSystem/_interfaces/IFileSystemService.ts'
 
 //--------------------------------------------------------------------------------------------------------------<<
 
@@ -35,15 +36,17 @@ import type { IFileSystemService } from 'src/modules/fileSystem/_interfaces/IFil
  * Delegates state management and core logic to internal services.
  */
 @injectable()
-export class WorkspaceNamespace implements IWorkspaceNamespace {
+export class WorkspaceNamespace implements IWorkspaceNamespace { //>
 
 	constructor(
 		@inject('IWorkspaceStateService') private wsService: IWorkspaceStateService,
 		@inject('ITextDocumentService') private docService: ITextDocumentService,
-		// IFileSystemUtilityService injection removed
 		@inject('ICoreUtilitiesService') private utils: ICoreUtilitiesService,
 		@inject('IEventBusService') private eventBus: IEventBusService,
-		@inject('IFileSystemModule') private fileSystemModule: IFileSystemModule,
+		// @inject('IFileSystemModule') private fileSystemModule: IFileSystemModule, // REMOVED
+		@inject('IFileSystemService') private fileSystemService: IFileSystemService, // ADDED
+		@inject('IMockNodePathService') private pathService: IMockNodePathService, // ADDED
+		@inject('IUriService') private uriService: IUriService, // ADDED
 	) {
 		this.utils.log(LogLevel.Debug, 'WorkspaceNamespaceImpl initialized.')
 	
@@ -57,7 +60,7 @@ export class WorkspaceNamespace implements IWorkspaceNamespace {
 	 * @inheritdoc
 	 */
 	get fs(): IFileSystemService { //>
-		return this.fileSystemModule.fs
+		return this.fileSystemService // MODIFIED
 	
 	} //<
 
@@ -206,7 +209,7 @@ export class WorkspaceNamespace implements IWorkspaceNamespace {
 				let currentContent = ''
 				if (!textDocument) {
 					try {
-						const contentBuffer = await this.fileSystemModule.fs.readFile(uri)
+						const contentBuffer = await this.fileSystemService.readFile(uri) // MODIFIED
 						currentContent = new TextDecoder().decode(contentBuffer)
 					
 					}
@@ -248,7 +251,7 @@ export class WorkspaceNamespace implements IWorkspaceNamespace {
 				
 				}
 
-				await this.fileSystemModule.fs.writeFile(
+				await this.fileSystemService.writeFile( // MODIFIED
 					uri,
 					new TextEncoder().encode(updatedContent),
 					{ create: true, overwrite: true },
@@ -272,7 +275,7 @@ export class WorkspaceNamespace implements IWorkspaceNamespace {
 	async delete(uri: vt.Uri, options?: { recursive?: boolean, useTrash?: boolean }): Promise<void> { //>
 		this.utils.log(LogLevel.Info, `WorkspaceNamespace.delete called for: ${uri.toString()}`)
 		try {
-			await this.fileSystemModule.fs.delete(uri, options)
+			await this.fileSystemService.delete(uri, options) // MODIFIED
 		
 		}
 		catch (e) {
@@ -306,9 +309,14 @@ export class WorkspaceNamespace implements IWorkspaceNamespace {
 		
 		}
 
-		const pathService = this.fileSystemModule.path
-		const uriService = this.fileSystemModule.Uri
-		const fs = this.fileSystemModule.fs
+		// const pathService = this.fileSystemModule.path // REMOVED
+		// const uriService = this.fileSystemModule.Uri // REMOVED
+		// const fs = this.fileSystemModule.fs // REMOVED
+		// Use directly injected services:
+		const pathService = this.pathService
+		const uriService = this.uriService
+		const fs = this.fileSystemService
+
 
 		const includePatternString = typeof include === 'string' ? include : include.pattern
 		const includeBaseUri = typeof include === 'object' && 'baseUri' in include ? include.baseUri : undefined
@@ -438,9 +446,13 @@ export class WorkspaceNamespace implements IWorkspaceNamespace {
 	async openTextDocument(uriOrOptions?: vt.Uri | string | { language?: string, content?: string }): Promise<vt.TextDocument> { //>
 		this.utils.log(LogLevel.Trace, 'WorkspaceNamespace.openTextDocument called')
 
-		const uriService = this.fileSystemModule.Uri
-		const pathService = this.fileSystemModule.path
-		const fs = this.fileSystemModule.fs
+		// const uriService = this.fileSystemModule.Uri // REMOVED
+		// const pathService = this.fileSystemModule.path // REMOVED
+		// const fs = this.fileSystemModule.fs // REMOVED
+		// Use directly injected services:
+		const uriService = this.uriService
+		const pathService = this.pathService
+		const fs = this.fileSystemService
 
 		let uri: nUri
 		let language: string | undefined
@@ -573,7 +585,8 @@ export class WorkspaceNamespace implements IWorkspaceNamespace {
 	async saveAll(includeUntitled?: boolean, cancellation?: vt.CancellationToken): Promise<boolean> { //>
 		this.utils.log(LogLevel.Info, `WorkspaceNamespace.saveAll called (includeUntitled: ${includeUntitled ?? false})`)
 		let allSaved = true
-		const fs = this.fileSystemModule.fs
+		// const fs = this.fileSystemModule.fs // REMOVED
+		const fs = this.fileSystemService // ADDED
 
 		const documentsToSave = [...this.docService.getTextDocuments()]
 
@@ -626,16 +639,18 @@ export class WorkspaceNamespace implements IWorkspaceNamespace {
 	 * @inheritdoc
 	 */
 	asRelativePath(pathOrUri: string | vt.Uri, includeWorkspaceFolder?: boolean): string { //>
-		const uriService = this.fileSystemModule.Uri
-		const pathService = this.fileSystemModule.path
+		// const uriService = this.fileSystemModule.Uri // REMOVED
+		// const pathService = this.fileSystemModule.path // REMOVED
+		const uriService = this.uriService // ADDED
+		const pathService = this.pathService // ADDED
 
 		const uri = typeof pathOrUri === 'string'
 			? uriService.file(pathOrUri)
-			: uriService.parse(pathOrUri.toString())
+			: uriService.parse(pathOrUri.toString()) // Ensure it's our Uri type if vt.Uri is passed
 
 		const folder = this.wsService.getWorkspaceFolder(uri)
 		if (!folder) {
-			return uri.path
+			return uri.path // Or fsPath depending on desired output for non-workspace files
 		
 		}
 
@@ -659,7 +674,8 @@ export class WorkspaceNamespace implements IWorkspaceNamespace {
 		ignoreDeleteEvents?: boolean,
 	): vt.FileSystemWatcher {
 		this.utils.log(LogLevel.Info, `WorkspaceNamespace.createFileSystemWatcher for pattern: ${typeof globPattern === 'string' ? globPattern : globPattern.pattern}`)
-		const pathService = this.fileSystemModule.path
+		// const pathService = this.fileSystemModule.path // REMOVED
+		const pathService = this.pathService // ADDED
 
 		const _onDidCreateEmitter = new EventEmitter<nUri>()
 		const _onDidChangeEmitter = new EventEmitter<nUri>()
@@ -696,7 +712,7 @@ export class WorkspaceNamespace implements IWorkspaceNamespace {
 				const folder = this.wsService.getWorkspaceFolder(uri)
 				testPath = folder
 					? pathService.relative(pathService.normalize(folder.uri.path), pathService.normalize(uri.path))
-					: pathService.normalize(uri.path)
+					: pathService.normalize(uri.path) // Fallback to full path if not in a workspace folder
 			
 			}
 			const isMatch = micromatch.isMatch(testPath, patternString, { dot: true })
@@ -708,7 +724,7 @@ export class WorkspaceNamespace implements IWorkspaceNamespace {
 		if (!ignoreCreateEvents) {
 			const listener = this.eventBus.getOnDidCreateFilesEvent()((e) => {
 				e.files.forEach((file) => {
-					if (matchesGlob(file as nUri))
+					if (matchesGlob(file as nUri)) // Ensure Uri type for matchesGlob
 						_onDidCreateEmitter.fire(file as nUri)
 
 				})
@@ -719,7 +735,7 @@ export class WorkspaceNamespace implements IWorkspaceNamespace {
 		}
 		if (!ignoreChangeEvents) {
 			const saveListener = this.eventBus.getOnDidSaveTextDocumentEvent()((doc) => {
-				if (matchesGlob(doc.uri as nUri))
+				if (matchesGlob(doc.uri as nUri)) // Ensure Uri type
 					_onDidChangeEmitter.fire(doc.uri as nUri)
 			
 			})
@@ -729,7 +745,7 @@ export class WorkspaceNamespace implements IWorkspaceNamespace {
 		if (!ignoreDeleteEvents) {
 			const listener = this.eventBus.getOnDidDeleteFilesEvent()((e) => {
 				e.files.forEach((file) => {
-					if (matchesGlob(file as nUri))
+					if (matchesGlob(file as nUri)) // Ensure Uri type
 						_onDidDeleteEmitter.fire(file as nUri)
 
 				})
@@ -790,4 +806,4 @@ export class WorkspaceNamespace implements IWorkspaceNamespace {
 	
 	} //<
 
-}
+} //<

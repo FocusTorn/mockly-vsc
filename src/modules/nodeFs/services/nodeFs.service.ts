@@ -16,14 +16,13 @@ import { Buffer } from 'node:buffer'
 //= INJECTED TYPES ============================================================================================
 import type { ICoreUtilitiesService } from '../../../core/_interfaces/ICoreUtilitiesService.ts'
 import type { IFileSystemStateService, IAddNodeOptions } from '../../fileSystem/_interfaces/IFileSystemStateService.ts'
-import type { IMockNodePathService } from '../../fileSystem/_interfaces/IMockNodePathService.ts'
+import type { IMockNodePathService } from '../../nodePath/_interfaces/IMockNodePathService.ts'
 import type { IUriService } from '../../fileSystem/_interfaces/IUriService.ts'
 
 //= IMPLEMENTATION TYPES ======================================================================================
-import type { IMockDirent, INodeFsService } from '../_interfaces/INodeFsService.ts'
+import type { IMockDirent, INodeFsService, IMockStats } from '../_interfaces/INodeFsService.ts' // IMockStats imported
 
 //--------------------------------------------------------------------------------------------------------------<<
-
 
 class MockDirent implements IMockDirent { //>
 
@@ -52,8 +51,8 @@ class MockDirent implements IMockDirent { //>
 @singleton()
 export class NodeFsService implements INodeFsService {
 
-	private _textEncoder = new TextEncoder() // Default UTF-8
-	private _textDecoder = new TextDecoder() // Default UTF-8
+	private _textEncoder = new TextEncoder()
+	private _textDecoder = new TextDecoder()
 
 	constructor(
 		@inject('ICoreUtilitiesService') private utils: ICoreUtilitiesService,
@@ -73,9 +72,6 @@ export class NodeFsService implements INodeFsService {
 		e: any,
 		_uriForError: Uri,
 	): never {
-		// Try to map VFS error codes to Node.js like error codes if possible
-		// Our VFS uses FileSystemError with codes like 'FileNotFound'
-		// Node.js uses Error with code like 'ENOENT'
 		let nodeJsCode = (e as any).code
 		if (e.name === 'FileSystemError') {
 			const fsError = e as LocalFileSystemError
@@ -84,11 +80,9 @@ export class NodeFsService implements INodeFsService {
 				case 'FileExists': nodeJsCode = 'EEXIST'; break
 				case 'FileIsADirectory': nodeJsCode = 'EISDIR'; break
 				case 'FileNotADirectory': nodeJsCode = 'ENOTDIR'; break
-				// No direct VFS code for ENOTEMPTY, but it's thrown as a generic error by VFSStateService
 			}
 		
 		}
-		// If it's a generic error from VFSStateService for "Directory not empty"
 		if (e.message?.includes('Directory not empty')) {
 			nodeJsCode = 'ENOTEMPTY'
 		
@@ -108,10 +102,25 @@ export class NodeFsService implements INodeFsService {
 
 	statSync( //>
 		path: string | Uri,
-	): vt.FileStat {
+	): IMockStats {
 		const uri = this._toUri(path)
 		try {
-			return this.vfsStateService.statSync(uri)
+			const vfsStat = this.vfsStateService.statSync(uri)
+			
+			const result: IMockStats = {
+				type: vfsStat.type,
+				ctime: vfsStat.ctime,
+				mtime: vfsStat.mtime,
+				size: vfsStat.size,
+				isFile: () => vfsStat.type === FileType.File,
+				isDirectory() { return this.type === FileType.Directory }, // Explicit function
+				isSymbolicLink: () => vfsStat.type === FileType.SymbolicLink,
+				isBlockDevice: () => false,
+				isCharacterDevice: () => false,
+				isFIFO: () => false,
+				isSocket: () => false,
+			}
+			return result
 		
 		}
 		catch (e) {
@@ -128,34 +137,28 @@ export class NodeFsService implements INodeFsService {
 		const uri = this._toUri(path)
 		try {
 			const uint8Array = this.vfsStateService.readFileSync(uri)
-			let encoding: BufferEncoding | null | undefined = null // Will hold a valid BufferEncoding or null/undefined
+			let encoding: BufferEncoding | null | undefined = null
 
 			if (typeof options === 'string') {
-				encoding = options // options is a BufferEncoding here
+				encoding = options
 			
 			}
 			else if (options && typeof options === 'object') {
-				encoding = options.encoding // options.encoding is BufferEncoding | null | undefined
+				encoding = options.encoding
 			
 			}
 
-			// Check if a specific encoding is provided and it's not meant to return a Buffer directly
-			if (encoding) { // If encoding is a valid BufferEncoding string (not null or undefined)
-				// Use TextDecoder with the specified encoding if provided
-				// For simplicity, this mock's TextDecoder is UTF-8 by default.
-				// A more complete mock might instantiate TextDecoder with the given encoding.
+			if (encoding) {
 				if (encoding.toLowerCase().replace('-', '') === 'utf8') {
 					return this._textDecoder.decode(uint8Array)
 				
 				}
 				else {
 					this.utils.warn(`NodeFsService.readFileSync: Encoding '${encoding}' is not fully supported by this mock's TextDecoder. Returning UTF-8 decoded string or raw Buffer.`)
-					// Fallback for simplicity or attempt to decode if possible
 					try {
 						return new TextDecoder(encoding).decode(uint8Array)
 					
 					}
-                    
 					// eslint-disable-next-line unused-imports/no-unused-vars
 					catch (_error) {
 						this.utils.error(`Failed to decode with encoding: ${encoding}. Returning raw buffer.`)
@@ -166,8 +169,6 @@ export class NodeFsService implements INodeFsService {
 				}
 			
 			}
-			// If no encoding, or if options explicitly wanted a buffer (e.g. options = { encoding: null } or options = null after typical fs patterns)
-			// then return as Buffer.
 			return Buffer.from(uint8Array)
 		
 		}
@@ -186,7 +187,7 @@ export class NodeFsService implements INodeFsService {
 		const uri = this._toUri(path)
 		let contentUint8Array: Uint8Array
 
-		let encoding: BufferEncoding | null | undefined = 'utf8' // Default for string data
+		let encoding: BufferEncoding | null | undefined = 'utf8'
 		if (typeof options === 'string') {
 			encoding = options
 		
@@ -201,8 +202,6 @@ export class NodeFsService implements INodeFsService {
 		}
 
 		if (typeof data === 'string') {
-			// Similar to readFileSync, this mock's TextEncoder is UTF-8.
-			// A more complete mock would use the specified encoding.
 			if (encoding && encoding.toLowerCase().replace('-', '') !== 'utf8') {
 				this.utils.warn(`NodeFsService.writeFileSync: Encoding '${encoding}' for string data is not fully supported by this mock's TextEncoder. Using UTF-8.`)
 			
@@ -239,16 +238,15 @@ export class NodeFsService implements INodeFsService {
 			withFileTypes = !!options.withFileTypes
 		
 		}
-		// Encoding option is ignored for readdirSync in this simplified mock as names are strings.
 
 		try {
-			const entries = this.vfsStateService.readDirectorySync(uri) // Returns [string, FileType][]
+			const entries = this.vfsStateService.readDirectorySync(uri)
 			if (withFileTypes) {
-				return entries.map(([name, type]) => new MockDirent(name, type)) // Returns IMockDirent[]
+				return entries.map(([name, type]) => new MockDirent(name, type))
 			
 			}
 			else {
-				return entries.map(([name, _type]) => name) // Returns string[]
+				return entries.map(([name, _type]) => name)
 			
 			}
 		
@@ -262,7 +260,7 @@ export class NodeFsService implements INodeFsService {
     
 	mkdirSync( //>
 		path: string | Uri,
-		options?: vt.WorkspaceEditEntryMetadata & { recursive?: boolean, mode?: number },
+		options?: { recursive?: boolean, mode?: number },
 	): void {
 		const uri = this._toUri(path)
 		const recursive = options?.recursive ?? false
@@ -274,19 +272,15 @@ export class NodeFsService implements INodeFsService {
 
 		try {
 			if (recursive) {
-				this.vfsStateService.addFolderSync(uri) // addFolderSync with _ensureParentsSync handles recursion
+				this.vfsStateService.addFolderSync(uri)
 			
 			}
 			else {
-				// Check if parent exists
 				const parentPath = this.pathService.dirname(uri.path)
 				if (parentPath !== uri.path && !this.vfsStateService.existsSync(this.uriService.file(parentPath))) {
 					throw this.utils.createFileSystemError('FileNotFound', uri, `Parent directory does not exist for ${uri.fsPath}`)
 				
 				}
-				// Attempt to add the folder; addFolderSync will throw if it exists as a file,
-				// or if it exists as a folder (which is fine for mkdir unless EEXIST is strict for non-recursive)
-				// Node.js mkdirSync without recursive throws EEXIST if path itself exists.
 				if (this.vfsStateService.existsSync(uri)) {
 					throw this.utils.createFileSystemError('FileExists', uri, `Path already exists: ${uri.fsPath}`)
 				
@@ -317,8 +311,8 @@ export class NodeFsService implements INodeFsService {
 		}
 
 		try {
-			const stats = this.vfsStateService.statSync(uri) // Throws if not found (unless force handles it)
-			if (stats.type === FileType.Directory) {
+			const stats = this.statSync(uri)
+			if (stats.isDirectory()) {
 				this.vfsStateService.deleteFolderSync(uri, { recursive })
 			
 			}
@@ -333,8 +327,8 @@ export class NodeFsService implements INodeFsService {
 		
 		}
 		catch (e) {
-			if (force && ((e as any).code === 'FileNotFound' /* VFS code */ || (e as any).code === 'ENOENT' /* Mapped code */)) {
-				return // Suppress error if force is true and file not found
+			if (force && ((e as any).code === 'FileNotFound' || (e as any).code === 'ENOENT')) {
+				return
 			
 			}
             

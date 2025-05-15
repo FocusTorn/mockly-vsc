@@ -10,8 +10,10 @@ const testFiles = [
     // 'src/test/*.{vi,vite}.{ts,tsx}',
     // 'test/*.{vi,vite}.{ts,tsx}',
     
-    'test/*.{vi,vite}.{ts,tsx}', // Include files directly under test/
+    // 'test/*.{vi,vite}.{ts,tsx}', // Include files directly under test/
     'test/**/*.{vi,vite}.{ts,tsx}', // Include files in subdirectories under test/
+    
+    // 'test/nodeFs/**/*.{vi,vite}.{ts,tsx}'
     
 ]
 const excludedFiles = [

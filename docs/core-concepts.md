@@ -2,7 +2,7 @@
 
 Mockly-VSC provides two primary exports that you'll interact with in your tests: `mockly` (the VSCode API mock) and `vscodeSimulator` (for test environment control). Understanding these is key to effectively using the library.
 
-## The `mockly` Object (Simulating `vscode`)
+## The mockly Object (Simulating vscode)
 
 The `mockly` object is your direct replacement for the standard `vscode` API namespace that you would use in your extension's actual code. It aims to provide a faithful, in-memory mock implementation of the VSCode API.
 
@@ -79,7 +79,7 @@ describe('createAndOpenFile', () => {
 });
 ~~~
 
-## The `vscodeSimulator` Object (Test Control)
+## The vscodeSimulator Object (Test Control)
 
 The `vscodeSimulator` object provides utilities specifically for controlling and interacting with the Mockly-VSC environment during your tests. It is **not** meant to be a direct mock of any `vscode` API but rather a tool for test setup, teardown, and advanced state manipulation.
 

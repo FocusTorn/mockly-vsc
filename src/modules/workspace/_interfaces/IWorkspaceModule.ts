@@ -14,7 +14,6 @@ import type { IWorkspaceStateService } from './IWorkspaceStateService.ts'
 //= IMPLEMENTATIONS ===========================================================================================
 import type { TextDocumentService } from '../services/textDocument.service.ts'
 import type { IFileSystemService } from 'src/modules/fileSystem/_interfaces/IFileSystemService.ts'
-import type { IMockNodePathService } from 'src/modules/fileSystem/_interfaces/IMockNodePathService.ts'
 import type { IUriService } from 'src/modules/fileSystem/_interfaces/IUriService.ts'
 
 //--------------------------------------------------------------------------------------------------------------<<
@@ -25,7 +24,7 @@ import type { IUriService } from 'src/modules/fileSystem/_interfaces/IUriService
  * Redundant top-level VS Code types/enums/classes are exposed via the
  * IVSCodeAPISimulatorService instead.
  */
-export interface IWorkspaceModule {
+export interface IWorkspaceModule { //>
 	readonly workspace: IWorkspaceNamespace
 	reset: () => Promise<void>
 
@@ -56,10 +55,10 @@ export interface IWorkspaceModule {
 	 */
 	readonly _uriService: IUriService
 
-	/**
-	 * Exposes the internal MockNodePathService for testing and state inspection.
-	 */
-	readonly _nodePathService: IMockNodePathService
+	// /** // REMOVED
+	//  * Exposes the internal MockNodePathService for testing and state inspection.
+	//  */
+	// readonly _nodePathService: IMockNodePathService // REMOVED
 
 	/**
 	 * Exposes the internal FileSystemService for testing and state inspection.
@@ -73,4 +72,4 @@ export interface IWorkspaceModule {
 	 * @param fireEvent Whether to fire the onDidCloseTextDocument event (default true).
 	 */
 	closeTextDocument: (uri: vt.Uri, fireEvent?: boolean) => Promise<void> //>
-}
+} //<

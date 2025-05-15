@@ -1,4 +1,4 @@
-# API Reference: `mockly.extensions`
+# API Reference: mockly.extensions
 
 The `mockly.extensions` object simulates the `vscode.extensions` API, which provides access to information about installed extensions and allows interaction with their exported APIs. In Mockly-VSC, you primarily use this to set up mock extension data for your tests.
 
@@ -40,8 +40,8 @@ To add, remove, or modify mock extensions for your tests, you use the internal `
 
 **Example:**
 
-```typescript
-import { ExtensionKind, mockly, vscodeSimulator } from 'mockly-vsc';
+~~~typescript
+import { mockly, vscodeSimulator } from 'mockly-vsc'; // ExtensionKind is accessed via mockly.ExtensionKind
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 // Define a type for our mock extension's API for better type safety
@@ -73,7 +73,7 @@ describe('Extensions API (mockly.extensions) Tests', () => {
 				publisher: 'publisher',
 				displayName: 'Mock Dependency Extension',
 			},
-			extensionKind: ExtensionKind.Workspace,
+			extensionKind: mockly.ExtensionKind.Workspace, // Use mockly.ExtensionKind
 			exports: mockApi,
 			activate: vi.fn(async () => { // Mock the activate function
 				// 'this' inside activate refers to the Extension object itself
@@ -160,7 +160,7 @@ describe('Extensions API (mockly.extensions) Tests', () => {
 		disposable.dispose();
 	});
 });
-```
+~~~
 
 **Testing Extensions that Depend on Other Extensions:**
 

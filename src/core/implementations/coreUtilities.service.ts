@@ -16,7 +16,7 @@ import type { IEventBusService } from '../_interfaces/IEventBusService.ts'
 //= IMPLEMENTATION TYPES ======================================================================================
 import type { ICoreUtilitiesService } from '../_interfaces/ICoreUtilitiesService.ts'
 import { LogLevel } from '../../_vscCore/vscEnums.ts'
-import type { IMockNodePathService } from 'src/modules/fileSystem/_interfaces/IMockNodePathService.ts'
+import type { IMockNodePathService } from 'src/modules/nodePath/_interfaces/IMockNodePathService.ts'
 import type { IUriService } from 'src/modules/fileSystem/_interfaces/IUriService.ts'
 
 //--------------------------------------------------------------------------------------------------------------<<

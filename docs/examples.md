@@ -319,7 +319,7 @@ describe('readMyToolConfig', () => {
 });
 ~~~
 
-## Example 4: Testing Extension Code Using Node.js `fs` and `path`
+## Example 4: Testing Extension Code Using Node.js fs and path
 
 This example demonstrates testing an extension function that uses Node.js `fs` (synchronous methods) and `path` modules, mocked by `mockly.node.fs` and `mockly.node.path` respectively. We'll use `vscodeSimulator.vfs.populateSync` for easy test setup.
 

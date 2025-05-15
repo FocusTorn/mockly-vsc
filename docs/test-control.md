@@ -2,7 +2,7 @@
 
 Effective testing often requires careful control over the environment's state to ensure tests are isolated and repeatable. Mockly-VSC provides the `vscodeSimulator` object specifically for this purpose.
 
-## Resetting the Mock Environment with `vscodeSimulator.reset()`
+## Resetting the Mock Environment with vscodeSimulator.reset()
 
 The most critical function for test control is `vscodeSimulator.reset()`. To ensure that each test runs in a clean, predictable environment and that state from one test does not leak into another, you should call `await vscodeSimulator.reset()` before each test (e.g., in a `beforeEach` block) or after each test (in an `afterEach` block).
 
@@ -66,7 +66,7 @@ describe('My Feature Tests', () => {
 
 Using `beforeEach` is generally recommended as it ensures a clean state _before_ your test logic runs.
 
-## Populating the Virtual File System with `vscodeSimulator.vfs`
+## Populating the Virtual File System with vscodeSimulator.vfs
 
 For many tests, you'll need to set up a specific file and directory structure in the mock file system. Mockly-VSC provides a convenient utility on `vscodeSimulator.vfs` to declaratively populate the virtual file system: `populate()` (asynchronous) and `populateSync()` (synchronous).
 
@@ -75,7 +75,7 @@ These methods accept a single `structure` object where keys are paths and values
 -   `vscodeSimulator.vfs.populate(structure: IFileSystemStructure): Promise<void>`
 -   `vscodeSimulator.vfs.populateSync(structure: IFileSystemStructure): void`
 
-### `IFileSystemStructure` Format
+### IFileSystemStructure Format
 
 The `structure` object has the following format:
 
@@ -152,11 +152,11 @@ describe('My Feature Requiring VFS Setup', () => {
 
 Using `populateSync` or `populate` significantly simplifies test setup compared to manually creating each file and directory using `mockly.workspace.fs` or `mockly.node.fs` methods.
 
-## Path Manipulation (`mockly.node.path` and `vscodeSimulator.path`)
+## Path Manipulation (mockly.node.path and vscodeSimulator.path)
 
-Mockly-VSC provides utilities for Node.js-like path manipulation, which can be useful in your tests and for testing extension code that itself uses the Node.js `path` module.
+Mockly-VSC provides utilities for Node.js-like path manipulation, which can be useful in your tests and for testing extension code that itself uses the Node.js path` module.
 
-### `mockly.node.path` (Recommended for Extension Code Testing)
+### mockly.node.path (Recommended for Extension Code Testing)
 
 If your extension code uses the Node.js `path` module (e.g., `import path from 'path';` or `require('path')`), you should test it against `mockly.node.path`. This object is an instance of `IMockNodePathService` and provides common path functions:
 
@@ -195,7 +195,7 @@ describe('Path Utilities in Extension', () => {
 });
 ~~~
 
-### `vscodeSimulator.path` (For Test Helper Logic)
+### vscodeSimulator.path (For Test Helper Logic)
 
 The `vscodeSimulator` object also exposes a `path` property (`vscodeSimulator.path`), which is the **same instance** of `IMockNodePathService` as `mockly.node.path`.
 

@@ -4,7 +4,7 @@ Mockly-VSC provides mock implementations and re-exports for many of the core typ
 
 Understanding these core types is fundamental, as they are used throughout the `mockly` API, just as they are in the real VSCode API.
 
-## `mockly.Uri`
+## mockly.Uri
 
 Mockly-VSC uses the `vscode-uri` library internally for URI manipulation and exposes its `URI` class and static methods directly via `mockly.Uri`. This ensures compatibility and correct handling of URI schemes, paths, and components.
 
@@ -63,9 +63,9 @@ describe('Uri Type Tests', () => {
 **Note on Path Manipulation:**
 While `mockly.Uri` is used for creating and managing `Uri` objects (which are expected by many `mockly` API methods), for general string-based path manipulation (like joining path segments as strings, getting basenames, normalizing string paths, etc.) in your test helpers, prefer using `vscodeSimulator.path` or `mockly.node.path`. See the [Path Manipulation section in Test Control](/test-control#path-manipulation-mockly-node-path-and-vscodesimulator-path) for more details.
 
-## Positional Types (`Position`, `Range`, `Selection`, `Location`)
+## Positional Types (Position, Range, Selection, Location)
 
-These are fundamental types for representing locations and areas within text documents.
+These are fundamental types for representing locations and areas within text documents. All are accessed via `mockly` (e.g., `new mockly.Position(...)`).
 
 - **`mockly.Position(line: number, character: number)`**: Represents a line and character position in a document.
   - Key methods: `isBefore(other: Position)`, `isEqual(other: Position)`, `translate(lineDelta?: number, characterDelta?: number)`, `with(line?: number, character?: number)`.
@@ -125,9 +125,9 @@ describe('Positional Types Tests', () => {
 });
 ~~~
 
-## Eventing Types (`Disposable`, `EventEmitter`)
+## Eventing Types (Disposable, EventEmitter)
 
-These are crucial for managing resources and handling events.
+These are crucial for managing resources and handling events. Access via `mockly` (e.g., `new mockly.Disposable(...)`).
 
 - **`mockly.Disposable(callOnDisposeFunction: () => any)`**: Creates an object that can be "disposed" to free up resources or unregister listeners. The provided function is called when `dispose()` is invoked.
   - Static method `mockly.Disposable.from(...disposables: { dispose(): any }[]): Disposable`: Creates a new disposable that groups other disposables. Calling `dispose()` on the result will dispose all of them.
@@ -185,9 +185,9 @@ describe('Eventing Types Tests', () => {
 });
 ~~~
 
-## Cancellation (`CancellationTokenSource`, `CancellationToken`)
+## Cancellation (CancellationTokenSource, CancellationToken)
 
-Used for signaling that an operation should be cancelled.
+Used for signaling that an operation should be cancelled. Access via `mockly` (e.g., `new mockly.CancellationTokenSource()`).
 
 - **`new mockly.CancellationTokenSource()`**: Creates a source for a `CancellationToken`.
   - `token: mockly.CancellationToken`: The actual token to pass to operations that support cancellation.
@@ -228,9 +228,9 @@ describe('Cancellation Token Tests', () => {
 });
 ~~~
 
-## Edit Types (`TextEdit`, `WorkspaceEdit`)
+## Edit Types (TextEdit, WorkspaceEdit)
 
-Used for describing text changes and file operations.
+Used for describing text changes and file operations. Access via `mockly` (e.g., `mockly.TextEdit.replace(...)`, `new mockly.WorkspaceEdit()`).
 
 - **`mockly.TextEdit`**: Represents a textual change.
   - Static factory methods:
@@ -247,7 +247,7 @@ Used for describing text changes and file operations.
 **Example:**
 
 ~~~typescript
-import { mockly, Position, Range } from 'mockly-vsc';
+import { mockly } from 'mockly-vsc'; // Position and Range are available via mockly
 import { describe, expect, it } from 'vitest';
 
 describe('Edit Types Tests', () => {
@@ -258,10 +258,10 @@ describe('Edit Types Tests', () => {
 		expect(textEdit.newText).toBe('new_value');
 		expect(textEdit.range.isEqual(range)).toBe(true);
 
-		const insertEdit = mockly.TextEdit.insert(new Position(1, 0), 'insert this');
+		const insertEdit = mockly.TextEdit.insert(new mockly.Position(1, 0), 'insert this');
 		expect(insertEdit.newText).toBe('insert this');
 		expect(insertEdit.range.isEmpty).toBe(true); // Insert range is empty
-		expect(insertEdit.range.start.isEqual(new Position(1, 0))).toBe(true);
+		expect(insertEdit.range.start.isEqual(new mockly.Position(1, 0))).toBe(true);
 	});
 
 	it('should allow adding various operations to a WorkspaceEdit', () => {
@@ -298,7 +298,7 @@ describe('Edit Types Tests', () => {
 
 ## Errors and Enums
 
-Mockly-VSC exposes core error classes like `FileSystemError` and numerous enums used throughout the API.
+Mockly-VSC exposes core error classes like `FileSystemError` and numerous enums used throughout the API. These are accessed via `mockly` (e.g., `mockly.FileSystemError.FileNotFound()`, `mockly.FileType.File`).
 
 - **`mockly.FileSystemError`**: Represents file system-related errors.
   - Static factory methods: `mockly.FileSystemError.FileNotFound(uri?)`, `mockly.FileSystemError.FileExists(uri?)`, `mockly.FileSystemError.FileNotADirectory(uri?)`, `mockly.FileSystemError.FileIsADirectory(uri?)`, `mockly.FileSystemError.NoPermissions(uri?)`, `mockly.FileSystemError.Unavailable(uri?)`.
@@ -316,18 +316,18 @@ Mockly-VSC exposes core error classes like `FileSystemError` and numerous enums 
   - `mockly.QuickPickItemKind`: `Default` (0), `Separator` (-1)
   - `mockly.ConfigurationTarget`: `Global`, `Workspace`, `WorkspaceFolder`
   - `mockly.DiagnosticSeverity`: `Error`, `Warning`, `Information`, `Hint`
-  - ...and many more. For a comprehensive list, you can inspect the `vscEnums.ts` file in the Mockly-VSC source code or rely on TypeScript autocompletion.
+  - ...and many more. For a comprehensive list, you can inspect the `vscEnums.ts` file in the Mockly-VSC source code or rely on TypeScript autocompletion when using `mockly.`.
 
 **Example:**
 
 ~~~typescript
-import { FileSystemError, FileType, LogLevel, mockly } from 'mockly-vsc'; // Import specific enums/errors
+import { mockly } from 'mockly-vsc'; // Enums like FileType and LogLevel are on mockly
 import { describe, expect, it } from 'vitest';
 
 describe('Errors and Enums Tests', () => {
 	it('should provide FileType enum values', () => {
 		expect(mockly.FileType.File).toBe(1);
-		expect(FileType.Directory).toBe(2); // Can also import directly
+		expect(mockly.FileType.Directory).toBe(2); // Can also import directly
 		expect(mockly.FileType.Unknown).toBe(0);
 	});
 
@@ -344,7 +344,7 @@ describe('Errors and Enums Tests', () => {
 
 	it('should provide LogLevel enum values', () => {
 		expect(mockly.LogLevel.Info).toBe(3); // As per VSCode's definition
-		expect(LogLevel.Debug).toBe(2);
+		expect(mockly.LogLevel.Debug).toBe(2);
 	});
 
 	it('should provide ViewColumn enum values', () => {

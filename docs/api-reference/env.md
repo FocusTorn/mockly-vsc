@@ -1,4 +1,4 @@
-# API Reference: `mockly.env`
+# API Reference: mockly.env
 
 The `mockly.env` object simulates the `vscode.env` API, providing information about the mock application environment, clipboard access, external URI handling, and other environment-specific utilities.
 
@@ -26,8 +26,8 @@ Mockly-VSC provides sensible default mock values for most `vscode.env` propertie
 
 **Example:**
 
-```typescript
-import { LogLevel, mockly, UIKind, vscodeSimulator } from 'mockly-vsc';
+~~~typescript
+import { mockly, vscodeSimulator } from 'mockly-vsc'; // LogLevel and UIKind are accessed via mockly
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 describe('Environment API (mockly.env) Properties Tests', () => {
@@ -38,7 +38,7 @@ describe('Environment API (mockly.env) Properties Tests', () => {
 	it('should provide default mock environment properties', () => {
 		expect(mockly.env.appName).toBe('Mock VS Code');
 		expect(mockly.env.language).toBe('en');
-		expect(mockly.env.uiKind).toBe(UIKind.Desktop);
+		expect(mockly.env.uiKind).toBe(mockly.UIKind.Desktop); // Use mockly.UIKind
 		expect(mockly.env.machineId).toBeDefined();
 		expect(mockly.env.sessionId).toBeDefined();
 		expect(mockly.env.uriScheme).toBe('vscode');
@@ -52,11 +52,11 @@ describe('Environment API (mockly.env) Properties Tests', () => {
 
 		// Simulate changing the log level (e.g., via a setting or command in a real scenario)
 		// In Mockly, this can be done via the internal service for testing:
-		vscodeSimulator._envModule._envService.setLogLevel(LogLevel.Debug);
+		vscodeSimulator._envModule._envService.setLogLevel(mockly.LogLevel.Debug); // Use mockly.LogLevel
 
-		expect(mockly.env.logLevel).toBe(LogLevel.Debug);
+		expect(mockly.env.logLevel).toBe(mockly.LogLevel.Debug); // Use mockly.LogLevel
 		expect(onLogLevelChangeSpy).toHaveBeenCalledTimes(1);
-		expect(onLogLevelChangeSpy).toHaveBeenCalledWith(LogLevel.Debug);
+		expect(onLogLevelChangeSpy).toHaveBeenCalledWith(mockly.LogLevel.Debug); // Use mockly.LogLevel
 
 		disposable.dispose();
 	});
@@ -68,9 +68,9 @@ describe('Environment API (mockly.env) Properties Tests', () => {
 		expect(mockly.env.remoteName).toBe(testRemoteName);
 	});
 });
-```
+~~~
 
-## Clipboard (`mockly.env.clipboard`)
+## Clipboard (mockly.env.clipboard)
 
 `mockly.env.clipboard` provides an in-memory simulation of the system clipboard, allowing you to test copy and paste functionality.
 
@@ -83,7 +83,7 @@ The clipboard content is reset when `vscodeSimulator.reset()` is called.
 
 **Example:**
 
-```typescript
+~~~typescript
 import { mockly, vscodeSimulator } from 'mockly-vsc';
 import { beforeEach, describe, expect, it } from 'vitest';
 
@@ -113,7 +113,7 @@ describe('Clipboard (mockly.env.clipboard) Tests', () => {
 		expect(textAfterReset).toBe(''); // Default empty state
 	});
 });
-```
+~~~
 
 ## External URI Handling
 
@@ -129,7 +129,7 @@ Mockly-VSC simulates methods for opening external URIs (e.g., in a web browser) 
 
 **Example:**
 
-```typescript
+~~~typescript
 import { mockly, vscodeSimulator } from 'mockly-vsc';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -163,4 +163,4 @@ describe('External URI Handling (mockly.env) Tests', () => {
 		// Check console for logging if any (asExternalUri might not log by default)
 	});
 });
-```
+~~~

@@ -12,7 +12,7 @@ import type * as vt from 'vscode'
 import type { ICoreUtilitiesService } from '../../../core/_interfaces/ICoreUtilitiesService.ts'
 import type { IEventBusService } from '../../../core/_interfaces/IEventBusService.ts'
 import type { IEnvService } from '../_interfaces/IEnvService.ts'
-import type { IMockNodePathService } from 'src/modules/fileSystem/_interfaces/IMockNodePathService.ts'
+import type { IMockNodePathService } from 'src/modules/nodePath/_interfaces/IMockNodePathService.ts'
 
 //--------------------------------------------------------------------------------------------------------------<<
 

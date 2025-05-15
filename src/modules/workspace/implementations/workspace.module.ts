@@ -15,7 +15,6 @@ import type { IEventBusService } from '../../../core/_interfaces/IEventBusServic
 import type { IWorkspaceStateService } from '../_interfaces/IWorkspaceStateService.ts'
 import type { IFileSystemModule } from '../../fileSystem/_interfaces/IFileSystemModule.ts'
 import type { IUriService } from '../../fileSystem/_interfaces/IUriService.ts'
-import type { IMockNodePathService } from '../../fileSystem/_interfaces/IMockNodePathService.ts'
 import type { IFileSystemService } from '../../fileSystem/_interfaces/IFileSystemService.ts'
 
 //= IMPLEMENTATION TYPES ======================================================================================
@@ -76,7 +75,7 @@ export class WorkspaceModule implements IWorkspaceModule {
 
 		this.utils.log(LogLevel.Debug, 'WorkspaceModuleImpl reset complete.')
 	} //<
-    
+
 	/**
 	 * @inheritdoc
 	 */
@@ -109,12 +108,12 @@ export class WorkspaceModule implements IWorkspaceModule {
 		return this.fileSystemModule.Uri // Delegate to FileSystemModule
 	} //<
 
-	/**
-	 * @inheritdoc
-	 */
-	get _nodePathService(): IMockNodePathService { //>
-		return this.fileSystemModule.path // Delegate to FileSystemModule
-	} //<
+	// /** // REMOVED
+	//  * @inheritdoc
+	//  */
+	// get _nodePathService(): IMockNodePathService { //> // REMOVED
+	// 	return this.fileSystemModule.path // Delegate to FileSystemModule // REMOVED
+	// } //< // REMOVED
 
 	/**
 	 * @inheritdoc

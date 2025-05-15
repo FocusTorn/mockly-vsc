@@ -26,6 +26,10 @@ import type {
 	TreeItemCollapsibleState,
 	UIKind,
 	EndOfLine,
+	LogLevel, // Added LogLevel here for the new method signature
+	TextEditorRevealType, // ADDED
+	ExtensionKind, // ADDED
+	ConfigurationTarget, // ADDED
 } from '../../_vscCore/vscEnums.ts'
 import type { FileSystemError } from '../../_vscCore/vscFileSystemError.ts'
 
@@ -33,7 +37,7 @@ import type { FileSystemError } from '../../_vscCore/vscFileSystemError.ts'
 import type { ICommandsNamespace } from '../../modules/commands/_interfaces/ICommandsNamespace.ts'
 import type { IEnvNamespace } from '../../modules/env/_interfaces/IEnvNamespace.ts'
 import type { IExtensionsNamespace } from '../../modules/extensions/_interfaces/IExtensionsNamespace.ts'
-import type { IMockNodePathService } from '../../modules/fileSystem/_interfaces/IMockNodePathService.ts'
+import type { IMockNodePathService } from '../../modules/nodePath/_interfaces/IMockNodePathService.ts'
 import type { IUriService } from '../../modules/fileSystem/_interfaces/IUriService.ts'
 import type { IWindowNamespace } from '../../modules/window/_interfaces/IWindowNamespace.ts'
 import type { IWorkspaceNamespace } from '../../modules/workspace/_interfaces/IWorkspaceNamespace.ts'
@@ -89,6 +93,10 @@ export interface IVSCodeAPISimulatorService {
 	readonly TreeItemCollapsibleState: typeof TreeItemCollapsibleState
 	readonly UIKind: typeof UIKind
 	readonly EndOfLine: typeof EndOfLine
+	readonly LogLevel: typeof LogLevel // Expose LogLevel enum itself if needed by consumers
+	readonly TextEditorRevealType: typeof TextEditorRevealType // ADDED
+	readonly ExtensionKind: typeof ExtensionKind // ADDED
+	readonly ConfigurationTarget: typeof ConfigurationTarget // ADDED
 
 	// Version
 	readonly version: string
@@ -108,4 +116,5 @@ export interface IVSCodeAPISimulatorService {
 	readonly vfs: IVSCodeAPISimulatorVFSHelpers; // New property
 
 	reset: () => Promise<void>
+	setLogLevel: (level: LogLevel | string) => void; // New method signature
 }

@@ -1,4 +1,4 @@
-# API Reference: `mockly.workspace`
+# API Reference: mockly.workspace
 
 The `mockly.workspace` object simulates the `vscode.workspace` API, providing functionalities related to workspace folders, text documents, file system operations, and workspace-related events.
 
@@ -157,7 +157,7 @@ describe('Text Documents Tests', () => {
 });
 ```
 
-## File System (`mockly.workspace.fs`)
+## File System (mockly.workspace.fs)
 
 Mockly-VSC provides a complete in-memory file system accessible via `mockly.workspace.fs`. This simulates the `vscode.workspace.fs` API, allowing you to perform file operations without affecting your actual disk. This is crucial for testing file-related functionality in isolation.
 
@@ -302,7 +302,7 @@ describe('Finding Files (workspace.findFiles) Tests', () => {
 });
 ```
 
-## Applying Edits (`mockly.workspace.applyEdit`)
+## Applying Edits (mockly.workspace.applyEdit)
 
 `mockly.workspace.applyEdit(edit: WorkspaceEdit): Promise<boolean>` simulates applying a `WorkspaceEdit`. This is useful for testing code that performs refactorings or bulk modifications across one or more files. A `WorkspaceEdit` can contain text edits and file operations (create, delete, rename).
 

@@ -23,7 +23,7 @@ import type { IExtensionsService } from './modules/extensions/_interfaces/IExten
 import type { IFileSystemModule } from './modules/fileSystem/_interfaces/IFileSystemModule.ts'
 import type { IFileSystemService } from './modules/fileSystem/_interfaces/IFileSystemService.ts'
 import type { IFileSystemStateService } from './modules/fileSystem/_interfaces/IFileSystemStateService.ts'
-import type { IMockNodePathService } from './modules/fileSystem/_interfaces/IMockNodePathService.ts'
+import type { IMockNodePathService } from './modules/nodePath/_interfaces/IMockNodePathService.ts'
 import type { IUriService } from './modules/fileSystem/_interfaces/IUriService.ts'
 import type { IWindowModule } from './modules/window/_interfaces/IWindowModule.ts'
 import type { IWindowNamespace } from './modules/window/_interfaces/IWindowNamespace.ts'
@@ -53,7 +53,7 @@ import { ExtensionsService } from './modules/extensions/services/extensions.serv
 import { FileSystemModule } from './modules/fileSystem/implementations/fileSystem.module.ts'
 import { FileSystemService } from './modules/fileSystem/services/fileSystem.service.ts'
 import { FileSystemStateService } from './modules/fileSystem/services/fileSystemState.service.ts'
-import { NodePathService } from './modules/fileSystem/services/nodePath.service.ts'
+import { NodePathService } from './modules/nodePath/services/nodePath.service.ts'
 import { UriService } from './modules/fileSystem/services/uri.service.ts'
 import { WindowModule } from './modules/window/implementations/window.module.ts'
 import { WindowNamespace } from './modules/window/windowNamespace.ts'
@@ -77,10 +77,14 @@ container.registerSingleton<ICoreUtilitiesService>('ICoreUtilitiesService', Core
 container.registerSingleton<IEventBusService>('IEventBusService', EventBusService)
 
 // ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+// │  NODE PATH (Mock of Node.js 'path')                                                              │
+// └──────────────────────────────────────────────────────────────────────────────────────────────────┘
+container.registerSingleton<IMockNodePathService>('IMockNodePathService', NodePathService)
+
+// ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
 // │  FILE SYSTEM                                                                                     │
 // └──────────────────────────────────────────────────────────────────────────────────────────────────┘
 
-container.registerSingleton<IMockNodePathService>('IMockNodePathService', NodePathService)
 container.registerSingleton<IFileSystemStateService>('IFileSystemStateService', FileSystemStateService)
 container.registerSingleton<IUriService>('IUriService', UriService)
 container.registerSingleton<IFileSystemService>('IFileSystemService', FileSystemService)
