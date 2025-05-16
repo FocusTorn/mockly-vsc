@@ -1,8 +1,7 @@
 
 
 
-# Ignored by Notes Hub extension
-.notesHub
+
 
 /node_modules
 /dist
@@ -18,11 +17,14 @@
 !.vscode/extensions.json
 
 #= VitePress ======================================================================================== 
-docs/.vitepress/cache
-docs/.vitepress/dist
+/docs/.vitepress/cache
+/docs/.vitepress/dist
 
 
 
+# Ignored by Notes Hub extension
+.notesHub
 
+/coverage
 
 
