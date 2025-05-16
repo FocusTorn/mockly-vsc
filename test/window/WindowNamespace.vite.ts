@@ -36,7 +36,8 @@ describe('WindowNamespace', () => {
 		eventBus = setup.eventBus
 		windowModule = setup.windowModule
 		textEditorService = windowModule._textEditorService // Access via windowModule
-		terminalService = windowModule._terminalService     // Access via windowModule
+		terminalService = windowModule._terminalService // Access via windowModule
+	
 	}) //<
 
 	//---------------------------------------------------------------------------------------------------------------<<
@@ -44,12 +45,14 @@ describe('WindowNamespace', () => {
 	describe('Internal Sanity Checks', () => { //>
 		it('should expose the window namespace on the simulator', () => { //>
 			expect(simulator.window).toBeDefined()
+		
 		}) //<
 		it('should have initial state for properties', () => { //>
 			expect(simulator.window.activeTextEditor).toBeUndefined()
 			expect(simulator.window.visibleTextEditors).toEqual([])
 			expect(simulator.window.terminals).toEqual([])
 			expect(simulator.window.activeTerminal).toBeUndefined()
+		
 		}) //<
 		it('should expose event emitters as functions', () => { //>
 			expect(typeof simulator.window.onDidChangeActiveTextEditor).toBe('function')
@@ -62,12 +65,14 @@ describe('WindowNamespace', () => {
 			expect(typeof simulator.window.onDidOpenTerminal).toBe('function')
 			expect(typeof simulator.window.onDidCloseTerminal).toBe('function')
 			expect(typeof simulator.window.onDidChangeActiveTerminal).toBe('function')
+		
 		}) //<
 		it('simulator.reset should call reset on the WindowModule', async () => { //>
 			const windowModuleResetSpy = vi.spyOn(windowModule, 'reset')
 			await simulator.reset() // Reset is handled by setup.afterEach
 			expect(windowModuleResetSpy).toHaveBeenCalledOnce()
 			windowModuleResetSpy.mockRestore()
+		
 		}) //<
 		it('simulator.reset should call _reset on internal services', async () => { //>
 			const textEditorServiceResetSpy = vi.spyOn(textEditorService, '_reset')
@@ -80,7 +85,9 @@ describe('WindowNamespace', () => {
 
 			textEditorServiceResetSpy.mockRestore()
 			terminalServiceResetSpy.mockRestore()
+		
 		}) //<
+	
 	}) //<
 
 	describe('Event Firing', () => { //>
@@ -95,6 +102,7 @@ describe('WindowNamespace', () => {
 			await simulator.workspace.fs.writeFile(fileUri2, new TextEncoder().encode('content 2'))
 			doc1 = await simulator.workspace.openTextDocument(fileUri1) as TextDocument
 			doc2 = await simulator.workspace.openTextDocument(fileUri2) as TextDocument
+		
 		}) //<
 
 		//--------------------------------------------------------------------<<
@@ -116,6 +124,7 @@ describe('WindowNamespace', () => {
 			expect(onDidChangeActiveTextEditorSpy).toHaveBeenLastCalledWith(undefined)
 
 			sub.dispose()
+		
 		}) //<
 		it('onDidOpenTerminal should fire when a terminal is created', () => { //>
 			const onDidOpenTerminalSpy = vi.fn()
@@ -130,6 +139,7 @@ describe('WindowNamespace', () => {
 			expect(onDidOpenTerminalSpy).toHaveBeenLastCalledWith(terminal2)
 
 			sub.dispose()
+		
 		}) //<
 		it('onDidCloseTerminal should fire when a terminal is disposed', () => { //>
 			const terminal1 = simulator.window.createTerminal('Term 1')
@@ -146,6 +156,7 @@ describe('WindowNamespace', () => {
 			expect(onDidCloseTerminalSpy).toHaveBeenLastCalledWith(terminal2)
 
 			sub.dispose()
+		
 		}) //<
 		it('onDidChangeActiveTerminal should fire when active terminal changes', () => { //>
 			const terminal1 = simulator.window.createTerminal('Term 1') // Becomes active
@@ -169,7 +180,9 @@ describe('WindowNamespace', () => {
 			expect(onDidChangeActiveTerminalSpy).toHaveBeenLastCalledWith(undefined)
 
 			sub.dispose()
+		
 		}) //<
+	
 	}) //<
 
 })

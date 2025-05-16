@@ -31,6 +31,7 @@ describe('NodeFsService - Read Operations', () => {
 		uriService = setup.uriService
 		// Ensure VFS is clean before each test in this describe block
 		await vfsStateService.clear()
+	
 	})
 
 	//-----------------------------------------------------------------------------------<<
@@ -46,6 +47,7 @@ describe('NodeFsService - Read Operations', () => {
 
 			// Assert
 			expect(result).toBe(true)
+		
 		}) //<
 
 		it('should return false if path does not exist', () => { //>
@@ -57,6 +59,7 @@ describe('NodeFsService - Read Operations', () => {
 
 			// Assert
 			expect(result).toBe(false)
+		
 		}) //<
 
 		it('should work with string paths', async () => { //>
@@ -69,7 +72,9 @@ describe('NodeFsService - Read Operations', () => {
 
 			// Assert
 			expect(result).toBe(true)
+		
 		}) //<
+	
 	}) //<
 
 	describe('statSync()', () => { //>
@@ -88,6 +93,7 @@ describe('NodeFsService - Read Operations', () => {
 			expect(stats.size).toBe(Buffer.from(content).byteLength)
 			expect(stats.mtime).toBe(now)
 			expect(stats.ctime).toBe(now - 1000)
+		
 		}) //<
 
 		it('should return stat for an existing directory', async () => { //>
@@ -103,6 +109,7 @@ describe('NodeFsService - Read Operations', () => {
 			expect(stats.type).toBe(FileType.Directory)
 			expect(stats.size).toBe(0) // Directories have size 0 in this mock
 			expect(stats.mtime).toBe(now)
+		
 		}) //<
 
 		it('should throw ENOENT if path does not exist', () => { //>
@@ -113,10 +120,14 @@ describe('NodeFsService - Read Operations', () => {
 			expect(() => nodeFsService.statSync(filePath)).toThrowError(/ENOENT|FileNotFound/)
 			try {
 				nodeFsService.statSync(filePath)
-			} catch (e) {
+			
+			}
+			catch (e) {
 				expect((e as FileSystemError | Error).name).toBe('Error') // Mapped to generic Error by _handleError
 				expect((e as any).code).toMatch(/ENOENT|FileNotFound/)
+			
 			}
+		
 		}) //<
 
 		it('should throw ENOTDIR if path is a file but used as directory for a non-existent child', async () => { //>
@@ -133,7 +144,9 @@ describe('NodeFsService - Read Operations', () => {
 			// ENOTDIR would be for operations like readdir on a file.
 			// Let's test readdir for this. For statSync, ENOENT is more likely.
 			expect(() => nodeFsService.statSync(nonExistentChild)).toThrowError(/ENOENT|FileNotFound/)
+		
 		}) //<
+	
 	}) //<
 
 	describe('readFileSync()', () => { //>
@@ -149,6 +162,7 @@ describe('NodeFsService - Read Operations', () => {
 			// Assert
 			expect(buffer).toBeInstanceOf(Buffer)
 			expect(buffer.toString('utf8')).toBe(content)
+		
 		}) //<
 
 		it('should read file content with utf8 encoding', async () => { //>
@@ -163,6 +177,7 @@ describe('NodeFsService - Read Operations', () => {
 			// Assert
 			expect(typeof strContent).toBe('string')
 			expect(strContent).toBe(content)
+		
 		}) //<
 
 		it('should read file content with string encoding option', async () => { //>
@@ -177,6 +192,7 @@ describe('NodeFsService - Read Operations', () => {
 			// Assert
 			expect(typeof strContent).toBe('string')
 			expect(strContent).toBe(content)
+		
 		}) //<
 
 		it('should throw ENOENT if file does not exist', () => { //>
@@ -185,6 +201,7 @@ describe('NodeFsService - Read Operations', () => {
 
 			// Act & Assert
 			expect(() => nodeFsService.readFileSync(filePath)).toThrowError(/ENOENT|FileNotFound/)
+		
 		}) //<
 
 		it('should throw EISDIR if path is a directory', async () => { //>
@@ -196,10 +213,15 @@ describe('NodeFsService - Read Operations', () => {
 			expect(() => nodeFsService.readFileSync(dirPath)).toThrowError(/EISDIR|FileIsADirectory/)
 			try {
 				nodeFsService.readFileSync(dirPath)
-			} catch (e) {
-				expect((e as any).code).toMatch(/EISDIR|FileIsADirectory/)
+			
 			}
+			catch (e) {
+				expect((e as any).code).toMatch(/EISDIR|FileIsADirectory/)
+			
+			}
+		
 		}) //<
+	
 	}) //<
 
 	describe('readdirSync()', () => { //>
@@ -210,6 +232,7 @@ describe('NodeFsService - Read Operations', () => {
 			await vfsStateService.addFile(uriService.file('/test/readdir_dir/file2.ts'), { content: 'f2' })
 			await vfsStateService.addFolder(uriService.file('/test/readdir_dir/subdir'))
 			await vfsStateService.addFile(uriService.file('/test/readdir_dir/subdir/nested.js'), { content: 'n1' })
+		
 		})
 
 		it('should return an array of names by default', () => { //>
@@ -226,6 +249,7 @@ describe('NodeFsService - Read Operations', () => {
 			expect(entries).toContain('file2.ts')
 			expect(entries).toContain('subdir')
 			entries.forEach(entry => expect(typeof entry).toBe('string'))
+		
 		}) //<
 
 		it('should return an array of Dirent objects when withFileTypes is true', () => { //>
@@ -248,6 +272,7 @@ describe('NodeFsService - Read Operations', () => {
 			expect(subdir).toBeDefined()
 			expect(subdir.isFile()).toBe(false)
 			expect(subdir.isDirectory()).toBe(true)
+		
 		}) //<
 
 		it('should throw ENOENT if directory does not exist', () => { //>
@@ -256,6 +281,7 @@ describe('NodeFsService - Read Operations', () => {
 
 			// Act & Assert
 			expect(() => nodeFsService.readdirSync(dirPath)).toThrowError(/ENOENT|FileNotFound/)
+		
 		}) //<
 
 		it('should throw ENOTDIR if path is a file', async () => { //>
@@ -267,9 +293,15 @@ describe('NodeFsService - Read Operations', () => {
 			expect(() => nodeFsService.readdirSync(filePath)).toThrowError(/ENOTDIR|FileNotADirectory/)
 			try {
 				nodeFsService.readdirSync(filePath)
-			} catch (e) {
-				expect((e as any).code).toMatch(/ENOTDIR|FileNotADirectory/)
+			
 			}
+			catch (e) {
+				expect((e as any).code).toMatch(/ENOTDIR|FileNotADirectory/)
+			
+			}
+		
 		}) //<
+	
 	}) //<
+
 })

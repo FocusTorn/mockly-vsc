@@ -23,20 +23,21 @@ import { setupWorkspaceTests, silenceStd } from './_setup'
 const setup = setupWorkspaceTests()
 
 describe('Workspace Sanity Checks', () => { //>
-    // SETUP -->>
-    /* eslint-disable unused-imports/no-unused-vars */
-    let simulator: IVSCodeAPISimulatorService
+	// SETUP -->>
+	/* eslint-disable unused-imports/no-unused-vars */
+	let simulator: IVSCodeAPISimulatorService
 	let workspaceModule: IWorkspaceModule
 	let utilsService: ICoreUtilitiesService
-    /* eslint-enable unused-imports/no-unused-vars */
+	/* eslint-enable unused-imports/no-unused-vars */
     
 	beforeEach(() => {
 		simulator = setup.simulator
 		workspaceModule = setup.workspaceModule
 		utilsService = setup.utilsService
+	
 	})
 
-    //---------------------------------------------------------------------------------------------------------------<<
+	//---------------------------------------------------------------------------------------------------------------<<
     
 	it('textDocuments getter should return a snapshot', async () => { //>
 		const fileUri = simulator.Uri.file('/test/snapshot.txt')
@@ -54,6 +55,7 @@ describe('Workspace Sanity Checks', () => { //>
 		expect(textDocuments2.length).toBe(2) // Snapshot 2 should have the new doc
 		expect(textDocuments2).toContain(doc1)
 		expect(textDocuments2).toContain(doc2)
+	
 	}) //<
 	it('openAndAddTextDocument should only be called once per URI', async () => { //>
 		const localSilence = silenceStd(utilsService) // Silence console noise for this specific test
@@ -67,10 +69,14 @@ describe('Workspace Sanity Checks', () => { //>
 			// Remove the file if it exists (ensure clean state)
 			try {
 				await simulator.workspace.fs.delete(fileUri)
-			} catch (e) { //>
+			
+			}
+			catch (e) { //>
 				if ((e as any).code !== 'FileNotFound') {
 					throw e
+				
 				}
+			
 			} //<
 
 			await simulator.workspace.fs.writeFile(fileUri, new TextEncoder().encode('test'))
@@ -83,9 +89,13 @@ describe('Workspace Sanity Checks', () => { //>
 
 			// Restore the spy
 			openAndAddTextDocumentSpy.mockRestore()
-		} finally {
-			localSilence.dispose()
+		
 		}
+		finally {
+			localSilence.dispose()
+		
+		}
+	
 	}) //<
 	it('reset method should be called only once per test', () => { //>
 		// This test relies on the afterEach hook in the shared setup,
@@ -93,6 +103,7 @@ describe('Workspace Sanity Checks', () => { //>
 		// something is calling reset more than once per test, which is wrong.
 		// Pass condition is just that the test runs without error.
 		expect(true).toBe(true) // Dummy assertion
+	
 	}) //<
 	it('should not directly modify the array returned by textDocuments getter', async () => { //>
 		// Arrange: Open a document so there's something in the list
@@ -107,8 +118,8 @@ describe('Workspace Sanity Checks', () => { //>
 
 		// Attempt to modify the returned array (this should not affect the internal state)
 		// Using 'as any' to bypass readonly check for testing purposes
-        (docsArray1 as any).push('this should not be added internally');
-        (docsArray1 as any).splice(0, 1) // Also try removing
+		(docsArray1 as any).push('this should not be added internally');
+		(docsArray1 as any).splice(0, 1) // Also try removing
 
 		// Assert: Get the array snapshot again
 		const docsArray2 = simulator.workspace.textDocuments
@@ -124,6 +135,7 @@ describe('Workspace Sanity Checks', () => { //>
 		const mockTextDocumentService = container.resolve<TextDocumentService>('ITextDocumentService')
 		const openTextDocumentsMap = (mockTextDocumentService as any)._openTextDocuments
 		expect(openTextDocumentsMap.size).toBe(1) // Should still only have the original document
+	
 	}) //<
 	it('openTextDocument adds document to TextDocumentService', async () => { //>
 		const fileUri = simulator.Uri.file('/test/docServiceAdd.txt')
@@ -134,6 +146,7 @@ describe('Workspace Sanity Checks', () => { //>
 
 		const doc = await simulator.workspace.openTextDocument(fileUri)
 		expect(mockTextDocumentService.getTextDocument(fileUri)).toBe(doc)
+	
 	}) //<
 	it('closeTextDocument removes document from TextDocumentService', async () => { //>
 		const localSilence = silenceStd(utilsService) // Silence console noise for this specific test
@@ -158,11 +171,15 @@ describe('Workspace Sanity Checks', () => { //>
 			expect(closedDocInstance).toBeDefined()
 			expect(closedDocInstance?.isClosed).toBe(true)
 			expect(mockTextDocumentService.getTextDocuments().find(d => d.uri.toString() === fileUri.toString())).toBeUndefined()
-		} finally {
-			localSilence.dispose()
+		
 		}
+		finally {
+			localSilence.dispose()
+		
+		}
+	
 	}) //<
-    it('reset clears _openTextDocuments in TextDocumentService', async () => { //>
+	it('reset clears _openTextDocuments in TextDocumentService', async () => { //>
 		const fileUri = simulator.Uri.file('/test/resetClears.txt')
 		await simulator.workspace.fs.writeFile(fileUri, new TextEncoder().encode('test'))
 		await simulator.workspace.openTextDocument(fileUri)
@@ -174,5 +191,7 @@ describe('Workspace Sanity Checks', () => { //>
 		await simulator.reset() // reset is called in global afterEach
 
 		expect(mockTextDocumentService.getTextDocuments().length).toBe(0)
+	
 	}) //<
-}) 
+
+})

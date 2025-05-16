@@ -24,52 +24,55 @@ import type { IEnvNamespace } from './../_interfaces/IEnvNamespace.ts'
 @injectable()
 export class EnvNamespace implements IEnvNamespace {
 
-    private envService: IEnvService
-    private utils: ICoreUtilitiesService
+	private envService: IEnvService
+	private utils: ICoreUtilitiesService
 
-    constructor(
-        @inject('ICoreUtilitiesService') utils: ICoreUtilitiesService,
-        @inject('IEnvService') envService: IEnvService,
-    ) {
-        this.utils = utils
-        this.envService = envService
-        this.utils.log(LogLevel.Debug, 'EnvNamespace initialized.')
-    }
+	constructor(
+		@inject('ICoreUtilitiesService') utils: ICoreUtilitiesService,
+		@inject('IEnvService') envService: IEnvService,
+	) {
+		this.utils = utils
+		this.envService = envService
+		this.utils.log(LogLevel.Debug, 'EnvNamespace initialized.')
+	
+	}
 
-    // ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
-    // │  Getters                                                                                         │
-    // └──────────────────────────────────────────────────────────────────────────────────────────────────┘
+	// ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+	// │  Getters                                                                                         │
+	// └──────────────────────────────────────────────────────────────────────────────────────────────────┘
 
-    get appHost(): string { return this.envService.appHost }
-    get appName(): string { return this.envService.appName }
-    get appRoot(): string { return this.envService.appRoot }
-    get clipboard(): vt.Clipboard { return this.envService.clipboard }
-    get isNewAppInstall(): boolean { return this.envService.isNewAppInstall }
-    get language(): string { return this.envService.language }
-    get logLevel(): vt.LogLevel { return this.envService.logLevel }
-    get machineId(): string { return this.envService.machineId }
-    get onDidChangeLogLevel(): vt.Event<vt.LogLevel> { return this.envService.onDidChangeLogLevel }
-    get remoteName(): string | undefined { return this.envService.remoteName }
-    get sessionId(): string { return this.envService.sessionId }
-    get uiKind(): vt.UIKind { return this.envService.uiKind }
-    get uriScheme(): string { return this.envService.uriScheme }
+	get appHost(): string { return this.envService.appHost }
+	get appName(): string { return this.envService.appName }
+	get appRoot(): string { return this.envService.appRoot }
+	get clipboard(): vt.Clipboard { return this.envService.clipboard }
+	get isNewAppInstall(): boolean { return this.envService.isNewAppInstall }
+	get language(): string { return this.envService.language }
+	get logLevel(): vt.LogLevel { return this.envService.logLevel }
+	get machineId(): string { return this.envService.machineId }
+	get onDidChangeLogLevel(): vt.Event<vt.LogLevel> { return this.envService.onDidChangeLogLevel }
+	get remoteName(): string | undefined { return this.envService.remoteName }
+	get sessionId(): string { return this.envService.sessionId }
+	get uiKind(): vt.UIKind { return this.envService.uiKind }
+	get uriScheme(): string { return this.envService.uriScheme }
 
-    // ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
-    // │  Methods                                                                                         │
-    // └──────────────────────────────────────────────────────────────────────────────────────────────────┘
+	// ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+	// │  Methods                                                                                         │
+	// └──────────────────────────────────────────────────────────────────────────────────────────────────┘
 
-    async asExternalUri( //>
-        target: vUri,
-    ): Promise<vUri> {
-        this.utils.log(LogLevel.Trace, `env.asExternalUri called for: ${target.toString()}`)
-        return this.envService.asExternalUri(target)
-    } //<
+	async asExternalUri( //>
+		target: vUri,
+	): Promise<vUri> {
+		this.utils.log(LogLevel.Trace, `env.asExternalUri called for: ${target.toString()}`)
+		return this.envService.asExternalUri(target)
+	
+	} //<
 
-    async openExternal( //>
-        target: vUri,
-    ): Promise<boolean> {
-        this.utils.log(LogLevel.Trace, `env.openExternal called for: ${target.toString()}`)
-        return this.envService.openExternal(target)
-    } //<
+	async openExternal( //>
+		target: vUri,
+	): Promise<boolean> {
+		this.utils.log(LogLevel.Trace, `env.openExternal called for: ${target.toString()}`)
+		return this.envService.openExternal(target)
+	
+	} //<
 
 }

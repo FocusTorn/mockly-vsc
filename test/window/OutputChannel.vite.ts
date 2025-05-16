@@ -34,6 +34,7 @@ describe('OutputChannel', () => {
 		utilsService = setup.utilsService
 		windowModule = setup.windowModule
 		outputChannelService = windowModule._outputChannelService // Access via windowModule
+	
 	}) //<
 
 	//---------------------------------------------------------------------------------------------------------------<<
@@ -46,10 +47,12 @@ describe('OutputChannel', () => {
 		beforeEach(() => { //>
 			consoleLogSpy = vi.spyOn(console, 'log')
 			consoleLogSpy.mockImplementation(() => {})
+		
 		}) //<
 
 		afterEach(() => { //>
 			consoleLogSpy.mockRestore()
+		
 		}) //<
 
 		//------------------------------------------------<<
@@ -67,6 +70,7 @@ describe('OutputChannel', () => {
 			expect(typeof channel.dispose).toBe('function')
 			expect((channel as any).logLevel).toBeUndefined()
 			expect((channel as any).trace).toBeUndefined()
+		
 		}) //<
 		it('should create a log output channel with correct properties', () => { //>
 			const logChannel = simulator.window.createOutputChannel('Log Channel', { log: true })
@@ -86,11 +90,13 @@ describe('OutputChannel', () => {
 			expect(typeof logChannel.info).toBe('function')
 			expect(typeof logChannel.warn).toBe('function')
 			expect(typeof logChannel.error).toBe('function')
+		
 		}) //<
 		it('should return the same instance for channels with the same name', () => { //>
 			const channel1 = simulator.window.createOutputChannel('Shared Channel')
 			const channel2 = simulator.window.createOutputChannel('Shared Channel')
 			expect(channel2).toBe(channel1)
+		
 		}) //<
 		it('should log output for standard channel append and appendLine', () => { //>
 			const channel = simulator.window.createOutputChannel('Standard Log Test')
@@ -105,6 +111,7 @@ describe('OutputChannel', () => {
 			expect(consoleLogSpy).toHaveBeenCalledWith('[Output Standard Log Test] Another')
 			expect(consoleLogSpy).toHaveBeenCalledWith('[Output Standard Log Test] Line')
 			expect(consoleLogSpy).toHaveBeenCalledTimes(4)
+		
 		}) //<
 		it('should log output for log channel methods based on log level', () => { //>
 			const logChannel = simulator.window.createOutputChannel('Log Log Test', { log: true }) as vt.LogOutputChannel
@@ -138,6 +145,7 @@ describe('OutputChannel', () => {
 			expect(consoleLogSpy).toHaveBeenCalledWith('[LogOutput Log Log Test - DEBUG] Debug message 2')
 			expect(consoleLogSpy).toHaveBeenCalledWith('[LogOutput Log Log Test - INFO] Info message 2')
 			expect(consoleLogSpy).toHaveBeenCalledTimes(3)
+		
 		}) //<
 		it('should clear output channels on reset', async () => { //>
 			simulator.window.createOutputChannel('Channel 1')
@@ -147,6 +155,7 @@ describe('OutputChannel', () => {
 			await simulator.reset()
 
 			expect((outputChannelService as any)._outputChannels.size).toBe(0)
+		
 		}) //<
 		it('should log clear, show, and hide calls', () => { //>
 			const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {})
@@ -165,6 +174,7 @@ describe('OutputChannel', () => {
 			expect(hideSpy).toHaveBeenCalled()
 
 			consoleSpy.mockRestore() // Restore console.log spy
+		
 		}) //<
 		it('should remove channel from internal map when disposed', () => { //>
 			const localSilence = silenceStd(utilsService) // Silence logs for this test
@@ -177,11 +187,15 @@ describe('OutputChannel', () => {
 
 				expect(outputChannelsMap.has('Disposable Channel')).toBe(false)
 				expect((channel as any).logLevel).toBeUndefined() // Check if it's a standard channel
+			
 			}
 			finally {
 				localSilence.dispose()
+			
 			}
+		
 		}) //<
+	
 	}) //<
 
 })

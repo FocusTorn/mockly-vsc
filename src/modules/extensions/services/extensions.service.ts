@@ -17,66 +17,77 @@ import type { IExtensionsService } from '../_interfaces/IExtensionsService.ts'
 @injectable()
 @singleton()
 export class ExtensionsService implements IExtensionsService {
-    private _extensionsMap = new Map<string, vt.Extension<any>>()
 
-    constructor(
-        @inject('ICoreUtilitiesService') private utils: ICoreUtilitiesService,
-        @inject('IEventBusService') private eventBus: IEventBusService,
-    ) {
-        this.utils.log(LogLevel.Debug, 'ExtensionsService initialized.')
-    }
+	private _extensionsMap = new Map<string, vt.Extension<any>>()
 
-    // ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
-    // │  Getters                                                                                         │
-    // └──────────────────────────────────────────────────────────────────────────────────────────────────┘
+	constructor(
+		@inject('ICoreUtilitiesService') private utils: ICoreUtilitiesService,
+		@inject('IEventBusService') private eventBus: IEventBusService,
+	) {
+		this.utils.log(LogLevel.Debug, 'ExtensionsService initialized.')
+	
+	}
 
-    get all(): readonly vt.Extension<any>[] { //>
-        return Array.from(this._extensionsMap.values())
-    } //<
+	// ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+	// │  Getters                                                                                         │
+	// └──────────────────────────────────────────────────────────────────────────────────────────────────┘
 
-    get onDidChange(): vt.Event<void> { //>
-        return this.eventBus.getOnDidChangeExtensionsEvent()
-    } //<
+	get all(): readonly vt.Extension<any>[] { //>
+		return Array.from(this._extensionsMap.values())
+	
+	} //<
 
-    // ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
-    // │  Methods                                                                                         │
-    // └──────────────────────────────────────────────────────────────────────────────────────────────────┘
+	get onDidChange(): vt.Event<void> { //>
+		return this.eventBus.getOnDidChangeExtensionsEvent()
+	
+	} //<
 
-    getExtension<T>( //>
-        extensionId: string,
-    ): vt.Extension<T> | undefined {
-        this.utils.log(LogLevel.Trace, `ExtensionsService.getExtension called for: ${extensionId}`)
-        return this._extensionsMap.get(extensionId) as vt.Extension<T> | undefined
-    } //<
+	// ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+	// │  Methods                                                                                         │
+	// └──────────────────────────────────────────────────────────────────────────────────────────────────┘
 
-    // ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
-    // │  Internal                                                                                        │
-    // └──────────────────────────────────────────────────────────────────────────────────────────────────┘
+	getExtension<T>( //>
+		extensionId: string,
+	): vt.Extension<T> | undefined {
+		this.utils.log(LogLevel.Trace, `ExtensionsService.getExtension called for: ${extensionId}`)
+		return this._extensionsMap.get(extensionId) as vt.Extension<T> | undefined
+	
+	} //<
 
-    _addExtension(ext: vt.Extension<any>): void { //>
-        this.utils.log(LogLevel.Debug, `ExtensionsService: Adding mock extension: ${ext.id}`)
-        this._extensionsMap.set(ext.id, ext)
-        this.eventBus.fireOnDidChangeExtensions()
-    } //<
+	// ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+	// │  Internal                                                                                        │
+	// └──────────────────────────────────────────────────────────────────────────────────────────────────┘
 
-    _clearExtensions(): void { //>
-        if (this._extensionsMap.size > 0) {
-            this.utils.log(LogLevel.Debug, `ExtensionsService: Clearing all mock extensions.`)
-            this._extensionsMap.clear()
-            this.eventBus.fireOnDidChangeExtensions()
-        }
-    } //<
+	_addExtension(ext: vt.Extension<any>): void { //>
+		this.utils.log(LogLevel.Debug, `ExtensionsService: Adding mock extension: ${ext.id}`)
+		this._extensionsMap.set(ext.id, ext)
+		this.eventBus.fireOnDidChangeExtensions()
+	
+	} //<
 
-    _removeExtension(extensionId: string): void { //>
-        if (this._extensionsMap.delete(extensionId)) {
-            this.utils.log(LogLevel.Debug, `ExtensionsService: Removing mock extension: ${extensionId}`)
-            this.eventBus.fireOnDidChangeExtensions()
-        }
-    } //<
+	_clearExtensions(): void { //>
+		if (this._extensionsMap.size > 0) {
+			this.utils.log(LogLevel.Debug, `ExtensionsService: Clearing all mock extensions.`)
+			this._extensionsMap.clear()
+			this.eventBus.fireOnDidChangeExtensions()
+		
+		}
+	
+	} //<
 
-    _reset(): void { //>
-        this.utils.log(LogLevel.Debug, 'ExtensionsService state reset...')
-        this._clearExtensions()
-    } //<
+	_removeExtension(extensionId: string): void { //>
+		if (this._extensionsMap.delete(extensionId)) {
+			this.utils.log(LogLevel.Debug, `ExtensionsService: Removing mock extension: ${extensionId}`)
+			this.eventBus.fireOnDidChangeExtensions()
+		
+		}
+	
+	} //<
+
+	_reset(): void { //>
+		this.utils.log(LogLevel.Debug, 'ExtensionsService state reset...')
+		this._clearExtensions()
+	
+	} //<
 
 }

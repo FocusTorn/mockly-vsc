@@ -25,6 +25,7 @@ import type { IFileSystemModule } from '../_interfaces/IFileSystemModule.ts'
  */
 @injectable()
 export class FileSystemModule implements IFileSystemModule {
+
 	readonly fs: IFileSystemService
 	readonly Uri: IUriService
 	readonly _fileSystemStateService: IFileSystemStateService
@@ -40,6 +41,7 @@ export class FileSystemModule implements IFileSystemModule {
 		this.Uri = uriService
 		this._fileSystemStateService = fileSystemStateService
 		this.utils.log(LogLevel.Debug, 'FileSystemModule initialized.')
+	
 	}
 
 	// ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐

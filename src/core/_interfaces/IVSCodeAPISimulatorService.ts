@@ -53,9 +53,9 @@ import type { IFileSystemStructure } from '../../modules/fileSystem/_interfaces/
 //--------------------------------------------------------------------------------------------------------------<<
 
 export interface IVSCodeAPISimulatorVFSHelpers { //>
-    populate: (structure: IFileSystemStructure) => Promise<void>;
-    populateSync: (structure: IFileSystemStructure) => void;
-    // Future VFS helpers can be added here
+	populate: (structure: IFileSystemStructure) => Promise<void>
+	populateSync: (structure: IFileSystemStructure) => void
+	// Future VFS helpers can be added here
 } //<
 
 export interface IVSCodeAPISimulatorService {
@@ -111,10 +111,10 @@ export interface IVSCodeAPISimulatorService {
 
 	// Public Path Service Accessor (for test helpers)
 	readonly path: IMockNodePathService
-	readonly nodePathService: IMockNodePathService;
-	readonly nodeFsService: INodeFsService;
-	readonly vfs: IVSCodeAPISimulatorVFSHelpers; // New property
+	readonly nodePathService: IMockNodePathService
+	readonly nodeFsService: INodeFsService
+	readonly vfs: IVSCodeAPISimulatorVFSHelpers // New property
 
 	reset: () => Promise<void>
-	setLogLevel: (level: LogLevel | string) => void; // New method signature
+	setLogLevel: (level: LogLevel | string) => void // New method signature
 }

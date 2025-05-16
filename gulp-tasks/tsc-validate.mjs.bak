@@ -1,0 +1,48 @@
+// ESLint & Imports -->>
+
+import chalk from 'chalk';
+import { exec as callbackExec } from 'child_process';
+import { promisify } from 'util';
+
+//--------------------------------------------------------------------------------------------------------------<<
+
+const exec = promisify(callbackExec); // Promisify exec for async/await usage
+
+export async function tsum() {
+    console.log('\x1Bc'); // Clear console
+
+    let output = '';
+    let exitCode = 0;
+    let tscSuccess = false;
+
+    try {
+        const { stdout, stderr } = await exec('npx tsc --pretty');
+        output = stderr + stdout;
+        tscSuccess = true;
+        exitCode = 0;
+    }
+    catch (e) { //>
+        output = (e.stderr || '') + (e.stdout || '');
+        exitCode = typeof e.code === 'number' ? e.code : 1;
+        tscSuccess = false;
+    } //<
+
+    const outputLines = output.trim().split(/\r?\n/);
+    let startIndex = -1;
+    
+    const summaryPattern = /^Found \d+ errors? in (the same file|\d+ file)\.?/;
+    startIndex = outputLines.findIndex(line => summaryPattern.test(line));
+
+    if (startIndex !== -1) {
+        console.log(outputLines.slice(startIndex).join('\n'));
+    }
+    else if (!tscSuccess) {
+        console.log(chalk.red(`\n--- TSC output (Exited with code ${exitCode}, TSC summary line NOT found) ---\n`));
+        console.log(output.trim());
+    }
+    else {
+        console.log(chalk.green('\nTSC found no errors'));
+    }
+
+    console.log(''); // Ensure a blank line after output
+}

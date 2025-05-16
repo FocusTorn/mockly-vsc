@@ -24,15 +24,15 @@ import type { IFileSystemService } from '../../src/modules/workspace/_interfaces
 const setup = setupWorkspaceTests()
 
 describe('WorkspaceStateService Unit Tests', () => {
-    // SETUP -->>
-    /* eslint-disable unused-imports/no-unused-vars */
-    let simulator: IVSCodeAPISimulatorService
+	// SETUP -->>
+	/* eslint-disable unused-imports/no-unused-vars */
+	let simulator: IVSCodeAPISimulatorService
 	let eventBus: IEventBusService
 	let utilsService: ICoreUtilitiesService
 	let diContainer: typeof container
 	let wsStateService: IWorkspaceStateService
 	let onChangeFoldersSpy: ReturnType<typeof vi.fn>
-    /* eslint-enable unused-imports/no-unused-vars */
+	/* eslint-enable unused-imports/no-unused-vars */
     
 	beforeEach(async () => {
 		simulator = setup.simulator
@@ -43,9 +43,10 @@ describe('WorkspaceStateService Unit Tests', () => {
 		wsStateService = diContainer.resolve<IWorkspaceStateService>('IWorkspaceStateService')
 		onChangeFoldersSpy = vi.fn()
 		eventBus.getOnDidChangeWorkspaceFoldersEvent()(onChangeFoldersSpy)
+	
 	}) //<
 
-    //---------------------------------------------------------------------------------------------------------------<<
+	//---------------------------------------------------------------------------------------------------------------<<
     
 	describe('Properties', () => { //>
 		it('should reflect workspaceFolders from WorkspaceStateService', async () => { //>
@@ -78,6 +79,7 @@ describe('WorkspaceStateService Unit Tests', () => {
 			// Act & Assert: Clear workspace via service
 			await wsStateService.clearWorkspace()
 			expect(simulator.workspace.workspaceFolders).toBeUndefined()
+		
 		}) //<
 		it('should reflect name and workspaceFile from WorkspaceStateService', async () => { //>
 			// Arrange
@@ -103,12 +105,15 @@ describe('WorkspaceStateService Unit Tests', () => {
 			await wsStateService.clearWorkspace()
 			expect(simulator.workspace.name).toBeUndefined()
 			expect(simulator.workspace.workspaceFile).toBeUndefined()
+		
 		}) //<
+	
 	}) //<
 
 	describe('setWorkspaceFolders', () => { //>
 		beforeEach(() => { //>
 			utilsService.setLogLevel(LogLevel.Off)
+		
 		}) //<
 
 		it('should set a single valid folder, becoming SINGLE_ROOT', async () => { //>
@@ -133,6 +138,7 @@ describe('WorkspaceStateService Unit Tests', () => {
 				added: [expect.objectContaining({ uri: folderUri })],
 				removed: [],
 			})
+		
 		}) //<
 		it('should set multiple valid folders, becoming MULTI_ROOT', async () => { //>
 			// Arrange
@@ -163,6 +169,7 @@ describe('WorkspaceStateService Unit Tests', () => {
 				],
 				removed: [],
 			})
+		
 		}) //<
 		it('should set folders with a workspace file, becoming MULTI_ROOT and deriving name', async () => { //>
 			// Arrange
@@ -184,6 +191,7 @@ describe('WorkspaceStateService Unit Tests', () => {
 				added: [expect.objectContaining({ uri: folderUri })],
 				removed: [],
 			})
+		
 		}) //<
 		it('should clear folders when setting an empty array, becoming NONE', async () => { //>
 			// Arrange
@@ -205,6 +213,7 @@ describe('WorkspaceStateService Unit Tests', () => {
 				added: [],
 				removed: [expect.objectContaining({ uri: folderUri })],
 			})
+		
 		}) //<
 		it('should skip non-existent or non-directory folders', async () => { //>
 			// Arrange
@@ -226,6 +235,7 @@ describe('WorkspaceStateService Unit Tests', () => {
 				added: [expect.objectContaining({ uri: validFolderUri })],
 				removed: [],
 			})
+		
 		}) //<
 		it('should skip duplicate folder URIs', async () => { //>
 			// Arrange
@@ -244,6 +254,7 @@ describe('WorkspaceStateService Unit Tests', () => {
 				added: [expect.objectContaining({ uri: folderUri })],
 				removed: [],
 			})
+		
 		}) //<
 		it('should handle a mix of Uri and WorkspaceFolder objects', async () => { //>
 			// Arrange
@@ -267,6 +278,7 @@ describe('WorkspaceStateService Unit Tests', () => {
 			expect(simulator.workspace.workspaceFolders?.[1].index).toBe(1)
 			// Assert Event
 			expect(onChangeFoldersSpy).toHaveBeenCalledOnce()
+		
 		}) //<
 		it('should correctly report added and removed folders in the event', async () => { //>
 			// Arrange
@@ -294,6 +306,7 @@ describe('WorkspaceStateService Unit Tests', () => {
 			expect(simulator.workspace.workspaceFolders?.length).toBe(2)
 			expect(simulator.workspace.workspaceFolders?.find(f => f.uri.toString() === folderUri2.toString())).toBeDefined()
 			expect(simulator.workspace.workspaceFolders?.find(f => f.uri.toString() === folderUri3.toString())).toBeDefined()
+		
 		}) //<
 		it('should become MULTI_ROOT even with one folder if workspaceFile is provided', async () => { //>
 			// Arrange
@@ -312,6 +325,7 @@ describe('WorkspaceStateService Unit Tests', () => {
 
 			// Assert Event
 			expect(onChangeFoldersSpy).toHaveBeenCalledOnce()
+		
 		}) //<
 		it('should become MULTI_ROOT (empty) if zero folders but workspaceFile is provided', async () => { //>
 			// Arrange
@@ -329,7 +343,9 @@ describe('WorkspaceStateService Unit Tests', () => {
 			// Assert Event
 			expect(onChangeFoldersSpy).toHaveBeenCalledOnce()
 			expect(onChangeFoldersSpy).toHaveBeenCalledWith({ added: [], removed: [] })
+		
 		}) //<
+	
 	}) //<
 
 	describe('getWorkspaceFolder', () => { //>
@@ -347,6 +363,7 @@ describe('WorkspaceStateService Unit Tests', () => {
 			await simulator.workspace.fs.writeFile(fileInFolder1, new Uint8Array())
 
 			await wsStateService.setWorkspaceFolders([folderUri1, folderUri2])
+		
 		}) //<
 
 		it('should return the correct folder for a URI inside it', () => { //>
@@ -358,6 +375,7 @@ describe('WorkspaceStateService Unit Tests', () => {
 			expect(result?.uri.toString()).toBe(folderUri1.toString())
 			expect(result?.name).toBe('folder1')
 			expect(result?.index).toBe(0)
+		
 		}) //<
 		it('should return the correct folder for a URI matching the folder exactly', () => { //>
 			// Act
@@ -368,6 +386,7 @@ describe('WorkspaceStateService Unit Tests', () => {
 			expect(result?.uri.toString()).toBe(folderUri2.toString())
 			expect(result?.name).toBe('nested')
 			expect(result?.index).toBe(1)
+		
 		}) //<
 		it('should return undefined for a URI outside any workspace folder', () => { //>
 			// Act
@@ -375,6 +394,7 @@ describe('WorkspaceStateService Unit Tests', () => {
 
 			// Assert
 			expect(result).toBeUndefined()
+		
 		}) //<
 		it('should return undefined if no workspace folders are open', async () => { //>
 			// Arrange: Clear folders
@@ -385,6 +405,7 @@ describe('WorkspaceStateService Unit Tests', () => {
 
 			// Assert
 			expect(result).toBeUndefined()
+		
 		}) //<
 		it('should return the closest parent folder if folders are nested', async () => { //>
 			// Arrange: Add a nested folder structure
@@ -403,7 +424,9 @@ describe('WorkspaceStateService Unit Tests', () => {
 			expect(result).toBeDefined()
 			expect(result?.uri.toString()).toBe(innerFolderUri.toString())
 			expect(result?.name).toBe('inner')
+		
 		}) //<
+	
 	}) //<
 
 	describe('[UNIT] addWorkspaceFolder (via Service)', () => { //>
@@ -415,11 +438,13 @@ describe('WorkspaceStateService Unit Tests', () => {
 			utilsErrorSpy = vi.spyOn(utilsService, 'error')
 			utilsLogSpy = vi.spyOn(utilsService, 'log')
 			utilsService.setLogLevel(LogLevel.Off)
+		
 		}) //<
 
 		afterEach(() => { //>
 			utilsErrorSpy.mockRestore()
 			utilsLogSpy.mockRestore()
+		
 		}) //<
 
 		it('should return false and log error for non-existent folder URI', async () => { //>
@@ -437,6 +462,7 @@ describe('WorkspaceStateService Unit Tests', () => {
 				expect.stringContaining(`Validation failed for adding workspace folder: ${nonExistentUri.toString()}`),
 			)
 			expect(onChangeFoldersSpy).not.toHaveBeenCalled()
+		
 		}) //<
 		it('should return false and log error for URI pointing to a file', async () => { //>
 			// Arrange
@@ -454,6 +480,7 @@ describe('WorkspaceStateService Unit Tests', () => {
 				expect.stringContaining(`Validation failed for adding workspace folder: ${fileUri.toString()}`),
 			)
 			expect(onChangeFoldersSpy).not.toHaveBeenCalled()
+		
 		}) //<
 		it('should return false and log debug if folder already exists', async () => { //>
 			// Arrange
@@ -474,7 +501,9 @@ describe('WorkspaceStateService Unit Tests', () => {
 				expect.stringContaining('Workspace folder already exists'),
 			)
 			expect(onChangeFoldersSpy).not.toHaveBeenCalled()
+		
 		}) //<
+	
 	}) //<
 
 	describe('[UNIT] _updateStateAndFireEvent (via Service)', () => { //>
@@ -486,11 +515,13 @@ describe('WorkspaceStateService Unit Tests', () => {
 			utilsErrorSpy = vi.spyOn(utilsService, 'error')
 			utilsLogSpy = vi.spyOn(utilsService, 'log')
 			utilsService.setLogLevel(LogLevel.Off)
+		
 		}) //<
 
 		afterEach(() => { //>
 			utilsErrorSpy.mockRestore()
 			utilsLogSpy.mockRestore()
+		
 		}) //<
 
 		//---------------------------------------------------------------------------------------------------------------<<
@@ -504,8 +535,10 @@ describe('WorkspaceStateService Unit Tests', () => {
 			const statSpy = vi.spyOn(fileSystemService, 'stat').mockImplementation(async (uri) => {
 				if (uri.toString() === problematicUri.toString()) {
 					throw genericError
+				
 				}
 				throw new Error(`Unexpected stat call for ${uri.toString()}`)
+			
 			})
 
 			// Act
@@ -526,6 +559,7 @@ describe('WorkspaceStateService Unit Tests', () => {
 
 			// Cleanup
 			statSpy.mockRestore()
+		
 		}) //<
         
 		it('should set name from basename if workspace file has no extension', async () => { //>
@@ -550,7 +584,9 @@ describe('WorkspaceStateService Unit Tests', () => {
 				added: [expect.objectContaining({ name: 'ws_no_ext_proj' })],
 				removed: [],
 			}))
+		
 		}) //<
+	
 	}) //<
     
 })

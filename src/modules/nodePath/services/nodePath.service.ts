@@ -9,6 +9,7 @@ import type { IPathObject, IMockNodePathService } from '../_interfaces/IMockNode
 //--------------------------------------------------------------------------------------------------------------<<
 
 export class NodePathService implements IMockNodePathService {
+
 	// ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
 	// │ Properties                                                                                       │
 	// └──────────────────────────────────────────────────────────────────────────────────────────────────┘
@@ -25,6 +26,7 @@ export class NodePathService implements IMockNodePathService {
 	constructor(initialMode: 'posix' | 'win32' = 'posix') { //>
 		this.currentMode = initialMode
 		this.pathModule = this.currentMode === 'win32' ? NodePathService._nodeWin32Path : NodePathService._nodePosixPath
+	
 	} //<
 
 	// ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
@@ -33,10 +35,12 @@ export class NodePathService implements IMockNodePathService {
 
 	get sep(): '/' | '\\' { //>
 		return this.pathModule.sep
+	
 	} //<
 
 	get delimiter(): ':' | ';' { //>
 		return this.pathModule.delimiter
+	
 	} //<
 
 	get posix(): IMockNodePathService { //>
@@ -48,12 +52,14 @@ export class NodePathService implements IMockNodePathService {
 		// However, for this mock, simply returning an instance set to 'posix' is sufficient
 		// to satisfy the type, and its methods will use nodePathPosix.
 		return posixService
+	
 	} //<
 
 	get win32(): IMockNodePathService { //>
 		const win32Service = new NodePathService('win32')
 		// Similar to posix, this instance should always use win32 behavior.
 		return win32Service
+	
 	} //<
 
 	// ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
@@ -67,38 +73,47 @@ export class NodePathService implements IMockNodePathService {
 		// For now, allow changing mode on any instance for flexibility in the mock.
 		this.currentMode = mode
 		this.pathModule = mode === 'win32' ? NodePathService._nodeWin32Path : NodePathService._nodePosixPath
+	
 	} //<
 
 	getMode(): 'posix' | 'win32' { //>
 		return this.currentMode
+	
 	} //<
 
 	basename(p: string, ext?: string): string { //>
 		return this.pathModule.basename(p, ext)
+	
 	} //<
 
 	dirname(p: string): string { //>
 		return this.pathModule.dirname(p)
+	
 	} //<
 
 	extname(p: string): string { //>
 		return this.pathModule.extname(p)
+	
 	} //<
 
 	format(pathObject: Partial<IPathObject>): string { //>
 		return this.pathModule.format(pathObject as any)
+	
 	} //<
 
 	isAbsolute(p: string): boolean { //>
 		return this.pathModule.isAbsolute(p)
+	
 	} //<
 
 	join(...paths: string[]): string { //>
 		return this.pathModule.join(...paths)
+	
 	} //<
 
 	normalize(p: string): string { //>
 		return this.pathModule.normalize(p)
+	
 	} //<
 
 	parse(p: string): IPathObject { //>
@@ -110,26 +125,35 @@ export class NodePathService implements IMockNodePathService {
 			ext: parsed.ext,
 			name: parsed.name,
 		}
+	
 	} //<
 
 	relative(from: string, to: string): string { //>
 		return this.pathModule.relative(from, to)
+	
 	} //<
 
 	resolve(...pathSegments: string[]): string { //>
 		return this.pathModule.resolve(...pathSegments)
+	
 	} //<
 
 	toNamespacedPath(p: string): string { //>
 		if (this.pathModule.toNamespacedPath) { //>
 			return this.pathModule.toNamespacedPath(p)
+		
 		} //<
 		return p
+	
 	} //<
 
 	matchesGlob(_pattern: string, _path: string): boolean { //>
-		if (_pattern === '**/*.*' && _path.includes('.')) return true
-		if (_pattern === '**/foo' && _path.endsWith('/foo')) return true
+		if (_pattern === '**/*.*' && _path.includes('.'))
+			return true
+		if (_pattern === '**/foo' && _path.endsWith('/foo'))
+			return true
 		return false
+	
 	} //<
+
 }

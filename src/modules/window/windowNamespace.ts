@@ -39,7 +39,6 @@ export class WindowNamespace implements IWindowNamespace {
 		@inject('ITerminalService') private terminalService: ITerminalService,
 		@inject('IOutputChannelService') private outputChannelService: IOutputChannelService,
 	) {
-
 		this.utils.log(LogLevel.Debug, 'WindowNamespace initialized.')
 	
 	}
@@ -90,7 +89,6 @@ export class WindowNamespace implements IWindowNamespace {
 		name: string,
 		optionsOrLanguageId?: string | { log: true },
 	): vt.OutputChannel | vt.LogOutputChannel {
-
 		// Cast needed due to overloads
 		return this.outputChannelService.createOutputChannel(name, optionsOrLanguageId as any)
 	
@@ -101,29 +99,24 @@ export class WindowNamespace implements IWindowNamespace {
 		alignmentOrPriority?: vt.StatusBarAlignment | number,
 		priority?: number,
 	): vt.StatusBarItem {
-
 		let id: string | undefined
 		let alignment: vt.StatusBarAlignment = StatusBarAlignment.Left // Refactored VSCode value
 		let finalPriority: number | undefined
 
 		if (typeof idOrAlignment === 'string') {
-
 			// Overload 2: createStatusBarItem(id: string, alignment?: StatusBarAlignment, priority?: number)
 			id = idOrAlignment
 
 			// Now determine alignment and priority based on the next arguments
 			if (typeof alignmentOrPriority === 'number') {
-
 				// Second argument is a number. Could be alignment or priority.
 				if (typeof priority === 'number') {
-
 					// Three arguments: id, alignment, priority
 					alignment = alignmentOrPriority as vt.StatusBarAlignment // Second arg is alignment
 					finalPriority = priority // Third arg is priority
 				
 				}
 				else {
-
 					// Two arguments: id, priority
 					finalPriority = alignmentOrPriority // Second arg is priority
 					// alignment remains default Left
@@ -132,7 +125,6 @@ export class WindowNamespace implements IWindowNamespace {
 			
 			}
 			else if (alignmentOrPriority !== undefined) {
-
 				// Second argument is StatusBarAlignment (or undefined).
 				// Two arguments: id, alignment (priority is undefined)
 				alignment = alignmentOrPriority // Second arg is alignment
@@ -140,7 +132,6 @@ export class WindowNamespace implements IWindowNamespace {
 			
 			}
 			else {
-
 				// Only one argument: id (alignment and priority are default/undefined)
 				// alignment remains default Left
 				finalPriority = priority // Third arg (if any) is priority, otherwise undefined
@@ -149,7 +140,6 @@ export class WindowNamespace implements IWindowNamespace {
 
 		}
 		else if (typeof idOrAlignment === 'number') {
-
 			// Overload 1: createStatusBarItem(alignment?: StatusBarAlignment, priority?: number)
 			alignment = idOrAlignment // First arg is alignment
 			finalPriority = alignmentOrPriority as number | undefined // Second arg is priority
@@ -198,7 +188,6 @@ export class WindowNamespace implements IWindowNamespace {
 		shellPath?: string,
 		shellArgs?: string[] | string,
 	): vt.Terminal {
-
 		// Cast needed due to overloads
 		return this.terminalService.createTerminal(nameOrOptions as any, shellPath, shellArgs)
 	
@@ -208,11 +197,9 @@ export class WindowNamespace implements IWindowNamespace {
 		viewId: string,
 		_treeDataProvider: vt.TreeDataProvider<any>,
 	): vt.Disposable {
-
 		this.utils.log(LogLevel.Info, `[UI MOCK] registerTreeDataProvider called for view: ${viewId}`)
 
 		return new Disposable(() => {
-
 			this.utils.log(LogLevel.Debug, `[UI MOCK] Disposing TreeDataProvider for view: ${viewId}`)
 		
 		})
@@ -223,7 +210,6 @@ export class WindowNamespace implements IWindowNamespace {
 		message: string,
 		...args: any[]
 	): Thenable<any | undefined> {
-
 		return this.userInteractionService.showErrorMessage(message, ...args)
 	
 	} //<
@@ -232,7 +218,6 @@ export class WindowNamespace implements IWindowNamespace {
 		message: string,
 		...args: any[]
 	): Thenable<any | undefined> {
-
 		return this.userInteractionService.showInformationMessage(message, ...args)
 	
 	} //<
@@ -241,7 +226,6 @@ export class WindowNamespace implements IWindowNamespace {
 		options?: vt.InputBoxOptions,
 		token?: vt.CancellationToken,
 	): Thenable<string | undefined> {
-
 		return this.userInteractionService.showInputBox(options, token)
 	
 	} //<
@@ -261,7 +245,6 @@ export class WindowNamespace implements IWindowNamespace {
 		options?: vt.QuickPickOptions,
 		token?: vt.CancellationToken,
 	): Thenable<any | undefined> {
-
 		return this.userInteractionService.showQuickPick(items, options, token)
 	
 	} //<
@@ -283,7 +266,6 @@ export class WindowNamespace implements IWindowNamespace {
 		optionsOrColumn?: vt.TextDocumentShowOptions | vt.ViewColumn,
 		preserveFocusLegacy?: boolean,
 	): Promise<vt.TextEditor> {
-
 		this.utils.log(
 			LogLevel.Info,
 			`window.showTextDocument called for: `
@@ -296,20 +278,16 @@ export class WindowNamespace implements IWindowNamespace {
 		let showOptions: vt.TextDocumentShowOptions | undefined
 
 		if (documentOrUri instanceof Uri) {
-
 			// Overload 3: (uri: Uri, options?: TextDocumentShowOptions)
 			if (typeof optionsOrColumn !== 'number') {
-
 				showOptions = optionsOrColumn
 			
 			}
 			try {
-
 				document = await this.workspaceModule.workspace.openTextDocument(documentOrUri) as TextDocument
 			
 			}
 			catch (e) {
-
 				this.utils.error(`showTextDocument failed to open document: ${documentOrUri.toString()}`, e)
 				throw e
 			
@@ -317,22 +295,18 @@ export class WindowNamespace implements IWindowNamespace {
 		
 		}
 		else {
-
 			// Overloads 1 or 2: (document: TextDocument, ...)
 			try {
-
 				document = await this.workspaceModule.workspace.openTextDocument(documentOrUri.uri) as TextDocument
 			
 			}
 			catch (e) {
-
 				this.utils.error(`showTextDocument failed to re-open/find document: ${documentOrUri.uri.toString()}`, e)
 				throw e
 			
 			}
 
 			if (typeof optionsOrColumn === 'number') {
-
 				// Overload 1: (document: TextDocument, column?: ViewColumn, preserveFocus?: boolean)
 				showOptions = {
 					viewColumn: optionsOrColumn,
@@ -341,7 +315,6 @@ export class WindowNamespace implements IWindowNamespace {
 			
 			}
 			else {
-
 				// Overload 2: (document: TextDocument, options?: TextDocumentShowOptions)
 				showOptions = optionsOrColumn
 			
@@ -350,7 +323,6 @@ export class WindowNamespace implements IWindowNamespace {
 		}
 
 		if (document.isClosed) {
-
 			throw this.utils.createError(`Cannot show closed document: ${document.uri.toString()}`)
 		
 		}
@@ -363,7 +335,6 @@ export class WindowNamespace implements IWindowNamespace {
 		message: string,
 		...args: any[]
 	): Thenable<any | undefined> {
-
 		return this.userInteractionService.showWarningMessage(message, ...args)
 	
 	} //<

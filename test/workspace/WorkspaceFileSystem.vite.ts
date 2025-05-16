@@ -20,19 +20,20 @@ const setup = setupWorkspaceTests()
 
 describe('Workspace File System (fs)', () => {
 	// SETUP -->>
-    /* eslint-disable unused-imports/no-unused-vars */
-    let simulator: IVSCodeAPISimulatorService
+	/* eslint-disable unused-imports/no-unused-vars */
+	let simulator: IVSCodeAPISimulatorService
 	let eventBus: IEventBusService
-    /* eslint-enable unused-imports/no-unused-vars */
+	/* eslint-enable unused-imports/no-unused-vars */
 	
-    const decoder = new TextDecoder()
+	const decoder = new TextDecoder()
 
 	beforeEach(() => {
 		simulator = setup.simulator
 		eventBus = setup.eventBus
+	
 	})
 
-    //---------------------------------------------------------------------------------------------------------------<<
+	//---------------------------------------------------------------------------------------------------------------<<
     
 	describe('stat()', () => { //>
 		it('should return stats for an existing file', async () => { //>
@@ -50,6 +51,7 @@ describe('Workspace File System (fs)', () => {
 			expect(stats.size).toBe(content.length)
 			expect(stats.ctime).toBeGreaterThan(0)
 			expect(stats.mtime).toBeGreaterThan(0)
+		
 		}) //<
 		it('should return stats for an existing directory', async () => { //>
 			// Arrange
@@ -63,6 +65,7 @@ describe('Workspace File System (fs)', () => {
 			expect(stats).toBeDefined()
 			expect(stats.type).toBe(simulator.FileType.Directory)
 			expect(stats.size).toBe(0) // Directories have size 0 in this mock
+		
 		}) //<
 		it('should throw FileNotFound for non-existent path', async () => { //>
 			// Arrange
@@ -72,7 +75,9 @@ describe('Workspace File System (fs)', () => {
 			await expect(simulator.workspace.fs.stat(nonExistentUri))
 				.rejects
 				.toThrowError(/FileNotFound/)
+		
 		}) //<
+	
 	}) //<
 
 	describe('readDirectory()', () => { //>
@@ -86,6 +91,7 @@ describe('Workspace File System (fs)', () => {
 
 			// Assert
 			expect(entries).toEqual([])
+		
 		}) //<
 		it('should read a directory with files and subdirectories', async () => { //>
 			// Arrange
@@ -106,6 +112,7 @@ describe('Workspace File System (fs)', () => {
 				['file.txt', simulator.FileType.File],
 				['subdir', simulator.FileType.Directory],
 			])
+		
 		}) //<
 		it('should throw FileNotFound for non-existent path', async () => { //>
 			// Arrange
@@ -115,6 +122,7 @@ describe('Workspace File System (fs)', () => {
 			await expect(simulator.workspace.fs.readDirectory(nonExistentUri))
 				.rejects
 				.toThrowError(/FileNotFound/)
+		
 		}) //<
 		it('should throw FileNotADirectory for a file path', async () => { //>
 			// Arrange
@@ -125,7 +133,9 @@ describe('Workspace File System (fs)', () => {
 			await expect(simulator.workspace.fs.readDirectory(fileUri))
 				.rejects
 				.toThrowError(/FileNotADirectory/)
+		
 		}) //<
+	
 	}) //<
 
 	describe('readFile()', () => { //>
@@ -141,6 +151,7 @@ describe('Workspace File System (fs)', () => {
 			// Assert
 			expect(readBytes).toEqual(content)
 			expect(decoder.decode(readBytes)).toBe('Read this content')
+		
 		}) //<
 		it('should throw FileNotFound for non-existent file', async () => { //>
 			// Arrange
@@ -150,6 +161,7 @@ describe('Workspace File System (fs)', () => {
 			await expect(simulator.workspace.fs.readFile(nonExistentUri))
 				.rejects
 				.toThrowError(/FileNotFound/)
+		
 		}) //<
 		it('should throw FileIsADirectory for a directory path', async () => { //>
 			// Arrange
@@ -160,7 +172,9 @@ describe('Workspace File System (fs)', () => {
 			await expect(simulator.workspace.fs.readFile(dirUri))
 				.rejects
 				.toThrowError(/FileIsADirectory/)
+		
 		}) //<
+	
 	}) //<
 
 	describe('writeFile()', () => { //>
@@ -189,6 +203,7 @@ describe('Workspace File System (fs)', () => {
 			// Cleanup
 			sub1.dispose()
 			sub2.dispose()
+		
 		}) //<
 		it('should overwrite an existing file', async () => { //>
 			// Arrange
@@ -203,6 +218,7 @@ describe('Workspace File System (fs)', () => {
 			// Assert File Content
 			const readBytes = await simulator.workspace.fs.readFile(fileUri)
 			expect(readBytes).toEqual(newContent)
+		
 		}) //<
 		it('should create parent directories if they do not exist', async () => { //>
 			// Arrange
@@ -219,6 +235,7 @@ describe('Workspace File System (fs)', () => {
 			// Assert Parent Exists
 			const parentStats = await simulator.workspace.fs.stat(simulator.Uri.file('/write-parent/subdir/'))
 			expect(parentStats.type).toBe(simulator.FileType.Directory)
+		
 		}) //<
 		it('should throw FileIsADirectory if path is a directory', async () => { //>
 			// Arrange
@@ -230,6 +247,7 @@ describe('Workspace File System (fs)', () => {
 			await expect(simulator.workspace.fs.writeFile(dirUri, content))
 				.rejects
 				.toThrowError(/FileIsADirectory/)
+		
 		}) //<
 		it('should update open document content, mark saved, and fire save events', async () => { //>
 			// Arrange
@@ -265,7 +283,9 @@ describe('Workspace File System (fs)', () => {
 			// Cleanup
 			sub1.dispose()
 			sub2.dispose()
+		
 		}) //<
+	
 	}) //<
 
 	describe('rename()', () => { //>
@@ -296,6 +316,7 @@ describe('Workspace File System (fs)', () => {
 			// Cleanup
 			sub1.dispose()
 			sub2.dispose()
+		
 		}) //<
 		it('should rename a directory and fire rename events', async () => { //>
 			// Arrange
@@ -328,6 +349,7 @@ describe('Workspace File System (fs)', () => {
 			// Cleanup
 			sub1.dispose()
 			sub2.dispose()
+		
 		}) //<
 		it('should throw FileNotFound for non-existent source', async () => { //>
 			// Arrange
@@ -338,6 +360,7 @@ describe('Workspace File System (fs)', () => {
 			await expect(simulator.workspace.fs.rename(oldUri, newUri))
 				.rejects
 				.toThrowError(/FileNotFound/)
+		
 		}) //<
 		it('should throw FileExists if target exists and overwrite is false', async () => { //>
 			// Arrange
@@ -350,6 +373,7 @@ describe('Workspace File System (fs)', () => {
 			await expect(simulator.workspace.fs.rename(oldUri, newUri, { overwrite: false }))
 				.rejects
 				.toThrowError(/FileExists/)
+		
 		}) //<
 		it('should overwrite if target exists and overwrite is true', async () => { //>
 			// Arrange
@@ -380,6 +404,7 @@ describe('Workspace File System (fs)', () => {
 			// Cleanup
 			sub1.dispose()
 			sub2.dispose()
+		
 		}) //<
 		it('should update open document URI when renaming', async () => { //>
 			// Arrange
@@ -401,7 +426,9 @@ describe('Workspace File System (fs)', () => {
 			expect(docAfterRename?.getText()).toBe(content)
 			expect(simulator.workspace.textDocuments.find(d => d.uri.toString() === oldUri.toString())).toBeUndefined() // Doc with old URI should be gone
 			expect(simulator.workspace.textDocuments.length).toBe(1)
+		
 		}) //<
+	
 	}) //<
 
 	describe('createDirectory()', () => { //>
@@ -429,6 +456,7 @@ describe('Workspace File System (fs)', () => {
 			// Cleanup
 			sub1.dispose()
 			sub2.dispose()
+		
 		}) //<
 		it('should create nested directories', async () => { //>
 			// Arrange
@@ -442,6 +470,7 @@ describe('Workspace File System (fs)', () => {
 			expect(stats.type).toBe(simulator.FileType.Directory)
 			const parentStats = await simulator.workspace.fs.stat(simulator.Uri.file('/createDir-nested/'))
 			expect(parentStats.type).toBe(simulator.FileType.Directory)
+		
 		}) //<
 		it('should not throw if directory already exists', async () => { //>
 			// Arrange
@@ -462,6 +491,7 @@ describe('Workspace File System (fs)', () => {
 			// Cleanup
 			sub1.dispose()
 			sub2.dispose()
+		
 		}) //<
 		it('should throw FileExists if path exists as a file', async () => { //>
 			// Arrange
@@ -472,7 +502,9 @@ describe('Workspace File System (fs)', () => {
 			await expect(simulator.workspace.fs.createDirectory(fileUri))
 				.rejects
 				.toThrowError(/FileExists/)
+		
 		}) //<
+	
 	}) //<
 
 	describe('isWritableFileSystem()', () => { //>
@@ -481,12 +513,14 @@ describe('Workspace File System (fs)', () => {
 			const result = simulator.workspace.fs.isWritableFileSystem('file')
 			// Assert
 			expect(result).toBe(true)
+		
 		}) //<
 		it('should return true for "untitled" scheme', () => { //>
 			// Act
 			const result = simulator.workspace.fs.isWritableFileSystem('untitled')
 			// Assert
 			expect(result).toBe(true)
+		
 		}) //<
 		it('should return undefined for other schemes', () => { //>
 			// Act
@@ -495,7 +529,9 @@ describe('Workspace File System (fs)', () => {
 			// Assert
 			expect(resultHttp).toBeUndefined()
 			expect(resultGit).toBeUndefined()
+		
 		}) //<
+	
 	}) //<
 
 	describe('copy()', () => { //>
@@ -526,6 +562,7 @@ describe('Workspace File System (fs)', () => {
 
 			// Cleanup
 			sub.dispose()
+		
 		}) //<
 		it('should copy a directory recursively and fire create event', async () => { //>
 			// Arrange
@@ -556,6 +593,7 @@ describe('Workspace File System (fs)', () => {
 
 			// Cleanup
 			sub.dispose()
+		
 		}) //<
 		it('should throw FileNotFound for non-existent source', async () => { //>
 			// Arrange
@@ -566,6 +604,7 @@ describe('Workspace File System (fs)', () => {
 			await expect(simulator.workspace.fs.copy(sourceUri, targetUri))
 				.rejects
 				.toThrowError(/FileNotFound/)
+		
 		}) //<
 		it('should throw FileExists if target exists and overwrite is false', async () => { //>
 			// Arrange
@@ -578,6 +617,7 @@ describe('Workspace File System (fs)', () => {
 			await expect(simulator.workspace.fs.copy(sourceUri, targetUri, { overwrite: false }))
 				.rejects
 				.toThrowError(/FileExists/)
+		
 		}) //<
 		it('should overwrite if target exists and overwrite is true', async () => { //>
 			// Arrange
@@ -606,7 +646,9 @@ describe('Workspace File System (fs)', () => {
 
 			// Cleanup
 			sub.dispose()
+		
 		}) //<
+	
 	}) //<
 
 	describe('delete()', () => { //>
@@ -634,6 +676,7 @@ describe('Workspace File System (fs)', () => {
 			// Cleanup
 			sub1.dispose()
 			sub2.dispose()
+		
 		}) //<
 		it('should delete an empty directory', async () => { //>
 			// Arrange
@@ -657,6 +700,7 @@ describe('Workspace File System (fs)', () => {
 			// Cleanup
 			sub1.dispose()
 			sub2.dispose()
+		
 		}) //<
 		it('should delete a directory recursively', async () => { //>
 			// Arrange
@@ -684,6 +728,7 @@ describe('Workspace File System (fs)', () => {
 			// Cleanup
 			sub1.dispose()
 			sub2.dispose()
+		
 		}) //<
 		it('should not throw when deleting non-existent path', async () => { //>
 			// Arrange
@@ -703,6 +748,7 @@ describe('Workspace File System (fs)', () => {
 			// Cleanup
 			sub1.dispose()
 			sub2.dispose()
+		
 		}) //<
 		it('should throw error deleting non-empty directory without recursive flag', async () => { //>
 			// Arrange
@@ -715,6 +761,7 @@ describe('Workspace File System (fs)', () => {
 			await expect(simulator.workspace.fs.delete(dirUri, { recursive: false }))
 				.rejects
 				.toThrowError(/Directory not empty/)
+		
 		}) //<
 		it('should close the document when deleting an open file', async () => { //>
 			// Arrange
@@ -736,7 +783,9 @@ describe('Workspace File System (fs)', () => {
 
 			// Cleanup
 			sub.dispose()
+		
 		}) //<
+	
 	}) //<
 
 })

@@ -28,22 +28,23 @@ import { setupWorkspaceTests } from './_setup'
 const setup = setupWorkspaceTests()
 
 describe('Workspace Events', () => { //>
-    // SETUP -->>
-    /* eslint-disable unused-imports/no-unused-vars */
-    let simulator: IVSCodeAPISimulatorService
+	// SETUP -->>
+	/* eslint-disable unused-imports/no-unused-vars */
+	let simulator: IVSCodeAPISimulatorService
 	let workspaceModule: IWorkspaceModule
 	let eventBus: IEventBusService
 	let utilsService: ICoreUtilitiesService
-    /* eslint-enable unused-imports/no-unused-vars */
+	/* eslint-enable unused-imports/no-unused-vars */
     
 	beforeEach(() => {
 		simulator = setup.simulator
 		workspaceModule = setup.workspaceModule
 		eventBus = setup.eventBus
 		utilsService = setup.utilsService
+	
 	})
 
-    //---------------------------------------------------------------------------------------------------------------<<
+	//---------------------------------------------------------------------------------------------------------------<<
     
 	it('should fire onDidChangeWorkspaceFolders when folders change', async () => { //>
 		// Arrange
@@ -92,6 +93,7 @@ describe('Workspace Events', () => { //>
 
 		// Cleanup
 		sub.dispose()
+	
 	}) //<
 	it('should fire onDidOpenTextDocument when opening a document', async () => { //>
 		// Arrange
@@ -109,6 +111,7 @@ describe('Workspace Events', () => { //>
 
 		// Cleanup
 		sub.dispose()
+	
 	}) //<
 	it('should fire onDidCloseTextDocument when closing a document', async () => { //>
 		// Arrange
@@ -128,6 +131,7 @@ describe('Workspace Events', () => { //>
 
 		// Cleanup
 		sub.dispose()
+	
 	}) //<
 	it('should fire onWillSaveTextDocument and onDidSaveTextDocument on save', async () => { //>
 		// Arrange
@@ -160,6 +164,7 @@ describe('Workspace Events', () => { //>
 		// Cleanup
 		sub1.dispose()
 		sub2.dispose()
+	
 	}) //<
 	it('should fire onDidChangeTextDocument when document content changes', async () => { //>
 		// Arrange
@@ -183,6 +188,7 @@ describe('Workspace Events', () => { //>
 
 		// Cleanup
 		sub.dispose()
+	
 	}) //<
 	it('should fire file operation events (create, delete, rename)', async () => { //>
 		// Arrange
@@ -242,6 +248,7 @@ describe('Workspace Events', () => { //>
 		subDeleteD.dispose()
 		subRenameW.dispose()
 		subRenameD.dispose()
+	
 	}) //<
 
 }) //<

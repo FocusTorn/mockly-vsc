@@ -47,6 +47,7 @@ export class WorkspaceModule implements IWorkspaceModule {
 		this.utils.log(LogLevel.Debug, 'WorkspaceModuleImpl initializing...')
 		this.workspace = mockWorkspaceImpl
 		this.utils.log(LogLevel.Debug, 'WorkspaceModuleImpl initialized.')
+	
 	}
 
 	// ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
@@ -74,6 +75,7 @@ export class WorkspaceModule implements IWorkspaceModule {
 		await this.docService._reset()
 
 		this.utils.log(LogLevel.Debug, 'WorkspaceModuleImpl reset complete.')
+	
 	} //<
 
 	/**
@@ -81,6 +83,7 @@ export class WorkspaceModule implements IWorkspaceModule {
 	 */
 	async closeTextDocument(uri: vt.Uri, fireEvent: boolean = true): Promise<void> { //>
 		await this.docService.closeTextDocument(uri, fireEvent)
+	
 	} //<
 
 	// ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
@@ -92,6 +95,7 @@ export class WorkspaceModule implements IWorkspaceModule {
 	 */
 	get _workspaceStateService(): IWorkspaceStateService { //>
 		return this.wsStateService
+	
 	} //<
 
 	/**
@@ -99,6 +103,7 @@ export class WorkspaceModule implements IWorkspaceModule {
 	 */
 	get _textDocumentService(): TextDocumentService { //>
 		return this.docService
+	
 	} //<
 
 	/**
@@ -106,6 +111,7 @@ export class WorkspaceModule implements IWorkspaceModule {
 	 */
 	get _uriService(): IUriService { //>
 		return this.fileSystemModule.Uri // Delegate to FileSystemModule
+	
 	} //<
 
 	// /** // REMOVED
@@ -120,6 +126,7 @@ export class WorkspaceModule implements IWorkspaceModule {
 	 */
 	get _fileSystemService(): IFileSystemService { //>
 		return this.fileSystemModule.fs // Delegate to FileSystemModule
+	
 	} //<
 
 }

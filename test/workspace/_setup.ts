@@ -51,7 +51,9 @@ export function silenceStd(utilsService: ICoreUtilitiesService) { //>
 		// This mimics the original utilsService.log behavior of respecting the log level
 		if (level >= utilsService.getLogLevel()) {
 			capturedUtilsLogs(level, message, ...args)
+		
 		}
+	
 	})
 
 	return {
@@ -63,10 +65,12 @@ export function silenceStd(utilsService: ICoreUtilitiesService) { //>
 			consoleDebugSpy.mockRestore()
 			utilsLogSpy.mockRestore()
 			// capturedUtilsLogs does not need restoring as it's a new spy each time
+		
 		},
 		// Expose the captured logs spy for assertion in logging tests
 		getCapturedUtilsLogs: () => capturedUtilsLogs,
 	}
+
 } //<
 
 /**
@@ -86,6 +90,7 @@ export function setupWorkspaceTests(): WorkspaceTestSetup { //>
 		// Dispose of previous simulator if it exists (this will now log at LogLevel.Off)
 		if (testContext.simulator) {
 			await testContext.simulator.reset()
+		
 		}
 		container.clearInstances() // Clear singleton instances
 
@@ -113,6 +118,7 @@ export function setupWorkspaceTests(): WorkspaceTestSetup { //>
 
 		// Set up a spy on console.warn here, active for all tests in this describe block
 		testContext.consoleWarnSpy = vi.spyOn(console, 'warn')
+	
 	})
 
 	afterEach(async () => {
@@ -122,9 +128,11 @@ export function setupWorkspaceTests(): WorkspaceTestSetup { //>
 		currentUtilsService.setLogLevel(LogLevel.Off)
 
 		await testContext.simulator?.reset()
+	
 	})
 
 	// Return the context object containing the resolved services and spy
 	// Cast to WorkspaceTestSetup as beforeEach ensures properties are set
 	return testContext as WorkspaceTestSetup
+
 } //<

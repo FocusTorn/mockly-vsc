@@ -46,7 +46,9 @@ export function silenceStd(utilsService: ICoreUtilitiesService) { //>
 	const utilsLogSpy = vi.spyOn(utilsService, 'log').mockImplementation((level, message, ...args) => {
 		if (level >= utilsService.getLogLevel()) {
 			capturedUtilsLogs(level, message, ...args)
+		
 		}
+	
 	})
 
 	return {
@@ -57,9 +59,11 @@ export function silenceStd(utilsService: ICoreUtilitiesService) { //>
 			consoleInfoSpy.mockRestore()
 			consoleDebugSpy.mockRestore()
 			utilsLogSpy.mockRestore()
+		
 		},
 		getCapturedUtilsLogs: () => capturedUtilsLogs,
 	}
+
 } //<
 
 /**
@@ -76,6 +80,7 @@ export function setupNodeFsTests(): NodeFsTestSetup { //>
 			const oldUtils = container.isRegistered('ICoreUtilitiesService') ? container.resolve<ICoreUtilitiesService>('ICoreUtilitiesService') : null
 			oldUtils?.setLogLevel(LogLevel.Off) // Silence utils of the old simulator instance
 			await testContext.simulator.reset()
+		
 		}
 		container.clearInstances()
 
@@ -99,6 +104,7 @@ export function setupNodeFsTests(): NodeFsTestSetup { //>
 
 		// Now, set the desired log level for the test itself on the shared utilsService instance
 		testContext.utilsService.setLogLevel(LogLevel.Warning)
+	
 	})
 
 	afterEach(async () => {
@@ -106,13 +112,17 @@ export function setupNodeFsTests(): NodeFsTestSetup { //>
 		if (container.isRegistered('ICoreUtilitiesService')) {
 			const currentUtilsService = container.resolve<ICoreUtilitiesService>('ICoreUtilitiesService')
 			currentUtilsService.setLogLevel(LogLevel.Off)
+		
 		}
 
 		if (testContext.simulator) {
 			await testContext.simulator.reset()
+		
 		}
 		container.clearInstances()
+	
 	})
 
 	return testContext as NodeFsTestSetup
+
 } //<

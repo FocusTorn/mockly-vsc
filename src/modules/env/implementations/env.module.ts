@@ -20,52 +20,56 @@ import type { IEnvService } from '../_interfaces/IEnvService.ts'
  */
 @injectable()
 export class EnvModule implements IEnvModule {
-    private envService: IEnvService
-    private utils: ICoreUtilitiesService
 
-    constructor(
-        @inject('ICoreUtilitiesService') utils: ICoreUtilitiesService,
-        @inject('IEnvService') envService: IEnvService,
-        @inject('IEnvNamespace') envNamespaceImpl: IEnvNamespace,
-    ) {
-        this.utils = utils
-        this.envService = envService
-        this.env = envNamespaceImpl
-        this.utils.log(LogLevel.Debug, 'EnvModule initializing...')
-        this.utils.log(LogLevel.Debug, 'EnvModule initialized.')
-    }
+	private envService: IEnvService
+	private utils: ICoreUtilitiesService
 
-    // ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
-    // │  Properties                                                                                      │
-    // └──────────────────────────────────────────────────────────────────────────────────────────────────┘
+	constructor(
+		@inject('ICoreUtilitiesService') utils: ICoreUtilitiesService,
+		@inject('IEnvService') envService: IEnvService,
+		@inject('IEnvNamespace') envNamespaceImpl: IEnvNamespace,
+	) {
+		this.utils = utils
+		this.envService = envService
+		this.env = envNamespaceImpl
+		this.utils.log(LogLevel.Debug, 'EnvModule initializing...')
+		this.utils.log(LogLevel.Debug, 'EnvModule initialized.')
+	
+	}
 
-    public readonly env: IEnvNamespace
+	// ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+	// │  Properties                                                                                      │
+	// └──────────────────────────────────────────────────────────────────────────────────────────────────┘
 
-    // ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
-    // │  Methods                                                                                         │
-    // └──────────────────────────────────────────────────────────────────────────────────────────────────┘
+	public readonly env: IEnvNamespace
 
-    /**
-     * Resets the state of the service managed by this module.
-     */
-    async reset(): Promise<void> { //>
-        this.utils.log(LogLevel.Info, 'Resetting EnvModule state...')
+	// ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+	// │  Methods                                                                                         │
+	// └──────────────────────────────────────────────────────────────────────────────────────────────────┘
 
-        // Delegate reset to the encapsulated internal service
-        this.envService._reset() // EnvService has a _reset method
+	/**
+	 * Resets the state of the service managed by this module.
+	 */
+	async reset(): Promise<void> { //>
+		this.utils.log(LogLevel.Info, 'Resetting EnvModule state...')
 
-        this.utils.log(LogLevel.Debug, 'EnvModule reset complete.')
-    } //<
+		// Delegate reset to the encapsulated internal service
+		this.envService._reset() // EnvService has a _reset method
 
-    // ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
-    // │  Internal                                                                                        │
-    // └──────────────────────────────────────────────────────────────────────────────────────────────────┘
+		this.utils.log(LogLevel.Debug, 'EnvModule reset complete.')
+	
+	} //<
 
-    /**
-     * Exposes the internal EnvService for testing and state inspection.
-     */
-    get _envService(): IEnvService { //> Expose EnvService
-        return this.envService
-    } //<
+	// ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+	// │  Internal                                                                                        │
+	// └──────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+	/**
+	 * Exposes the internal EnvService for testing and state inspection.
+	 */
+	get _envService(): IEnvService { //> Expose EnvService
+		return this.envService
+	
+	} //<
 
 }

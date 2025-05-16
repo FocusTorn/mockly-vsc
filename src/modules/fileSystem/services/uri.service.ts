@@ -26,19 +26,23 @@ export class UriService implements IUriService {
 
 	file(path: string): vUri { //>
 		return vUri.file(path)
+	
 	} //<
 
 	parse(uri: string): vUri { //>
 		return vUri.parse(uri)
+	
 	} //<
 
 	joinPath(baseUri: vUri, ...pathSegments: string[]): vUri { //>
 		const joinedPath = this.pathService.join(baseUri.path, ...pathSegments)
 		return baseUri.with({ path: joinedPath })
+	
 	} //<
 
 	normalize(p: string): string { //>
 		return this.pathService.normalize(p)
+	
 	} //<
 
 }

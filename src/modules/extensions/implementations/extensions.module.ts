@@ -20,6 +20,7 @@ import type { IExtensionsService } from '../_interfaces/IExtensionsService.ts'
  */
 @injectable()
 export class ExtensionsModule implements IExtensionsModule {
+
 	readonly extensions: IExtensionsNamespace
 
 	constructor(
@@ -32,6 +33,7 @@ export class ExtensionsModule implements IExtensionsModule {
 		this.utils.log(LogLevel.Debug, 'ExtensionsModule initializing...')
 		this.extensions = extensionsNamespaceImpl
 		this.utils.log(LogLevel.Debug, 'ExtensionsModule initialized.')
+	
 	}
 
 	// ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
@@ -49,6 +51,7 @@ export class ExtensionsModule implements IExtensionsModule {
 		)
 		this.extensionsService._reset()
 		this.utils.log(LogLevel.Debug, 'ExtensionsModule reset complete.')
+	
 	} //<
 
 	// ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
@@ -61,5 +64,7 @@ export class ExtensionsModule implements IExtensionsModule {
 	get _extensionsService(): IExtensionsService {
 		//> Expose ExtensionsService
 		return this.extensionsService
+	
 	} //<
+
 }

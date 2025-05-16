@@ -14,10 +14,10 @@ const setup = setupWorkspaceTests()
 describe('Workspace Namespace Top-Level', () => {
 	// SETUP -->>
 	/* eslint-disable unused-imports/no-unused-vars */
-    let simulator: IVSCodeAPISimulatorService
-    /* eslint-enable unused-imports/no-unused-vars */
+	let simulator: IVSCodeAPISimulatorService
+	/* eslint-enable unused-imports/no-unused-vars */
 	
-    beforeEach(() => { simulator = setup.simulator })
+	beforeEach(() => { simulator = setup.simulator })
 
 	//---------------------------------------------------------------------------------------------------------------<<
 

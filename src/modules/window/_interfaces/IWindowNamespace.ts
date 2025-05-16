@@ -11,7 +11,7 @@ import type * as vt from 'vscode'
  */
 export interface IWindowNamespace extends Pick<typeof vt.window,
 
-    // Properties
+	// Properties
   | 'activeTextEditor'
   | 'visibleTextEditors'
   | 'terminals'

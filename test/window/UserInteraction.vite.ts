@@ -33,6 +33,7 @@ describe('Window/UserInteraction', () => {
 		utilsService = setup.utilsService
 		windowModule = setup.windowModule
 		userInteractionService = windowModule._userInteractionService // Access via windowModule
+	
 	}) //<
 
 	//---------------------------------------------------------------------------------------------------------------<<
@@ -49,6 +50,7 @@ describe('Window/UserInteraction', () => {
 
 			await simulator.window.showInformationMessage('Third message', { modal: true }, 'Item A')
 			expect(userInteractionService.getLastInformationMessage()).toBe('Third message')
+		
 		}) //<
 		it('should clear the last information message on reset', async () => { //>
 			await simulator.window.showInformationMessage('Message before reset')
@@ -56,7 +58,9 @@ describe('Window/UserInteraction', () => {
 
 			await simulator.reset() // Reset is handled by setup.afterEach
 			expect(userInteractionService.getLastInformationMessage()).toBeUndefined()
+		
 		}) //<
+	
 	}) //<
 
 	describe('Methods: showQuickPick', () => { //>
@@ -65,10 +69,13 @@ describe('Window/UserInteraction', () => {
 			try {
 				const result = await simulator.window.showQuickPick(['item1', 'item2'])
 				expect(result).toBeUndefined()
+			
 			}
 			finally {
 				localSilence.dispose()
+			
 			}
+		
 		}) //<
 		it('should return the expected value when expectQuickPickAndReturn is used', async () => { //>
 			const localSilence = silenceStd(utilsService)
@@ -79,20 +86,26 @@ describe('Window/UserInteraction', () => {
 
 				const result = await simulator.window.showQuickPick(expectedItems)
 				expect(result).toBe(returnValue)
+			
 			}
 			finally {
 				localSilence.dispose()
+			
 			}
+		
 		}) //<
 		it('should return undefined if no quick pick expectation is set', async () => { //>
 			const localSilence = silenceStd(utilsService)
 			try {
 				const result = await simulator.window.showQuickPick(['Option A', 'Option B'])
 				expect(result).toBeUndefined()
+			
 			}
 			finally {
 				localSilence.dispose()
+			
 			}
+		
 		}) //<
 		it('should handle multiple queued quick pick responses', async () => { //>
 			const localSilence = silenceStd(utilsService)
@@ -108,10 +121,13 @@ describe('Window/UserInteraction', () => {
 
 				const result3 = await simulator.window.showQuickPick(['X', 'Y']) // No expectation for this one
 				expect(result3).toBeUndefined()
+			
 			}
 			finally {
 				localSilence.dispose()
+			
 			}
+		
 		}) //<
 		it('should clear queued quick pick responses on reset', async () => { //>
 			const localSilence = silenceStd(utilsService)
@@ -124,11 +140,15 @@ describe('Window/UserInteraction', () => {
 				expect((userInteractionService as any)._quickPickQueue.length).toBe(0)
 				const result = await simulator.window.showQuickPick(['A'])
 				expect(result).toBeUndefined()
+			
 			}
 			finally {
 				localSilence.dispose()
+			
 			}
+		
 		}) //<
+	
 	}) //<
 
 	describe('Methods: showInputBox', () => { //>
@@ -137,10 +157,13 @@ describe('Window/UserInteraction', () => {
 			try {
 				const result = await simulator.window.showInputBox({ prompt: 'Enter value' })
 				expect(result).toBeUndefined()
+			
 			}
 			finally {
 				localSilence.dispose()
+			
 			}
+		
 		}) //<
 		it('should return the expected value when expectInputBoxAndReturn is used', async () => { //>
 			const localSilence = silenceStd(utilsService)
@@ -150,10 +173,13 @@ describe('Window/UserInteraction', () => {
 
 				const result = await simulator.window.showInputBox({ prompt: 'Enter value' })
 				expect(result).toBe(returnValue)
+			
 			}
 			finally {
 				localSilence.dispose()
+			
 			}
+		
 		}) //<
 		it('should return undefined if expectInputBoxAndReturn is used with undefined', async () => { //>
 			const localSilence = silenceStd(utilsService)
@@ -162,10 +188,13 @@ describe('Window/UserInteraction', () => {
 
 				const result = await simulator.window.showInputBox({ prompt: 'Enter value' })
 				expect(result).toBeUndefined()
+			
 			}
 			finally {
 				localSilence.dispose()
+			
 			}
+		
 		}) //<
 		it('should handle multiple queued input box responses', async () => { //>
 			const localSilence = silenceStd(utilsService)
@@ -181,10 +210,13 @@ describe('Window/UserInteraction', () => {
 
 				const result3 = await simulator.window.showInputBox({ prompt: 'Prompt 3' }) // No expectation
 				expect(result3).toBeUndefined()
+			
 			}
 			finally {
 				localSilence.dispose()
+			
 			}
+		
 		}) //<
 		it('should clear queued input box responses on reset', async () => { //>
 			const localSilence = silenceStd(utilsService)
@@ -197,11 +229,15 @@ describe('Window/UserInteraction', () => {
 				expect((userInteractionService as any)._inputBoxQueue.length).toBe(0)
 				const result = await simulator.window.showInputBox({ prompt: 'Prompt after reset' })
 				expect(result).toBeUndefined()
+			
 			}
 			finally {
 				localSilence.dispose()
+			
 			}
+		
 		}) //<
+	
 	}) //<
 
 	describe('Methods: showErrorMessage', () => { //>
@@ -218,21 +254,28 @@ describe('Window/UserInteraction', () => {
 					LogLevel.Error,
 					expect.stringContaining(`[UI MOCK] Error Message: ${message}`),
 				)
+			
 			}
 			finally {
 				localSilence.dispose()
+			
 			}
+		
 		}) //<
 		it('should return undefined', async () => { //>
 			const localSilence = silenceStd(utilsService)
 			try {
 				const result = await simulator.window.showErrorMessage('Test')
 				expect(result).toBeUndefined()
+			
 			}
 			finally {
 				localSilence.dispose()
+			
 			}
+		
 		}) //<
+	
 	}) //<
 
 	describe('Methods: showWarningMessage', () => { //>
@@ -249,21 +292,28 @@ describe('Window/UserInteraction', () => {
 					LogLevel.Warning,
 					expect.stringContaining(`[UI MOCK] Warning Message: ${message}`),
 				)
+			
 			}
 			finally {
 				localSilence.dispose()
+			
 			}
+		
 		}) //<
 		it('should return undefined', async () => { //>
 			const localSilence = silenceStd(utilsService)
 			try {
 				const result = await simulator.window.showWarningMessage('Test')
 				expect(result).toBeUndefined()
+			
 			}
 			finally {
 				localSilence.dispose()
+			
 			}
+		
 		}) //<
+	
 	}) //<
 
 })

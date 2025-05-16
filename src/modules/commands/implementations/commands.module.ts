@@ -22,42 +22,45 @@ import type { ICommandsService } from '../_interfaces/ICommandsService.ts'
 @injectable()
 export class CommandsModule implements ICommandsModule { // Implement the interface
 
-    readonly commands: ICommandsNamespace
+	readonly commands: ICommandsNamespace
 
-    constructor(
-        @inject('ICoreUtilitiesService') private utils: ICoreUtilitiesService,
-        @inject('ICommandsService') private commandsService: ICommandsService,
-        @inject('ICommandsNamespace') commandsNamespaceImpl: ICommandsNamespace,
-    ) {
-        this.utils.log(LogLevel.Debug, 'CommandsModule initializing...')
-        this.commands = commandsNamespaceImpl
-        this.utils.log(LogLevel.Debug, 'CommandsModule initialized.')
-    }
+	constructor(
+		@inject('ICoreUtilitiesService') private utils: ICoreUtilitiesService,
+		@inject('ICommandsService') private commandsService: ICommandsService,
+		@inject('ICommandsNamespace') commandsNamespaceImpl: ICommandsNamespace,
+	) {
+		this.utils.log(LogLevel.Debug, 'CommandsModule initializing...')
+		this.commands = commandsNamespaceImpl
+		this.utils.log(LogLevel.Debug, 'CommandsModule initialized.')
+	
+	}
 
-    // ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
-    // │  Methods                                                                                         │
-    // └──────────────────────────────────────────────────────────────────────────────────────────────────┘
+	// ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+	// │  Methods                                                                                         │
+	// └──────────────────────────────────────────────────────────────────────────────────────────────────┘
 
-    /**
-     * Resets the state of the service managed by this module.
-     */
-    async reset(): Promise<void> { //>
-        this.utils.log(LogLevel.Info, 'Resetting CommandsModule state...')
+	/**
+	 * Resets the state of the service managed by this module.
+	 */
+	async reset(): Promise<void> { //>
+		this.utils.log(LogLevel.Info, 'Resetting CommandsModule state...')
 
-        this.commandsService._clearCommands()
+		this.commandsService._clearCommands()
 
-        this.utils.log(LogLevel.Debug, 'CommandsModule reset complete.')
-    } //<
+		this.utils.log(LogLevel.Debug, 'CommandsModule reset complete.')
+	
+	} //<
 
-    // ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
-    // │  Internal                                                                                        │
-    // └──────────────────────────────────────────────────────────────────────────────────────────────────┘
+	// ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+	// │  Internal                                                                                        │
+	// └──────────────────────────────────────────────────────────────────────────────────────────────────┘
 
-    /**
-     * Exposes the internal CommandsService for testing and state inspection.
-     */
-    get _commandsService(): ICommandsService { //> Expose FileSystemStateService
-        return this.commandsService
-    } //<
+	/**
+	 * Exposes the internal CommandsService for testing and state inspection.
+	 */
+	get _commandsService(): ICommandsService { //> Expose FileSystemStateService
+		return this.commandsService
+	
+	} //<
 
 }

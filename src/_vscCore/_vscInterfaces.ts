@@ -9,20 +9,20 @@ import type { Position, Range } from './vscClasses.ts'
 //--------------------------------------------------------------------------------------------------------------<<
 
 export interface FileOperation { //>
-    kind: 'create' | 'delete' | 'rename'
-    uri?: Uri
-    oldUri?: Uri
-    newUri?: Uri
-    options?: FileOperationOptions
-    metadata?: vt.WorkspaceEditEntryMetadata
+	kind: 'create' | 'delete' | 'rename'
+	uri?: Uri
+	oldUri?: Uri
+	newUri?: Uri
+	options?: FileOperationOptions
+	metadata?: vt.WorkspaceEditEntryMetadata
 } //<
 
 export interface TextEditFactory { //>
-    replace: (range: Range, newText: string) => vt.TextEdit
-    insert: (position: Position, newText: string) => vt.TextEdit
-    delete: (range: Range) => vt.TextEdit
-    setEndOfLine: (eol: EndOfLine) => vt.TextEdit
-    prototype?: any
+	replace: (range: Range, newText: string) => vt.TextEdit
+	insert: (position: Position, newText: string) => vt.TextEdit
+	delete: (range: Range) => vt.TextEdit
+	setEndOfLine: (eol: EndOfLine) => vt.TextEdit
+	prototype?: any
 } //<
 
 export interface MockFileSystemErrorNamespace extends Pick<typeof vt.FileSystemError, //>

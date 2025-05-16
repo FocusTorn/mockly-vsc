@@ -31,36 +31,40 @@
 // //<
 
 const esbuildProblemMatcher = {
-    name: 'esbuildProblemMatcher',
-    setup(build) {
-        build.onStart(() => {
+	name: 'esbuildProblemMatcher',
+	setup(build) {
+		build.onStart(() => {
             
-            // const currTime = getCurrentTimeWithMilliseconds()
-            // const coloredTime = `${ansii.gold}${currTime}${ansii.resetStyle}`
-            // console.log(`[${coloredTime}] Build started`)
+			// const currTime = getCurrentTimeWithMilliseconds()
+			// const coloredTime = `${ansii.gold}${currTime}${ansii.resetStyle}`
+			// console.log(`[${coloredTime}] Build started`)
             
-        })
-        build.onEnd((result) => {
-            result.errors.forEach(({ text, location }) => {
-                console.error(`✘ [ERROR] ${text}`)
-                console.error(
-                    `    ${location.file}:${location.line}:${location.column}:`,
-                )
-            })
+		})
+		build.onEnd((result) => {
+			result.errors.forEach(({ text, location }) => {
+				console.error(`✘ [ERROR] ${text}`)
+				console.error(
+					`    ${location.file}:${location.line}:${location.column}:`,
+				)
+			
+			})
 
-            // const currTime = getCurrentTimeWithMilliseconds()
-            // const coloredTime = `${ansii.gold}${currTime}${ansii.resetStyle}`
+			// const currTime = getCurrentTimeWithMilliseconds()
+			// const coloredTime = `${ansii.gold}${currTime}${ansii.resetStyle}`
 
-            // console.log(`[${coloredTime}] Build finished`)
+			// console.log(`[${coloredTime}] Build finished`)
 
-            result.errors.forEach(({ text, location }) => {
-                console.error(`✘ [ERROR] ${text}`)
-                console.error(
-                    `    ${location.file}:${location.line}:${location.column}:`,
-                )
-            })
-        })
-    },
+			result.errors.forEach(({ text, location }) => {
+				console.error(`✘ [ERROR] ${text}`)
+				console.error(
+					`    ${location.file}:${location.line}:${location.column}:`,
+				)
+			
+			})
+		
+		})
+	
+	},
 }
 
 export default esbuildProblemMatcher

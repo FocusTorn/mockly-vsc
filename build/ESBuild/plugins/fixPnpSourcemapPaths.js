@@ -1,22 +1,27 @@
 // import { Plugin } from 'esbuild';
 
 const fixPnpSourcemapPaths = {
-    name: 'fixPnpSourcemapPaths',
-    setup(build) {
-        build.onEnd(async (result) => {
-            if (result.metafile) {
-                for (const outputFile in result.metafile.outputs) {
-                    const output = result.metafile.outputs[outputFile]
+	name: 'fixPnpSourcemapPaths',
+	setup(build) {
+		build.onEnd(async (result) => {
+			if (result.metafile) {
+				for (const outputFile in result.metafile.outputs) {
+					const output = result.metafile.outputs[outputFile]
 
-                    if (output.sourcemap) {
-                        output.sourcemap.sources = output.sourcemap.sources.map(
-                            source => source.replace(/^d:\/_dev\/torn-focus-ui\/dist\/pnp:/, ''),
-                        )
-                    }
-                }
-            }
-        })
-    },
+					if (output.sourcemap) {
+						output.sourcemap.sources = output.sourcemap.sources.map(
+							source => source.replace(/^d:\/_dev\/torn-focus-ui\/dist\/pnp:/, ''),
+						)
+					
+					}
+				
+				}
+			
+			}
+		
+		})
+	
+	},
 }
 
 export default fixPnpSourcemapPaths

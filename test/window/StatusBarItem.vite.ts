@@ -27,6 +27,7 @@ describe('StatusBarItem', () => {
 	beforeEach(() => { //>
 		simulator = setup.simulator
 		utilsService = setup.utilsService
+	
 	}) //<
 
 	//---------------------------------------------------------------------------------------------------------------<<
@@ -57,10 +58,13 @@ describe('StatusBarItem', () => {
 				expect(item.accessibilityInformation).toBeUndefined()
 				expect(item.id).toBeDefined()
 				expect(typeof item.id).toBe('string')
+			
 			}
 			finally {
 				localSilence.dispose()
+			
 			}
+		
 		}) //<
 		it('should create a status bar item with specified properties (alignment, priority)', () => { //>
 			const localSilence = silenceStd(utilsService)
@@ -71,10 +75,13 @@ describe('StatusBarItem', () => {
 				expect(item.priority).toBe(10)
 				expect(item.text).toBe('')
 				expect(item.id).toBeDefined()
+			
 			}
 			finally {
 				localSilence.dispose()
+			
 			}
+		
 		}) //<
 		it('should create a status bar item with specified properties (id, alignment, priority)', () => { //>
 			const localSilence = silenceStd(utilsService)
@@ -85,10 +92,13 @@ describe('StatusBarItem', () => {
 				expect(item.alignment).toBe(simulator.StatusBarAlignment.Left)
 				expect(item.priority).toBe(5)
 				expect(item.text).toBe('')
+			
 			}
 			finally {
 				localSilence.dispose()
+			
 			}
+		
 		}) //<
 		it('should create a status bar item with specified id, priority', () => { //>
 			const localSilence = silenceStd(utilsService)
@@ -99,10 +109,13 @@ describe('StatusBarItem', () => {
 				expect(item.alignment).toBe(simulator.StatusBarAlignment.Left) // Default alignment
 				expect(item.priority).toBe(20)
 				expect(item.text).toBe('')
+			
 			}
 			finally {
 				localSilence.dispose()
+			
 			}
+		
 		}) //<
 
 		it('should create a status bar item with default alignment and priority when only id is provided', () => { //>
@@ -117,20 +130,26 @@ describe('StatusBarItem', () => {
 				expect(typeof item.show).toBe('function')
 				expect(typeof item.hide).toBe('function')
 				expect(typeof item.dispose).toBe('function')
+			
 			}
 			finally {
 				localSilence.dispose()
+			
 			}
+		
 		}) //<
 		it('should return a disposable object', () => { //>
 			const localSilence = silenceStd(utilsService)
 			try {
 				const item = simulator.window.createStatusBarItem()
 				expect(typeof item.dispose).toBe('function')
+			
 			}
 			finally {
 				localSilence.dispose()
+			
 			}
+		
 		}) //<
 		it('should log when show() is called', () => { //>
 			const localSilence = silenceStd(utilsService)
@@ -149,11 +168,14 @@ describe('StatusBarItem', () => {
 					expect.stringContaining('[UI MOCK] StatusBarItem log-show.show()'),
 				)
 				expect(capturedLogs).toHaveBeenCalledTimes(1)
+			
 			}
 			finally {
 				utilsService.setLogLevel(originalLogLevel) // Restore original log level
 				localSilence.dispose()
+			
 			}
+		
 		}) //<
 		it('should log when hide() is called', () => { //>
 			const localSilence = silenceStd(utilsService)
@@ -172,11 +194,14 @@ describe('StatusBarItem', () => {
 					expect.stringContaining('[UI MOCK] StatusBarItem log-hide.hide()'),
 				)
 				expect(capturedLogs).toHaveBeenCalledTimes(1)
+			
 			}
 			finally {
 				utilsService.setLogLevel(originalLogLevel) // Restore original log level
 				localSilence.dispose()
+			
 			}
+		
 		}) //<
 		it('should log when dispose() is called', () => { //>
 			const localSilence = silenceStd(utilsService)
@@ -195,12 +220,16 @@ describe('StatusBarItem', () => {
 					expect.stringContaining('[UI MOCK] StatusBarItem log-dispose.dispose()'),
 				)
 				expect(capturedLogs).toHaveBeenCalledTimes(1)
+			
 			}
 			finally {
 				utilsService.setLogLevel(originalLogLevel) // Restore original log level
 				localSilence.dispose()
+			
 			}
+		
 		}) //<
+	
 	}) //<
 
 })

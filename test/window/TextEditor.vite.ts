@@ -29,6 +29,7 @@ describe('TextEditor', () => {
 	beforeEach(() => { //>
 		simulator = setup.simulator
 		windowModule = setup.windowModule
+	
 	}) //<
 
 	//---------------------------------------------------------------------------------------------------------------<<
@@ -50,6 +51,7 @@ describe('TextEditor', () => {
 			// Initial state check (after global reset)
 			expect(simulator.window.activeTextEditor).toBeUndefined()
 			expect(simulator.window.visibleTextEditors).toEqual([])
+		
 		}) //<
 
 		//----------------------------------------------------------------<<
@@ -69,6 +71,7 @@ describe('TextEditor', () => {
 			expect(simulator.window.visibleTextEditors).toContain(editor1)
 			expect(simulator.window.visibleTextEditors).toContain(editor2)
 			expect(editor2.document).toBe(doc2)
+		
 		}) //<
 		it('should update activeTextEditor when showing a document with preserveFocus: true', async () => { //>
 			const editor1 = await simulator.window.showTextDocument(doc1)
@@ -80,6 +83,7 @@ describe('TextEditor', () => {
 			expect(simulator.window.visibleTextEditors.length).toBe(2)
 			expect(simulator.window.visibleTextEditors).toContain(editor1)
 			expect(simulator.window.visibleTextEditors).toContain(editor2)
+		
 		}) //<
 		it('should dispose all visible editors during simulator reset', async () => { //>
 			const editor1 = await simulator.window.showTextDocument(doc1) as TextEditor
@@ -94,6 +98,7 @@ describe('TextEditor', () => {
 
 			editor1DisposeSpy.mockRestore()
 			editor2DisposeSpy.mockRestore()
+		
 		}) //<
 
 		it('should update activeTextEditor and visibleTextEditors when using internal service methods', async () => { //>
@@ -109,6 +114,7 @@ describe('TextEditor', () => {
 			expect(simulator.window.visibleTextEditors).toContain(editor1)
 			// If active editor (editor1) is in the new visible list, it remains active.
 			expect(simulator.window.activeTextEditor).toBe(editor1)
+		
 		}) //<
 
 		it('should set activeTextEditor to undefined if the active editor is removed from visible editors', async () => { //>
@@ -127,6 +133,7 @@ describe('TextEditor', () => {
 			windowModule._textEditorService.setVisibleTextEditors([])
 			expect(simulator.window.visibleTextEditors).toEqual([])
 			expect(simulator.window.activeTextEditor).toBeUndefined()
+		
 		}) //<
 		it('should dispose of editors when they are removed from visibleTextEditors', async () => { //>
 			const editor1 = await simulator.window.showTextDocument(doc1) as TextEditor
@@ -148,6 +155,7 @@ describe('TextEditor', () => {
 
 			editor1DisposeSpy.mockRestore()
 			editor2DisposeSpy.mockRestore()
+		
 		}) //<
 		it('should not dispose of editors when they are still visible', async () => { //>
 			const editor1 = await simulator.window.showTextDocument(doc1) as TextEditor
@@ -162,7 +170,9 @@ describe('TextEditor', () => {
 
 			editor1DisposeSpy.mockRestore()
 			editor2DisposeSpy.mockRestore()
+		
 		}) //<
+	
 	}) //<
 
 	describe('Methods: showTextDocument', () => { //>
@@ -182,6 +192,7 @@ describe('TextEditor', () => {
 			// Initial state check
 			expect(simulator.window.activeTextEditor).toBeUndefined()
 			expect(simulator.window.visibleTextEditors).toEqual([])
+		
 		}) //<
 
 		//--------------------------------------------------------------------<<
@@ -193,6 +204,7 @@ describe('TextEditor', () => {
 			expect(editor.document.uri.toString()).toBe(fileUri1.toString())
 			expect(simulator.window.activeTextEditor).toBe(editor)
 			expect(simulator.window.visibleTextEditors).toContain(editor)
+		
 		}) //<
 		it('should open and show a document using a TextDocument object', async () => { //>
 			const editor = await simulator.window.showTextDocument(doc2)
@@ -201,6 +213,7 @@ describe('TextEditor', () => {
 			expect(editor.document).toBe(doc2)
 			expect(simulator.window.activeTextEditor).toBe(editor)
 			expect(simulator.window.visibleTextEditors).toContain(editor)
+		
 		}) //<
 		it('should show an existing editor if the document is already visible', async () => { //>
 			const editor1 = await simulator.window.showTextDocument(doc1)
@@ -211,6 +224,7 @@ describe('TextEditor', () => {
 			expect(editor2).toBe(editor1) // Should be the same editor instance
 			expect(simulator.window.activeTextEditor).toBe(editor1)
 			expect(simulator.window.visibleTextEditors.length).toBe(1)
+		
 		}) //<
 		it('should show a document in a specified ViewColumn (number overload)', async () => { //>
 			const editor = await simulator.window.showTextDocument(doc1, simulator.ViewColumn.Two)
@@ -219,6 +233,7 @@ describe('TextEditor', () => {
 			expect(editor.viewColumn).toBe(simulator.ViewColumn.Two)
 			expect(simulator.window.activeTextEditor).toBe(editor)
 			expect(simulator.window.visibleTextEditors).toContain(editor)
+		
 		}) //<
 		it('should show a document in a specified ViewColumn (options overload)', async () => { //>
 			const editor = await simulator.window.showTextDocument(doc2, { viewColumn: simulator.ViewColumn.Three })
@@ -227,6 +242,7 @@ describe('TextEditor', () => {
 			expect(editor.viewColumn).toBe(simulator.ViewColumn.Three)
 			expect(simulator.window.activeTextEditor).toBe(editor)
 			expect(simulator.window.visibleTextEditors).toContain(editor)
+		
 		}) //<
 		it('should show a document beside the active editor (ViewColumn.Beside)', async () => { //>
 			await simulator.window.showTextDocument(doc1!, simulator.ViewColumn.One)
@@ -238,6 +254,7 @@ describe('TextEditor', () => {
 			expect(editor2.viewColumn).toBe(simulator.ViewColumn.Beside) // Mock behavior might simplify this
 			expect(simulator.window.activeTextEditor).toBe(editor2)
 			expect(simulator.window.visibleTextEditors.length).toBe(2)
+		
 		}) //<
 		it('should apply the selection option when showing a document', async () => { //>
 			const selectionRange = new simulator.Range(0, 8, 0, 15) // Assuming "content 1" is "content 1"
@@ -250,7 +267,9 @@ describe('TextEditor', () => {
 			expect(editor).toBeDefined()
 			expect(editor.document).toBe(doc)
 			expect(editor.selection.isEqual(new simulator.Selection(selectionRange.start, selectionRange.end))).toBe(true)
+		
 		}) //<
+	
 	}) //<
 
 })

@@ -32,7 +32,7 @@ export class TextDocument implements vt.TextDocument { //>
 	isUntitled: boolean
 	languageId: string
 	readonly eol: vt.EndOfLine = EndOfLine.LF
-	readonly encoding: string = 'utf8'; // ADDED
+	readonly encoding: string = 'utf8' // ADDED
 	private _linesInitialized: boolean = false
 
 	constructor( //>
@@ -49,6 +49,7 @@ export class TextDocument implements vt.TextDocument { //>
 		this.languageId = languageId
 		// this.encoding = encoding; // If passed in constructor
 		this._updateContentInternal(initialContent, false)
+	
 	} //<
 
 	// ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
@@ -61,8 +62,10 @@ export class TextDocument implements vt.TextDocument { //>
 	get lineCount(): number { //>
 		if (!this._linesInitialized) {
 			this._initializeLines()
+		
 		}
 		return this._lines.length
+	
 	} //<
 
 	// ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
@@ -74,13 +77,16 @@ export class TextDocument implements vt.TextDocument { //>
 	): string {
 		if (!this._linesInitialized && !range) {
 			return this._content
+		
 		}
 		if (!this._linesInitialized) {
 			this._initializeLines()
+		
 		}
 
 		if (!range) {
 			return this._content
+		
 		}
 		range = this.validateRange(range)
 
@@ -92,8 +98,10 @@ export class TextDocument implements vt.TextDocument { //>
 		if (startLine === endLine) {
 			if (startLine >= this.lineCount) {
 				return ''
+			
 			}
 			return this._lines[startLine].substring(startChar, endChar)
+		
 		}
 
 		else {
@@ -105,12 +113,15 @@ export class TextDocument implements vt.TextDocument { //>
 
 			for (let i = startLine + 1; i < endLine; i++) {
 				text += this._lines[i] + (this.eol === EndOfLine.CRLF ? '\r\n' : '\n')
+			
 			}
 
 			text += this._lines[endLine].substring(0, endChar)
 
 			return text
+		
 		}
+	
 	} //<
 
 	lineAt( //>
@@ -118,12 +129,14 @@ export class TextDocument implements vt.TextDocument { //>
 	): vt.TextLine {
 		if (!this._linesInitialized) {
 			this._initializeLines()
+		
 		}
 
 		const line = typeof lineOrPosition === 'number' ? lineOrPosition : lineOrPosition.line
 
 		if (line < 0 || line >= this.lineCount) {
 			throw this.utils.createError(`Illegal value for line number: ${line}`)
+		
 		}
 
 		const text = this._lines[line]
@@ -141,6 +154,7 @@ export class TextDocument implements vt.TextDocument { //>
 			firstNonWhitespaceCharacterIndex: text.search(/\S|$/),
 			isEmptyOrWhitespace: text.trim().length === 0,
 		}
+	
 	} //<
 
 	offsetAt( //>
@@ -150,9 +164,11 @@ export class TextDocument implements vt.TextDocument { //>
 		let offset = 0
 		for (let i = 0; i < position.line; i++) {
 			offset += this._lines[i].length + (this.eol === EndOfLine.CRLF ? 2 : 1)
+		
 		}
 		offset += position.character
 		return offset
+	
 	} //<
 
 	positionAt( //>
@@ -166,20 +182,24 @@ export class TextDocument implements vt.TextDocument { //>
 			const lineLength = this._lines[line].length
 			const lineLengthWithEOL = lineLength + (this.eol === EndOfLine.CRLF ? 2 : 1)
 
-			if (offset <= currentOffset + lineLength) { 
+			if (offset <= currentOffset + lineLength) {
 				return new Position(line, offset - currentOffset)
+			
 			}
 
-			if (line === this.lineCount - 1 && offset > currentOffset + lineLength) { 
+			if (line === this.lineCount - 1 && offset > currentOffset + lineLength) {
 				return new Position(line, lineLength)
+			
 			}
 
 			currentOffset += lineLengthWithEOL
+		
 		}
 
 		const lastLineIndex = Math.max(0, this.lineCount - 1)
 		const lastLineLength = this._lines[lastLineIndex]?.length ?? 0
 		return new Position(lastLineIndex, lastLineLength)
+	
 	} //<
 
 	validateRange( //>
@@ -187,6 +207,7 @@ export class TextDocument implements vt.TextDocument { //>
 	): vt.Range {
 		if (!range?.start || !range?.end) {
 			return new Range(new Position(0, 0), new Position(0, 0))
+		
 		}
 
 		const start = this.validatePosition(range.start)
@@ -194,10 +215,13 @@ export class TextDocument implements vt.TextDocument { //>
 
 		if (range.start.isAfter(range.end)) {
 			return new Range(end, start)
+		
 		}
 		else {
 			return new Range(start, end)
+		
 		}
+	
 	} //<
 
 	validatePosition( //>
@@ -208,32 +232,40 @@ export class TextDocument implements vt.TextDocument { //>
 
 		if (line < 0) {
 			line = 0
-			character = 0 
+			character = 0
+		
 		}
 		else if (line >= this.lineCount) {
-			line = Math.max(0, this.lineCount - 1) 
+			line = Math.max(0, this.lineCount - 1)
 			character = this._lines[line]?.length ?? 0
+		
 		}
 		else {
 			const maxCharacter = this._lines[line]?.length ?? 0
 			if (character < 0) {
 				character = 0
+			
 			}
 			else if (character > maxCharacter) {
 				character = maxCharacter
+			
 			}
+		
 		}
 
 		if (this.lineCount === 0) {
 			line = 0
 			character = 0
+		
 		}
 
 		if (position.line === line && position.character === character) {
 			return position
+		
 		}
 
 		return new Position(line, character)
+	
 	} //<
 
 	getWordRangeAtPosition( //>
@@ -252,40 +284,50 @@ export class TextDocument implements vt.TextDocument { //>
 			const endIndex = startIndex + match[0].length
 			if (position.character >= startIndex && position.character <= endIndex) {
 				return new Range(position.line, startIndex, position.line, endIndex)
+			
 			}
+		
 		}
 		return undefined
+	
 	} //<
 
 	save( //>
 	): Thenable<boolean> {
 		if (!this.isUntitled) {
-			this._markSaved() 
+			this._markSaved()
 			this.eventBus?.fireOnDidSaveTextDocument(this)
+		
 		}
 		this._markSaved()
 		return Promise.resolve(true)
+	
 	} //<
 
 	// ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
 	// │  INTERNALS                                                                                       │
 	// └──────────────────────────────────────────────────────────────────────────────────────────────────┘
 
-    private _initializeLines(): void { //>
+	private _initializeLines(): void { //>
 		this._linesInitialized = true
 		if (this._content) {
 			const firstLF = this._content.indexOf('\n')
 			const firstCRLF = this._content.indexOf('\r\n')
 			if (firstCRLF !== -1 && (firstLF === -1 || firstCRLF < firstLF)) {
 				this._lines = this._content.split('\r\n')
+			
 			}
 			else {
 				this._lines = this._content.split('\n')
+			
 			}
+		
 		}
 		else {
 			this._lines = []
+		
 		}
+	
 	} //<
 
 	private _updateContentInternal(newContent: string, markDirty: boolean): void { //>
@@ -294,51 +336,61 @@ export class TextDocument implements vt.TextDocument { //>
 		const firstCRLF = this._content.indexOf('\r\n')
 		if (firstCRLF !== -1 && (firstLF === -1 || firstCRLF < firstLF)) {
 			this._lines = this._content.split('\r\n')
+		
 		}
 		else {
 			this._lines = this._content.split('\n')
+		
 		}
 		if (markDirty) {
 			this._isDirty = true
+		
 		}
+	
 	} //<
     
 	_close(): void { this._isClosed = true }
 
 	_markSaved(): void { this._isDirty = false }
 
-    _reOpen(content: string, languageId?: string): void { //>
-		this.utils.log(LogLevel.Debug, `Re-opening document: ${this.uri.toString()}`);
-		this._isClosed = false;
-		this._isDirty = false; // Typically, re-opening from disk means it's not dirty initially
-		this._updateContentInternal(content, false); // Update content without marking dirty
+	_reOpen(content: string, languageId?: string): void { //>
+		this.utils.log(LogLevel.Debug, `Re-opening document: ${this.uri.toString()}`)
+		this._isClosed = false
+		this._isDirty = false // Typically, re-opening from disk means it's not dirty initially
+		this._updateContentInternal(content, false) // Update content without marking dirty
 		if (languageId) {
-			this.languageId = languageId;
+			this.languageId = languageId
+		
 		}
-		this._version++; // Increment version on re-open
+		this._version++ // Increment version on re-open
+	
 	} //<
     
 	_setContentAfterSave(savedContent: string): void { //>
-		this._updateContentInternal(savedContent, false) 
+		this._updateContentInternal(savedContent, false)
 		this._isDirty = false
 		this._version++
 		this.utils.log(LogLevel.Trace, `Document ${this.uri.toString()} content updated internally after save. New version: ${this._version}`)
+	
 	} //<
 
 	_setLanguageId(languageId: string): void { //>
 		if (this.languageId !== languageId) {
-			this.languageId = languageId;
+			this.languageId = languageId
 			// TODO: Consider if a language change event should be fired.
 			// This is not standard in VS Code's public API for TextDocument,
 			// but might be useful for mock observation.
-			this.utils.log(LogLevel.Debug, `Language ID for ${this.uri.toString()} changed to ${languageId}`);
+			this.utils.log(LogLevel.Debug, `Language ID for ${this.uri.toString()} changed to ${languageId}`)
+		
 		}
+	
 	} //<
 
 	_updateContent(newContent: string): void { //>
 		this.utils.log(LogLevel.Debug, `_updateContent called for ${this.uri.toString()}`)
 		this._updateContentInternal(newContent, true)
 		this._version++
+	
 	} //<
 
 }

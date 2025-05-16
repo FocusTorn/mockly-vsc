@@ -48,7 +48,9 @@ export function silenceStd(utilsService: ICoreUtilitiesService) { //>
 		// This mimics the original utilsService.log behavior of respecting the log level
 		if (level >= utilsService.getLogLevel()) {
 			capturedUtilsLogs(level, message, ...args)
+		
 		}
+	
 	})
 
 	return {
@@ -63,6 +65,7 @@ export function silenceStd(utilsService: ICoreUtilitiesService) { //>
 		},
 		getCapturedUtilsLogs: () => capturedUtilsLogs,
 	}
+
 } //<
 
 /**
@@ -81,6 +84,7 @@ export function setupSimulatorTests(): WindowTestSetup { //>
 		// Dispose of previous simulator if it exists
 		if (testContext.simulator) {
 			await testContext.simulator.reset()
+		
 		}
 		container.clearInstances() // Clear singleton instances
 
@@ -103,6 +107,7 @@ export function setupSimulatorTests(): WindowTestSetup { //>
 
 		// Set up a spy on console.warn
 		testContext.consoleWarnSpy = vi.spyOn(console, 'warn')
+	
 	})
 
 	afterEach(async () => {
@@ -112,7 +117,9 @@ export function setupSimulatorTests(): WindowTestSetup { //>
 		currentUtilsService.setLogLevel(LogLevel.Off)
 
 		await testContext.simulator?.reset()
+	
 	})
 
 	return testContext as WindowTestSetup
+
 } //<

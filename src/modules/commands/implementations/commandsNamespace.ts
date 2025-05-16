@@ -23,44 +23,48 @@ import type { ICommandsNamespace } from '../_interfaces/ICommandsNamespace.ts'
 @injectable()
 export class CommandsNamespace implements ICommandsNamespace {
 
-    private commandsService: ICommandsService // Use the interface type
-    private utils: ICoreUtilitiesService
+	private commandsService: ICommandsService // Use the interface type
+	private utils: ICoreUtilitiesService
 
-    constructor(
-        @inject('ICoreUtilitiesService') utils: ICoreUtilitiesService,
-        @inject('ICommandsService') commandsService: ICommandsService, // Inject using the interface token
-    ) {
-        this.utils = utils
-        this.commandsService = commandsService
-        this.utils.log(LogLevel.Debug, 'CommandsNamespace initialized.')
-    }
+	constructor(
+		@inject('ICoreUtilitiesService') utils: ICoreUtilitiesService,
+		@inject('ICommandsService') commandsService: ICommandsService, // Inject using the interface token
+	) {
+		this.utils = utils
+		this.commandsService = commandsService
+		this.utils.log(LogLevel.Debug, 'CommandsNamespace initialized.')
+	
+	}
 
-    // ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
-    // │  Methods                                                                                         │
-    // └──────────────────────────────────────────────────────────────────────────────────────────────────┘
+	// ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+	// │  Methods                                                                                         │
+	// └──────────────────────────────────────────────────────────────────────────────────────────────────┘
 
-    executeCommand<T = unknown>( //>
-        command: string,
-        ...rest: any[]
-    ): Promise<T> {
-        this.utils.log(LogLevel.Trace, `commands.executeCommand called for: ${command}`)
-        return this.commandsService.executeCommand(command, ...rest)
-    } //<
+	executeCommand<T = unknown>( //>
+		command: string,
+		...rest: any[]
+	): Promise<T> {
+		this.utils.log(LogLevel.Trace, `commands.executeCommand called for: ${command}`)
+		return this.commandsService.executeCommand(command, ...rest)
+	
+	} //<
 
-    getCommands( //>
-        _filterInternal: boolean = false,
-    ): Promise<string[]> {
-        this.utils.log(LogLevel.Trace, `commands.getCommands called.`)
-        return this.commandsService.getCommands(_filterInternal)
-    } //<
+	getCommands( //>
+		_filterInternal: boolean = false,
+	): Promise<string[]> {
+		this.utils.log(LogLevel.Trace, `commands.getCommands called.`)
+		return this.commandsService.getCommands(_filterInternal)
+	
+	} //<
 
-    registerCommand( //>
-        command: string,
-        callback: (...args: any[]) => any,
-        thisArg?: any,
-    ): vt.Disposable {
-        this.utils.log(LogLevel.Trace, `commands.registerCommand called for: ${command}`)
-        return this.commandsService.registerCommand(command, callback, thisArg)
-    } //<
+	registerCommand( //>
+		command: string,
+		callback: (...args: any[]) => any,
+		thisArg?: any,
+	): vt.Disposable {
+		this.utils.log(LogLevel.Trace, `commands.registerCommand called for: ${command}`)
+		return this.commandsService.registerCommand(command, callback, thisArg)
+	
+	} //<
 
 }

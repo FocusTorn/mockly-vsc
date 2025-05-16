@@ -24,15 +24,15 @@ import { setupWorkspaceTests } from './_setup'
 const setup = setupWorkspaceTests()
 
 describe('Workspace Properties', () => {
-    // SETUP -->>
-    /* eslint-disable unused-imports/no-unused-vars */
-    let simulator: IVSCodeAPISimulatorService
+	// SETUP -->>
+	/* eslint-disable unused-imports/no-unused-vars */
+	let simulator: IVSCodeAPISimulatorService
 	let workspaceModule: IWorkspaceModule
 	let utilsService: ICoreUtilitiesService
 	// let fileUri1: any, fileUri2: any // Removed
 	// let doc1: TextDocument, doc2: TextDocument // Removed
 	let wsStateService: IWorkspaceStateService
-    /* eslint-enable unused-imports/no-unused-vars */
+	/* eslint-enable unused-imports/no-unused-vars */
 
 	beforeEach(async () => { //>
 		simulator = setup.simulator
@@ -42,9 +42,10 @@ describe('Workspace Properties', () => {
 		wsStateService = container.resolve<IWorkspaceStateService>('IWorkspaceStateService')
 
 		// Removed setup for fileUri1, fileUri2, doc1, doc2
+	
 	}) //<
 
-    //---------------------------------------------------------------------------------------------------------------<<
+	//---------------------------------------------------------------------------------------------------------------<<
     
 	it('should reflect workspaceFolders from WorkspaceStateService', async () => { //>
 		// Arrange
@@ -76,6 +77,7 @@ describe('Workspace Properties', () => {
 		// Act & Assert: Clear workspace
 		await wsStateService.clearWorkspace()
 		expect(simulator.workspace.workspaceFolders).toBeUndefined()
+	
 	}) //<
 	it('should reflect name and workspaceFile from WorkspaceStateService', async () => { //>
 		// Arrange
@@ -101,6 +103,7 @@ describe('Workspace Properties', () => {
 		await wsStateService.clearWorkspace()
 		expect(simulator.workspace.name).toBeUndefined()
 		expect(simulator.workspace.workspaceFile).toBeUndefined()
+	
 	}) //<
 	it('should reflect the list of open textDocuments', async () => { //>
 		// Arrange
@@ -136,6 +139,7 @@ describe('Workspace Properties', () => {
 
 		// Log the document count before reset
 		utilsService.log(LogLevel.Debug, `Before reset: textDocuments.length = ${simulator.workspace.textDocuments.length}`)
+	
 	}) //<
 
 })

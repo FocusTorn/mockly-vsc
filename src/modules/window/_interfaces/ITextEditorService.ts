@@ -11,32 +11,32 @@ import type { TextEditor } from '../implementations/textEditor.ts'
 
 export interface ITextEditorService {
 
-    // ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
-    // │  Properties                                                                                      │
-    // └──────────────────────────────────────────────────────────────────────────────────────────────────┘
-    readonly activeTextEditor: TextEditor | undefined
+	// ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+	// │  Properties                                                                                      │
+	// └──────────────────────────────────────────────────────────────────────────────────────────────────┘
+	readonly activeTextEditor: TextEditor | undefined
 
-    readonly visibleTextEditors: readonly TextEditor[]
+	readonly visibleTextEditors: readonly TextEditor[]
 
-    // ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
-    // │  Methods                                                                                         │
-    // └──────────────────────────────────────────────────────────────────────────────────────────────────┘
-    setActiveTextEditor: ( //>
-        editor?: TextEditor
-    ) => void //<
+	// ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+	// │  Methods                                                                                         │
+	// └──────────────────────────────────────────────────────────────────────────────────────────────────┘
+	setActiveTextEditor: ( //>
+		editor?: TextEditor
+	) => void //<
 
-    setVisibleTextEditors: ( //>
-        editors: TextEditor[]
-    ) => void //<
+	setVisibleTextEditors: ( //>
+		editors: TextEditor[]
+	) => void //<
 
-    showTextDocument: ( //>
-        document: TextDocument,
-        options?: vt.TextDocumentShowOptions
-    ) => Promise<TextEditor> //<
+	showTextDocument: ( //>
+		document: TextDocument,
+		options?: vt.TextDocumentShowOptions
+	) => Promise<TextEditor> //<
 
-    // ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
-    // │  Internal                                                                                        │
-    // └──────────────────────────────────────────────────────────────────────────────────────────────────┘
-    _reset: () => void //> //<
+	// ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+	// │  Internal                                                                                        │
+	// └──────────────────────────────────────────────────────────────────────────────────────────────────┘
+	_reset: () => void //> //<
 
 }

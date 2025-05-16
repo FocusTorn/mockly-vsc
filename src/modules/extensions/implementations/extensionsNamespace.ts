@@ -23,39 +23,43 @@ import type { IExtensionsNamespace } from './../_interfaces/IExtensionsNamespace
 @injectable()
 export class ExtensionsNamespace implements IExtensionsNamespace {
 
-    private extensionsService: IExtensionsService
-    private utils: ICoreUtilitiesService
+	private extensionsService: IExtensionsService
+	private utils: ICoreUtilitiesService
 
-    constructor(
-        @inject('ICoreUtilitiesService') utils: ICoreUtilitiesService,
-        @inject('IExtensionsService') extensionsService: IExtensionsService,
-    ) {
-        this.utils = utils
-        this.extensionsService = extensionsService
-        this.utils.log(LogLevel.Debug, 'ExtensionsNamespace initialized.')
-    }
+	constructor(
+		@inject('ICoreUtilitiesService') utils: ICoreUtilitiesService,
+		@inject('IExtensionsService') extensionsService: IExtensionsService,
+	) {
+		this.utils = utils
+		this.extensionsService = extensionsService
+		this.utils.log(LogLevel.Debug, 'ExtensionsNamespace initialized.')
+	
+	}
 
-    // ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
-    // │  Getters                                                                                         │
-    // └──────────────────────────────────────────────────────────────────────────────────────────────────┘
+	// ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+	// │  Getters                                                                                         │
+	// └──────────────────────────────────────────────────────────────────────────────────────────────────┘
 
-    get onDidChange(): vt.Event<void> { //>
-        return this.extensionsService.onDidChange
-    } //<
+	get onDidChange(): vt.Event<void> { //>
+		return this.extensionsService.onDidChange
+	
+	} //<
 
-    get all(): readonly vt.Extension<any>[] { //>
-        return this.extensionsService.all
-    } //<
+	get all(): readonly vt.Extension<any>[] { //>
+		return this.extensionsService.all
+	
+	} //<
 
-    // ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
-    // │  Methods                                                                                         │
-    // └──────────────────────────────────────────────────────────────────────────────────────────────────┘
+	// ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+	// │  Methods                                                                                         │
+	// └──────────────────────────────────────────────────────────────────────────────────────────────────┘
 
-    getExtension<T>( //>
-        extensionId: string,
-    ): vt.Extension<T> | undefined {
-        this.utils.log(LogLevel.Trace, `extensions.getExtension called for: ${extensionId}`)
-        return this.extensionsService.getExtension(extensionId)
-    } //<
+	getExtension<T>( //>
+		extensionId: string,
+	): vt.Extension<T> | undefined {
+		this.utils.log(LogLevel.Trace, `extensions.getExtension called for: ${extensionId}`)
+		return this.extensionsService.getExtension(extensionId)
+	
+	} //<
 
 }

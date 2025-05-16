@@ -23,6 +23,7 @@ export class CommandsService implements ICommandsService { // Implement the new 
 		@inject('ICoreUtilitiesService') private utils: ICoreUtilitiesService,
 	) {
 		this.utils.log(LogLevel.Debug, 'CommandsService initialized.')
+	
 	}
 
 	// ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
@@ -43,17 +44,22 @@ export class CommandsService implements ICommandsService { // Implement the new 
 			try {
 				const result = await Promise.resolve(handler(...rest))
 				return result as T
+			
 			}
 			catch (e) {
 				this.utils.error(`CommandsService: Error executing command '${command}':`, e)
 				throw e
+			
 			}
+		
 		}
 		else {
 			const errorMsg = `CommandsService: Command '${command}' not found.`
 			this.utils.warn(errorMsg)
 			throw this.utils.createError(errorMsg, 'CommandNotFound')
+		
 		}
+	
 	} //<
 
 	async getCommands( //>
@@ -61,6 +67,7 @@ export class CommandsService implements ICommandsService { // Implement the new 
 	): Promise<string[]> {
 		// TODO: Implement filtering if internal commands are ever added
 		return Array.from(this.registeredCommands.keys())
+	
 	} //<
 
 	registerCommand( //>
@@ -70,6 +77,7 @@ export class CommandsService implements ICommandsService { // Implement the new 
 	): Disposable {
 		if (this.registeredCommands.has(command)) {
 			this.utils.log(LogLevel.Warning, `CommandsService: Command '${command}' is already registered. Overwriting.`)
+		
 		}
 		this.utils.log(LogLevel.Info, `CommandsService: Command registered: ${command}`)
 		const boundCallback = thisArg ? callback.bind(thisArg) : callback
@@ -78,8 +86,11 @@ export class CommandsService implements ICommandsService { // Implement the new 
 			if (this.registeredCommands.get(command) === boundCallback) {
 				this.utils.log(LogLevel.Debug, `CommandsService: Disposing command registration: ${command}`)
 				this.registeredCommands.delete(command)
+			
 			}
+		
 		})
+	
 	} //<
 
 	// ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
@@ -89,16 +100,19 @@ export class CommandsService implements ICommandsService { // Implement the new 
 	_clearCommands(): void { //>
 		this.utils.log(LogLevel.Debug, 'CommandsService: Clearing all registered commands.')
 		this.registeredCommands.clear()
+	
 	} //<
 
 	_getCommandHandler( //>
 		commandId: string,
 	): ((...args: any[]) => any) | undefined {
 		return this.registeredCommands.get(commandId)
+	
 	} //<
 
 	_getRegisteredCommandIds(): string[] { //>
 		return Array.from(this.registeredCommands.keys())
+	
 	} //<
 
 }

@@ -734,7 +734,7 @@ export class FileSystemStateService implements IFileSystemStateService {
 	// │  Methods (Sync)                                                                                  │
 	// └──────────────────────────────────────────────────────────────────────────────────────────────────┘
 	
-    getNodeSync(path: string | Uri): IVirtualFSNode | undefined { //>
+	getNodeSync(path: string | Uri): IVirtualFSNode | undefined { //>
 		const uri = this._pathToUri(path)
 		this.utils.log(LogLevel.Trace, `VFSState: getNodeSync called for: ${uri.toString()}`)
 		return this._findNode(uri) // _findNode is already synchronous
@@ -1082,15 +1082,18 @@ export class FileSystemStateService implements IFileSystemStateService {
 				if (entryValue === null) {
 					// Explicit directory
 					this.addFolderSync(normalizedPath)
+				
 				}
 				else if (typeof entryValue === 'string') {
 					// File with string content
 					const contentUint8Array = this._textEncoder.encode(entryValue)
 					this.writeFileSync(normalizedPath, contentUint8Array)
+				
 				}
 				else if (entryValue instanceof Uint8Array) {
 					// File with Uint8Array content
 					this.writeFileSync(normalizedPath, entryValue)
+				
 				}
 				else if (typeof entryValue === 'object' && entryValue !== null) {
 					// IFileSystemPopulateEntry
@@ -1100,42 +1103,55 @@ export class FileSystemStateService implements IFileSystemStateService {
 
 					if (populateEntry.content === undefined) {
 						isDirectory = true // No content implies directory for IFileSystemPopulateEntry
+					
 					}
 
 					if (populateEntry.content !== undefined) {
 						addNodeOptions.content = populateEntry.content
+					
 					}
 					// TODO: Add mtime, ctime from populateEntry to addNodeOptions if they exist
 
 					if (isDirectory) {
 						this.addFolderSync(normalizedPath, addNodeOptions)
+					
 					}
 					else {
 						let contentUint8Array: Uint8Array
 						if (addNodeOptions.content instanceof Uint8Array) {
 							contentUint8Array = addNodeOptions.content
+						
 						}
 						else if (typeof addNodeOptions.content === 'string') {
 							contentUint8Array = this._textEncoder.encode(addNodeOptions.content)
+						
 						}
 						else {
 							contentUint8Array = new Uint8Array() // Default to empty if somehow still undefined
+						
 						}
 						this.writeFileSync(normalizedPath, contentUint8Array, addNodeOptions)
+					
 					}
+				
 				}
 				else {
 					this.utils.warn(`VFSState: populateSync - Skipping unknown entry type for path: ${rawPath}`)
+				
 				}
+			
 			}
 			catch (e) {
 				this.utils.error(`VFSState: populateSync - Error processing path '${rawPath}':`, e)
 				// Decide if we should re-throw or continue
 				// For sync, typically the first error would halt.
 				throw e
+			
 			}
+		
 		}
 		this.utils.log(LogLevel.Debug, `VFSState: populateSync finished.`)
+	
 	} //<
 
 	async populate(structure: IFileSystemStructure): Promise<void> { //>
@@ -1152,13 +1168,16 @@ export class FileSystemStateService implements IFileSystemStateService {
 
 				if (entryValue === null) {
 					await this.addFolder(normalizedPath)
+				
 				}
 				else if (typeof entryValue === 'string') {
 					const contentUint8Array = this._textEncoder.encode(entryValue)
 					await this.writeFile(normalizedPath, contentUint8Array)
+				
 				}
 				else if (entryValue instanceof Uint8Array) {
 					await this.writeFile(normalizedPath, entryValue)
+				
 				}
 				else if (typeof entryValue === 'object' && entryValue !== null) {
 					const populateEntry = entryValue as IFileSystemPopulateEntry
@@ -1167,41 +1186,54 @@ export class FileSystemStateService implements IFileSystemStateService {
 
 					if (populateEntry.content === undefined) {
 						isDirectory = true
+					
 					}
 
 					if (populateEntry.content !== undefined) {
 						addNodeOptions.content = populateEntry.content
+					
 					}
 
 					if (isDirectory) {
 						await this.addFolder(normalizedPath, addNodeOptions)
+					
 					}
 					else {
 						let contentUint8Array: Uint8Array
 						if (addNodeOptions.content instanceof Uint8Array) {
 							contentUint8Array = addNodeOptions.content
+						
 						}
 						else if (typeof addNodeOptions.content === 'string') {
 							contentUint8Array = this._textEncoder.encode(addNodeOptions.content)
+						
 						}
 						else {
 							contentUint8Array = new Uint8Array()
+						
 						}
 						await this.writeFile(normalizedPath, contentUint8Array, addNodeOptions)
+					
 					}
+				
 				}
 				else {
 					this.utils.warn(`VFSState: populate (async) - Skipping unknown entry type for path: ${rawPath}`)
+				
 				}
+			
 			}
 			catch (e) {
 				this.utils.error(`VFSState: populate (async) - Error processing path '${rawPath}':`, e)
 				// For async, we might choose to continue and report errors later, or re-throw immediately.
 				// Re-throwing immediately for now.
 				throw e
+			
 			}
+		
 		}
 		this.utils.log(LogLevel.Debug, `VFSState: populate (async) finished.`)
+	
 	} //<
 
 	// ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
@@ -1212,22 +1244,28 @@ export class FileSystemStateService implements IFileSystemStateService {
 		if (typeof path === 'string') {
 			// Use normalize instead of resolve to keep trailing slashes for directories,
 			// which helps consistency with how paths might be queried.
-			const normalizedStrPath = this.pathService.normalize(path);
+			const normalizedStrPath = this.pathService.normalize(path)
 			if (/^[a-z][a-z0-9+.-]*:/i.test(normalizedStrPath)) {
 				try {
 					return Uri.parse(normalizedStrPath, true)
+				
 				}
 				catch (e) {
 					this.utils.warn(`VFSState: Failed to parse potential URI string '${normalizedStrPath}', assuming file path. Error: ${e}`)
 					return Uri.file(normalizedStrPath)
+				
 				}
+			
 			}
 			else {
 				return Uri.file(normalizedStrPath)
+			
 			}
+		
 		}
 		// Ensure path component of Uri is normalized if it's already a Uri object
 		return path.with({ path: this.pathService.normalize(path.path) })
+	
 	} //<
 
 	private _createDirectoryNodeInternal(fullPath: string, parent: IVirtualFSNode | null, options?: IAddNodeOptions): IVirtualFSNode { //>

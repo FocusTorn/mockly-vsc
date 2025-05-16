@@ -16,24 +16,23 @@ import { setupWorkspaceTests, silenceStd } from './_setup'
 const setup = setupWorkspaceTests()
 
 describe('Workspace Providers', () => { //>
-    // SETUP -->>
+	// SETUP -->>
 	/* eslint-disable unused-imports/no-unused-vars */
-    let simulator: IVSCodeAPISimulatorService
+	let simulator: IVSCodeAPISimulatorService
 	let utilsService: ICoreUtilitiesService
-    /* eslint-enable unused-imports/no-unused-vars */
+	/* eslint-enable unused-imports/no-unused-vars */
 
 	beforeEach(() => {
 		simulator = setup.simulator
 		utilsService = setup.utilsService
 		utilsService.setLogLevel(LogLevel.Warning)
+	
 	})
 
 	//----------------------------------------------------------------<<
 
 	describe('register...Provider methods', () => { //>
-		
-    
-        it('should registerTextDocumentContentProvider log a warning and return a Disposable', () => { //>
+		it('should registerTextDocumentContentProvider log a warning and return a Disposable', () => { //>
 			const localSilence = silenceStd(utilsService) // Silence logs for this test
 			const capturedLogs = localSilence.getCapturedUtilsLogs() // Get the spy that captures utilsService.log calls
 
@@ -59,10 +58,13 @@ describe('Workspace Providers', () => { //>
 
 				// Cleanup
 				disposable.dispose()
+			
 			}
 			finally {
 				localSilence.dispose() // Ensure disposal of all spies
+			
 			}
+		
 		}) //<
 
 		it('should registerTaskProvider log a warning and return a Disposable', () => { //>
@@ -92,10 +94,13 @@ describe('Workspace Providers', () => { //>
 
 				// Cleanup
 				disposable.dispose()
+			
 			}
 			finally {
 				localSilence.dispose() // Ensure disposal of all spies
+			
 			}
+		
 		}) //<
 
 		it('should registerFileSystemProvider log a warning and return a Disposable', () => { //>
@@ -132,14 +137,17 @@ describe('Workspace Providers', () => { //>
 
 				// Cleanup
 				disposable.dispose()
+			
 			}
 			finally {
 				localSilence.dispose() // Ensure disposal of all spies
+			
 			}
+		
 		}) //<
     
     
-    }) //<
+	}) //<
 
 })
 

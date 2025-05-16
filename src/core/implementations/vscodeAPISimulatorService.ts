@@ -9,7 +9,7 @@ import type {
 	FileType as LocalFileType,
 } from '../../_vscCore/vscEnums.ts'
 import {
-	LogLevel as LocalLogLevel, // Renamed to avoid conflict with parameter name
+	LogLevel, // MODIFIED: Use original name
 	ViewColumn,
 	UIKind,
 	DiagnosticSeverity,
@@ -17,9 +17,9 @@ import {
 	StatusBarAlignment,
 	TreeItemCollapsibleState,
 	EndOfLine,
-	TextEditorRevealType, // ADDED
-	ExtensionKind, // ADDED
-	ConfigurationTarget, // ADDED
+	TextEditorRevealType,
+	ExtensionKind,
+	ConfigurationTarget,
 } from '../../_vscCore/vscEnums.ts'
 
 import type {
@@ -49,11 +49,7 @@ import type { FileSystemError as LocalFileSystemError } from '../../_vscCore/vsc
 //= INJECTED TYPES ============================================================================================
 import type { ICoreUtilitiesService } from '../_interfaces/ICoreUtilitiesService.ts'
 import type { IEventBusService } from '../_interfaces/IEventBusService.ts'
-
-// IMockNodePathService is no longer directly injected here
 import type { IUriService } from '../../modules/fileSystem/_interfaces/IUriService.ts'
-
-// Path updated
 import type { IVSCodeAPISimulatorService, IVSCodeAPISimulatorVFSHelpers } from '../_interfaces/IVSCodeAPISimulatorService.ts'
 import type { ICommandsModule } from '../../modules/commands/_interfaces/ICommandsModule.ts'
 import type { IEnvModule } from '../../modules/env/_interfaces/IEnvModule.ts'
@@ -62,7 +58,6 @@ import type { IWindowModule } from '../../modules/window/_interfaces/IWindowModu
 import type { IWorkspaceModule } from '../../modules/workspace/_interfaces/IWorkspaceModule.ts'
 
 import type { IFileSystemModule } from '../../modules/fileSystem/_interfaces/IFileSystemModule.ts'
-
 // Added
 import type { IMockNodePathService } from '../../modules/nodePath/_interfaces/IMockNodePathService.ts'
 import type { INodeFsService } from '../../modules/nodeFs/_interfaces/INodeFsService.ts'
@@ -99,9 +94,9 @@ export class VSCodeAPISimulatorService implements IVSCodeAPISimulatorService {
 	readonly _fileSystemModule: IFileSystemModule
 	readonly _nodeFsService: INodeFsService
 	private readonly _nodePathServiceInstance: IMockNodePathService
-	readonly vfs: IVSCodeAPISimulatorVFSHelpers;
+	readonly vfs: IVSCodeAPISimulatorVFSHelpers
 
-	constructor(
+	constructor( //>
 		@inject('ICoreUtilitiesService') private utils: ICoreUtilitiesService,
 		@inject('IEventBusService') private eventBus: IEventBusService,
 		@inject('IWorkspaceModule') workspaceModule: IWorkspaceModule,
@@ -111,30 +106,32 @@ export class VSCodeAPISimulatorService implements IVSCodeAPISimulatorService {
 		@inject('IExtensionsModule') extensionsModule: IExtensionsModule,
 		@inject('IFileSystemModule') fileSystemModule: IFileSystemModule,
 		@inject('INodeFsService') nodeFsService: INodeFsService, // Injected
-		@inject('IMockNodePathService') nodePathServiceInstance: IMockNodePathService, // MODIFIED: Injected IMockNodePathService
+		@inject('IMockNodePathService') nodePathServiceInstance: IMockNodePathService,
 	) {
-		this.utils.log(LocalLogLevel.Debug, 'VSCodeAPISimulatorService initializing...')
+		this.utils.log(LogLevel.Debug, 'VSCodeAPISimulatorService initializing...') // MODIFIED: Use LogLevel directly
 		this._workspaceModule = workspaceModule
 		this._windowModule = windowModule
 		this._commandsModule = commandsModule
 		this._envModule = envModule
 		this._extensionsModule = extensionsModule
 		this._fileSystemModule = fileSystemModule
-		this._nodeFsService = nodeFsService // Assigned
-		this._nodePathServiceInstance = nodePathServiceInstance // MODIFIED: Assigned
+		this._nodeFsService = nodeFsService
+		this._nodePathServiceInstance = nodePathServiceInstance
 
 		this.vfs = {
 			populate: async (structure: IFileSystemStructure): Promise<void> => {
 				await this._fileSystemModule._fileSystemStateService.populate(structure)
+			
 			},
 			populateSync: (structure: IFileSystemStructure): void => {
 				this._fileSystemModule._fileSystemStateService.populateSync(structure)
+			
 			},
 		}
 
-		this.utils.log(LocalLogLevel.Debug, 'VSCodeAPISimulatorService initialized.')
+		this.utils.log(LogLevel.Debug, 'VSCodeAPISimulatorService initialized.') // MODIFIED: Use LogLevel directly
 
-	}
+	} //<
 
 	// ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
 	// │  Public API Namespaces                                                                           │
@@ -148,11 +145,11 @@ export class VSCodeAPISimulatorService implements IVSCodeAPISimulatorService {
 	// ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
 	// │  Public API Types, Classes, Enums                                                                │
 	// └──────────────────────────────────────────────────────────────────────────────────────────────────┘
-	get Uri(): IUriService { return this._fileSystemModule.Uri } // Sourced from FileSystemModule
-	get FileSystemError(): typeof LocalFileSystemError { return this._workspaceModule.FileSystemError } // Corrected type hint
-	get FileType(): typeof LocalFileType { return this._workspaceModule.FileType } // WorkspaceModule still exposes this (from _vscCore)
-	get CancellationTokenSource(): typeof LocalCancellationTokenSource { return this._workspaceModule.CancellationTokenSource } // Corrected type hint
-	get TextEdit(): typeof LocalTextEdit { return LocalTextEdit } // Corrected type hint
+	get Uri(): IUriService { return this._fileSystemModule.Uri }
+	get FileSystemError(): typeof LocalFileSystemError { return this._workspaceModule.FileSystemError }
+	get FileType(): typeof LocalFileType { return this._workspaceModule.FileType }
+	get CancellationTokenSource(): typeof LocalCancellationTokenSource { return this._workspaceModule.CancellationTokenSource }
+	get TextEdit(): typeof LocalTextEdit { return LocalTextEdit }
 
 	get Position(): typeof Position { return Position }
 	get Range(): typeof Range { return Range }
@@ -173,17 +170,17 @@ export class VSCodeAPISimulatorService implements IVSCodeAPISimulatorService {
 	get TreeItemCollapsibleState(): typeof TreeItemCollapsibleState { return TreeItemCollapsibleState }
 	get UIKind(): typeof UIKind { return UIKind }
 	get EndOfLine(): typeof EndOfLine { return EndOfLine }
-	get LogLevel(): typeof LocalLogLevel { return LocalLogLevel } // Expose the enum
-	get TextEditorRevealType(): typeof TextEditorRevealType { return TextEditorRevealType } // ADDED
-	get ExtensionKind(): typeof ExtensionKind { return ExtensionKind } // ADDED
-	get ConfigurationTarget(): typeof ConfigurationTarget { return ConfigurationTarget } // ADDED
+	get LogLevel(): typeof LogLevel { return LogLevel } // MODIFIED: Return original LogLevel
+	get TextEditorRevealType(): typeof TextEditorRevealType { return TextEditorRevealType }
+	get ExtensionKind(): typeof ExtensionKind { return ExtensionKind }
+	get ConfigurationTarget(): typeof ConfigurationTarget { return ConfigurationTarget }
 
 	// ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
 	// │  Public Path Service Accessor (for test helpers)                                                 │
 	// └──────────────────────────────────────────────────────────────────────────────────────────────────┘
-	get path(): IMockNodePathService { return this._nodePathServiceInstance } // MODIFIED: Use directly injected instance
-	get nodePathService(): IMockNodePathService { return this._nodePathServiceInstance; } // MODIFIED: Use directly injected instance
-	get nodeFsService(): INodeFsService { return this._nodeFsService; } // Implement getter
+	get path(): IMockNodePathService { return this._nodePathServiceInstance }
+	get nodePathService(): IMockNodePathService { return this._nodePathServiceInstance }
+	get nodeFsService(): INodeFsService { return this._nodeFsService }
 
 	// ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
 	// │  Other Public API Properties                                                                     │
@@ -198,7 +195,7 @@ export class VSCodeAPISimulatorService implements IVSCodeAPISimulatorService {
 	 * @inheritdoc
 	 */
 	async reset(): Promise<void> { //>
-		this.utils.log(LocalLogLevel.Info, 'Resetting VSCodeAPISimulatorService...')
+		this.utils.log(LogLevel.Info, 'Resetting VSCodeAPISimulatorService...') // MODIFIED: Use LogLevel directly
 
 		await this._workspaceModule.reset()
 		await this._windowModule.reset()
@@ -206,45 +203,48 @@ export class VSCodeAPISimulatorService implements IVSCodeAPISimulatorService {
 		await this._envModule.reset()
 		await this._extensionsModule.reset()
 		await this._fileSystemModule.reset()
-		// Assuming INodeFsService might have a reset method if it becomes stateful
-		// For now, if it's purely delegating to VFSStateService, its state is reset via VFSStateService.
-		// If NodeFsService itself had internal state (e.g. open file descriptors mock), it would need:
-		// await (this._nodeFsService as any)._reset?.()
 
 		this.eventBus.reset()
 
-		this.utils.log(LocalLogLevel.Debug, 'VSCodeAPISimulatorService reset complete.')
+		this.utils.log(LogLevel.Debug, 'VSCodeAPISimulatorService reset complete.') // MODIFIED: Use LogLevel directly
 
 	} //<
 
-	// ...
-	setLogLevel(level: LocalLogLevel | string): void { //>
-		this.utils.log(LocalLogLevel.Info, `VSCodeAPISimulatorService.setLogLevel called with: ${level}`);
-		let targetLevel: LocalLogLevel | undefined;
+	setLogLevel(newLevel: LogLevel | string): void { //> MODIFIED: Parameter name changed
+		this.utils.log(LogLevel.Info, `VSCodeAPISimulatorService.setLogLevel called with: ${newLevel}`) // MODIFIED: Use LogLevel directly
+		let targetLevel: LogLevel | undefined
 
-		if (typeof level === 'string') {
-			const lowerLevel = level.toLowerCase();
+		if (typeof newLevel === 'string') {
+			const lowerLevel = newLevel.toLowerCase()
 			switch (lowerLevel) {
-				case 'off': targetLevel = LocalLogLevel.Off; break;
-				case 'trace': targetLevel = LocalLogLevel.Trace; break;
-				case 'debug': targetLevel = LocalLogLevel.Debug; break;
-				case 'info': targetLevel = LocalLogLevel.Info; break;
-				case 'warning': targetLevel = LocalLogLevel.Warning; break;
-				case 'error': targetLevel = LocalLogLevel.Error; break;
+				case 'off': targetLevel = LogLevel.Off; break
+				case 'trace': targetLevel = LogLevel.Trace; break
+				case 'debug': targetLevel = LogLevel.Debug; break
+				case 'info': targetLevel = LogLevel.Info; break
+				case 'warning': targetLevel = LogLevel.Warning; break
+				case 'error': targetLevel = LogLevel.Error; break
 				default:
-					this.utils.warn(`VSCodeAPISimulatorService.setLogLevel: Invalid log level string '${level}'. No change will be made.`);
-					return;
+					this.utils.warn(`VSCodeAPISimulatorService.setLogLevel: Invalid log level string '${newLevel}'. No change will be made.`)
+					return
 			}
-		} else if (typeof level === 'number' && LocalLogLevel[level] !== undefined) {
+		
+		}
+		else if (typeof newLevel === 'number' && LogLevel[newLevel] !== undefined) {
 			// Check if the number is a valid enum value
-			targetLevel = level as LocalLogLevel;
-		} else {
-			this.utils.warn(`VSCodeAPISimulatorService.setLogLevel: Invalid log level type or value '${level}'. No change will be made.`);
-			return;
+			targetLevel = newLevel as LogLevel
+		
+		}
+		else {
+			this.utils.warn(`VSCodeAPISimulatorService.setLogLevel: Invalid log level type or value '${newLevel}'. No change will be made.`)
+			return
+		
 		}
 
 		if (targetLevel !== undefined) {
-			this.utils.setLogLevel(targetLevel);
+			this.utils.setLogLevel(targetLevel) // This will also fire the onDidChangeLogLevel event via CoreUtilitiesService
+		
 		}
+	
 	} //<
+
 }

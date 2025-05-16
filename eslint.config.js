@@ -54,10 +54,10 @@ const focusTornConfig = {
         
 		//= STYLISTIC =========================================================================================
 		'style/indent': ['warn', 'tab'], // For spaces ['warn', 4],
-		"style/no-mixed-spaces-and-tabs": ["error", "smart-tabs"],
-        'style/no-multiple-empty-lines': ['warn', { max: 10, maxBOF: 1 }],
+		'style/no-mixed-spaces-and-tabs': ['error', 'smart-tabs'],
+		'style/no-multiple-empty-lines': ['warn', { max: 10, maxBOF: 1 }],
 		
-        'style/no-trailing-spaces': ['warn', { skipBlankLines: true, ignoreComments: true }],
+		'style/no-trailing-spaces': ['warn', { skipBlankLines: true, ignoreComments: true }],
 		'style/padded-blocks': ['error', { blocks: 'end', classes: 'always' }, { allowSingleLineBlocks: true }],
 		'style/semi': ['error', 'never'],
         

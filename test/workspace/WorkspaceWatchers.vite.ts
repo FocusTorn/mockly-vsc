@@ -29,13 +29,13 @@ const setup = setupWorkspaceTests()
 describe('Workspace Watchers', () => {
 	// SETUP -->>
 	/* eslint-disble unused-imports/no-unused-vars */
-    let simulator: IVSCodeAPISimulatorService
+	let simulator: IVSCodeAPISimulatorService
 	let eventBus: IEventBusService
 	let utilsService: ICoreUtilitiesService
 
 	let folderUri: any
 	let fileUri1: any, fileUri2: any, fileUri3: any
-    /* eslint-enable unused-imports/no-unused-vars */
+	/* eslint-enable unused-imports/no-unused-vars */
 
 	beforeEach(async () => {
 		simulator = setup.simulator
@@ -50,6 +50,7 @@ describe('Workspace Watchers', () => {
 		fileUri3 = simulator.Uri.joinPath(folderUri, 'other.txt')
 		await simulator.workspace.fs.createDirectory(folderUri)
 		await wsStateService.setWorkspaceFolders([folderUri])
+	
 	})
 
 	//----------------------------------------<<
@@ -71,6 +72,7 @@ describe('Workspace Watchers', () => {
 
 			// Cleanup
 			watcher.dispose()
+		
 		}) //<
 		it('should receive change events (on save)', async () => { //>
 			const localSilence = silenceStd(utilsService) // Silence logs for this test
@@ -91,10 +93,13 @@ describe('Workspace Watchers', () => {
 
 				// Cleanup
 				watcher.dispose()
+			
 			}
 			finally {
 				localSilence.dispose()
+			
 			}
+		
 		}) //<
 		it('should receive delete events', async () => { //>
 			// Arrange
@@ -115,6 +120,7 @@ describe('Workspace Watchers', () => {
 
 			// Cleanup
 			watcher.dispose()
+		
 		}) //<
 		it('should respect ignoreCreateEvents flag', async () => { //>
 			// Arrange
@@ -130,6 +136,7 @@ describe('Workspace Watchers', () => {
 
 			// Cleanup
 			watcher.dispose()
+		
 		}) //<
 		it('should respect ignoreChangeEvents flag', async () => { //>
 			const localSilence = silenceStd(utilsService) // Silence logs for this test
@@ -149,10 +156,13 @@ describe('Workspace Watchers', () => {
 
 				// Cleanup
 				watcher.dispose()
+			
 			}
 			finally {
 				localSilence.dispose()
+			
 			}
+		
 		}) //<
 		it('should respect ignoreDeleteEvents flag', async () => { //>
 			// Arrange
@@ -169,6 +179,7 @@ describe('Workspace Watchers', () => {
 
 			// Cleanup
 			watcher.dispose()
+		
 		}) //<
 		it('should stop receiving events after dispose()', async () => { //>
 			// Arrange
@@ -182,7 +193,9 @@ describe('Workspace Watchers', () => {
 
 			// Assert
 			expect(onCreate).not.toHaveBeenCalled()
+		
 		}) //<
+	
 	})
     
 })

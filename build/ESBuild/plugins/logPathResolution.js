@@ -1,11 +1,13 @@
 
 const logPathResolution = {
-    name: 'logPathResolution',
-    setup(build) {
-        build.onResolve({ filter: /.*/ }, (args) => {
-            console.log('Resolving:', args.path, 'from', args.importer)
-        })
-    },
+	name: 'logPathResolution',
+	setup(build) {
+		build.onResolve({ filter: /.*/ }, (args) => {
+			console.log('Resolving:', args.path, 'from', args.importer)
+		
+		})
+	
+	},
 }
 
 export default logPathResolution

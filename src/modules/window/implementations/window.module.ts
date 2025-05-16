@@ -32,75 +32,81 @@ import { LogLevel } from '../../../_vscCore/vscEnums.ts'
 @injectable()
 export class WindowModule implements IWindowModule {
 
-    readonly window: IWindowNamespace
+	readonly window: IWindowNamespace
 
-    /**
-     * @param utils - Core utility service for logging and errors.
-     * @param windowNamespaceImpl - The implementation of the vscode.window namespace.
-     * @param textEditorService - Service for managing text editors.
-     * @param userInteractionService - Service for user interaction (messages, quick picks, etc.).
-     * @param terminalService - Service for managing terminals.
-     * @param outputChannelService - Service for managing output channels.
-     */
-    constructor(
-        @inject('ICoreUtilitiesService') private utils: ICoreUtilitiesService,
-        @inject('IWindowNamespace') windowNamespaceImpl: IWindowNamespace,
-        @inject('ITextEditorService') private textEditorService: ITextEditorService,
-        @inject('IUserInteractionService') private userInteractionService: IUserInteractionService,
-        @inject('ITerminalService') private terminalService: ITerminalService,
-        @inject('IOutputChannelService') private outputChannelService: IOutputChannelService,
-    ) {
-        this.utils.log(LogLevel.Debug, 'WindowModule initializing...')
-        this.window = windowNamespaceImpl
-        this.utils.log(LogLevel.Debug, 'WindowModule initialized.')
-    }
+	/**
+	 * @param utils - Core utility service for logging and errors.
+	 * @param windowNamespaceImpl - The implementation of the vscode.window namespace.
+	 * @param textEditorService - Service for managing text editors.
+	 * @param userInteractionService - Service for user interaction (messages, quick picks, etc.).
+	 * @param terminalService - Service for managing terminals.
+	 * @param outputChannelService - Service for managing output channels.
+	 */
+	constructor(
+		@inject('ICoreUtilitiesService') private utils: ICoreUtilitiesService,
+		@inject('IWindowNamespace') windowNamespaceImpl: IWindowNamespace,
+		@inject('ITextEditorService') private textEditorService: ITextEditorService,
+		@inject('IUserInteractionService') private userInteractionService: IUserInteractionService,
+		@inject('ITerminalService') private terminalService: ITerminalService,
+		@inject('IOutputChannelService') private outputChannelService: IOutputChannelService,
+	) {
+		this.utils.log(LogLevel.Debug, 'WindowModule initializing...')
+		this.window = windowNamespaceImpl
+		this.utils.log(LogLevel.Debug, 'WindowModule initialized.')
+	
+	}
 
-    // ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
-    // │  Methods                                                                                         │
-    // └──────────────────────────────────────────────────────────────────────────────────────────────────┘
+	// ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+	// │  Methods                                                                                         │
+	// └──────────────────────────────────────────────────────────────────────────────────────────────────┘
 
-    /** @inheritdoc */
-    async reset(): Promise<void> { //>
-        this.utils.log(LogLevel.Info, 'Resetting WindowModule state...')
+	/** @inheritdoc */
+	async reset(): Promise<void> { //>
+		this.utils.log(LogLevel.Info, 'Resetting WindowModule state...')
 
-        this.textEditorService._reset()
-        this.userInteractionService._reset()
-        this.terminalService._reset()
-        this.outputChannelService._clearOutputChannels()
+		this.textEditorService._reset()
+		this.userInteractionService._reset()
+		this.terminalService._reset()
+		this.outputChannelService._clearOutputChannels()
 
-        this.utils.log(LogLevel.Debug, 'WindowModule reset complete.')
-    } //<
+		this.utils.log(LogLevel.Debug, 'WindowModule reset complete.')
+	
+	} //<
 
-    // ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
-    // │  Internal                                                                                        │
-    // └──────────────────────────────────────────────────────────────────────────────────────────────────┘
+	// ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+	// │  Internal                                                                                        │
+	// └──────────────────────────────────────────────────────────────────────────────────────────────────┘
 
-    /**
-     * Exposes the internal OutputChannelService for testing and state inspection.
-     */
-    get _outputChannelService(): IOutputChannelService { //>
-        return this.outputChannelService
-    } //<
+	/**
+	 * Exposes the internal OutputChannelService for testing and state inspection.
+	 */
+	get _outputChannelService(): IOutputChannelService { //>
+		return this.outputChannelService
+	
+	} //<
 
-    /**
-     * Exposes the internal TerminalService for testing and state inspection.
-     */
-    get _terminalService(): ITerminalService { //>
-        return this.terminalService
-    } //<
+	/**
+	 * Exposes the internal TerminalService for testing and state inspection.
+	 */
+	get _terminalService(): ITerminalService { //>
+		return this.terminalService
+	
+	} //<
 
-    /**
-     * Exposes the internal TextEditorService for testing and state inspection.
-     */
-    get _textEditorService(): ITextEditorService { //>
-        return this.textEditorService
-    } //<
+	/**
+	 * Exposes the internal TextEditorService for testing and state inspection.
+	 */
+	get _textEditorService(): ITextEditorService { //>
+		return this.textEditorService
+	
+	} //<
 
-    /**
-     * Exposes the internal UserInteractionService for testing and state inspection.
-     */
-    get _userInteractionService(): IUserInteractionService { //>
-        return this.userInteractionService
-    } //<
+	/**
+	 * Exposes the internal UserInteractionService for testing and state inspection.
+	 */
+	get _userInteractionService(): IUserInteractionService { //>
+		return this.userInteractionService
+	
+	} //<
 
 }

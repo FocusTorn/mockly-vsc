@@ -10,8 +10,8 @@ import type { IEnvNamespace } from './IEnvNamespace.ts'
  * It exposes the vscode.env namespace mock and a reset method.
  */
 export interface IEnvModule {
-    readonly env: IEnvNamespace
+	readonly env: IEnvNamespace
 
-    reset: () => Promise<void>
+	reset: () => Promise<void>
 
 }

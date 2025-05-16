@@ -1,156 +1,155 @@
-// ESLint & Imports --------->>
+// ESLint & Imports -->>
 
 import gulp from 'gulp'
-import log from 'fancy-log'
-
-import { exec as callbackExec } from 'child_process'
-import { promisify } from 'util'
 import chalk from 'chalk'
+
+// Import underlying validation functions
+import { tsum as tsumImplementation } from './gulp-tasks/tsc-validate.mjs'
+import { validatePackages } from './gulp-tasks/dependency-validate.mjs'
+import { eslintsum as eslintsumImplementation } from './gulp-tasks/eslint-validate.mjs'
 
 //--------------------------------------------------------------------------------------------------------------<<
 
-const tsSourceFiles = [
-    'src/**/*.ts',
-    '*.ts',
+const depcheckIgnoreDirs = ['dist', 'dll', 'release', 'src/dist', 'gulp-tasks']
+const depcheckIgnoreMatches = [
+	'@typescript-eslint/eslint-plugin',
+	'@typescript-eslint/parser',
+	'@vitest/coverage-v8',
+	'rimraf',
+	'fancy-log',
 ]
 
-const exec = promisify(callbackExec) // Promisify exec for async/await usage
+let validationResults = []
 
-async function tsum() { //>
-    console.log('\x1Bc')
+console.log('\x1Bc') // Clear console at the start of gulpfile execution
 
-    let output = ''
-    let exitCode = 0
-    let tscSuccess = false
+function printTaskBanner(taskName, state) { //>
+	const title = `${state === 'START' ? 'RUNNING' : 'COMPLETE'} ${taskName.toUpperCase()}`.padEnd(100)
+	const line = `║ ${title} ║`
+	console.log(chalk.cyanBright.bold('╔══════════════════════════════════════════════════════════════════════════════════════════════════════╗'))
+	console.log(chalk.cyanBright.bold(line))
+	console.log(chalk.cyanBright.bold('╚══════════════════════════════════════════════════════════════════════════════════════════════════════╝'))
 
-    try {
-        const { stdout, stderr } = await exec('npx tsc --pretty')
-        output = stderr + stdout
-        tscSuccess = true
-        exitCode = 0
-    }
-    catch (e) { //>
-        output = (e.stderr || '') + (e.stdout || '')
-        exitCode = typeof e.code === 'number' ? e.code : 1
-        tscSuccess = false
-    } //<
-
-    const outputLines = output.trim().split(/\r?\n/)
-    let startIndex = -1
-    
-    const summaryPattern = /^Found \d+ errors? in (the same file|\d+ file)\.?/
-    startIndex = outputLines.findIndex(line => summaryPattern.test(line))
-
-    if (startIndex !== -1) {
-        console.log(outputLines.slice(startIndex).join('\n'))
-    }
-    else if (!tscSuccess) {
-        console.log(chalk.red(`\n--- TSC output (Exited with code ${exitCode}, TSC summary line NOT found) ---\n`))
-        console.log(output.trim())
-    }
-    else {
-        console.log(chalk.green('\nTSC found no errors'))
-    }
-
-    console.log('')
 } //<
 
-function logWatchStart(done) { //> This task *only* logs the message. 
-    
-    // log(`Watcher started. Watching files: ${colors.cyan(tsSourceFiles.join(', '))}`)
-    
-    log(chalk.yellow(`Watching for file changes...`))
-    
-    // It needs `done` for Gulp to know it finished.
-    done()
-    
+//= Task for TSC validation ========================================================================= 
+async function tsumTask() { //>
+	printTaskBanner('TSC Validation', 'START')
+	const success = await tsumImplementation()
+	validationResults.push({ name: 'validateTSC (tsum)', success })
+	// printTaskBanner('TSC Validation', 'END')
+
 } //<
+tsumTask.displayName = 'validateTSC (tsum)'
+gulp.task('tsum', tsumTask)
 
-function startTscWatcher() { //>
-    return gulp.watch(tsSourceFiles, gulp.series(tsum, logWatchStart))
+
+
+
+//= Task for Dependency validation ================================================================== 
+function depsumTask() { //>
+	printTaskBanner('Dependency Validation', 'START')
+	return new Promise((resolve) => {
+		validatePackages((_gulpError, successStatus) => {
+			validationResults.push({ name: 'validatePackages (depsum)', success: successStatus })
+			// printTaskBanner('Dependency Validation', 'END')
+			resolve() // Resolve the promise for Gulp
+		
+		}, {
+			ignoreMatches: depcheckIgnoreMatches,
+			ignoreDirs: depcheckIgnoreDirs,
+		})
+	
+	})
+
 } //<
+depsumTask.displayName = 'validatePackages (depsum)'
+gulp.task('depsum', depsumTask)
 
-// Define the main watch task:
-// 1. Runs tsum once.
-// 2. Logs the "Watcher started" message.
-// 3. Starts the actual file watcher.
-export const watch = gulp.series(tsum, logWatchStart, startTscWatcher) // Run this with: gulp watch
-export { tsum }
+//= Task for ESLint validation ====================================================================== 
+async function eslintsumTask() { //>
+	printTaskBanner('ESLint Validation', 'START')
+	const success = await eslintsumImplementation()
+	validationResults.push({ name: 'validateESLint (eslintsum)', success })
+	// printTaskBanner('ESLint Validation', 'END')
 
-async function validatePackages(done) {
-    // log(colors.magenta('Validating Packages...'))
-    const { stdout, stderr } = await exec('node src/scripts/js/check_excess_packages.js')
-    if (stderr) {
-        console.error(chalk.red('Package validation errors:'))
-        console.error(stderr)
-    }
-    if (stdout) {
-        console.log(stdout) // Log the output
-    }
-    // log(colors.magenta('Package validation complete.'))
-    done() // Indicate task completion
-}
+} //<
+eslintsumTask.displayName = 'validateESLint (eslintsum)'
+gulp.task('eslsum', eslintsumTask)
 
-export const validate = gulp.series(tsum, validatePackages)
 
-// // ESLint ------------------->> 
+// Task to check all results and fail Gulp if needed
+function checkOverallValidation(done) { //>
+	// Determine overall success first
+	let overallSuccess = true
+	if (validationResults.length === 0) {
+		overallSuccess = false // Treat as failure if no results
+	
+	}
+	else {
+		validationResults.forEach((result) => {
+			if (!result.success) {
+				overallSuccess = false
+			
+			}
+		
+		})
+	
+	}
 
-// // --- Configuration ---
-// // Adjust this glob pattern to match all the TS files you want to lint.
-// // It respects the 'ignores' defined in your eslint.config.js
-// const filesToLint = [
-//     'src/**/*.ts',
-//     // 'lib/**/*.ts',
-//     'test/**/*.ts',
-//     '*.ts', // Lint TS files in the root
-//     '*.mjs', // Also lint MJS files (like this gulpfile or eslint.config.js if it were mjs)
-//     'eslint.config.js', // Lint your ESLint config itself
-// ];
+	// Now print the start banner for this check
+	printTaskBanner('Overall Validation Status', 'START')
 
-// // Options for ESLint execution
-// const eslintOptions = {
-//     // fix: true, // Uncomment to enable auto-fixing
-//     // warnIgnored: true, // Uncomment to show warnings for ignored files
-// };
+	if (validationResults.length === 0) {
+		console.log(chalk.yellow('No validation tasks were run or reported results.'))
+	
+	}
+	else {
+		validationResults.forEach((result) => {
+			const statusText = result.success ? chalk.green('PASSED') : chalk.red('FAILED')
+			console.log(`${chalk.white(result.name.padEnd(30))} ${statusText}`)
+		
+		})
+	
+	}
+    
+	// Prepare colored status for the end banner
+	// const statusString = overallSuccess ? chalk.green.bold('PASS') : chalk.red.bold('FAIL')
+	// printTaskBanner(`Overall Validation Status: ${statusString}`, 'END')
+    
+	console.log('') // Extra blank line for readability
 
-// // --- Gulp Task ---
+	// Clear results for the next potential 'validate' run in the same Gulp process
+	const currentResults = [...validationResults]
+	validationResults = []
 
-// /**
-//  * Lints TypeScript files using ESLint with Flat Config (eslint.config.js).
-//  */
-// function lint() {
-//     log(`Starting ${colors.cyan('\'lint\'')} task...`);
-//     return gulp.src(filesToLint, { base: './', since: gulp.lastRun(lint) }) // `since` optimizes for incremental builds
-//         .pipe(eslint(eslintOptions)) // ESLint automatically finds eslint.config.js
-//         .pipe(eslint.format('stylish')) // Format output nicely
-//         .pipe(eslint.failAfterError()) // Fail the Gulp task if errors are found
-//         // If using `fix: true`, uncomment the next line to write changes back to files
-//         // .pipe(gulp.dest('./'))
-//         .on('end', () => {
-//             log(`Finished ${colors.cyan('\'lint\'')} task`);
-//         })
-//         .on('error', (err) => {
-//             log.error(`Error in ${colors.cyan('\'lint\'')} task:`, err);
-//         });
-// }
+	if (!overallSuccess) {
+		console.log(chalk.red.bold('Validation Failed. Exiting.\n'))
+		const failedTasks = currentResults.filter(r => !r.success).map(r => r.name).join(', ')
+		done(new Error(`One or more validation tasks failed: ${failedTasks || 'Unknown task'}.`))
+	
+	}
+	else {
+		console.log(chalk.green.bold('All validations passed.\n'))
+		done() // Signal success to Gulp
+	
+	}
 
-// // --- Exports ---
+} //<
+checkOverallValidation.displayName = 'checkOverallValidation'
+gulp.task('checkOverallValidation', checkOverallValidation)
 
-// // Define the public Gulp task
-// gulp.task('lint', lint);
+// Main validate task
+export const validate = gulp.series( //>
+	(cb) => { // Task to reset results at the very start of the 'validate' series
+		validationResults = []
+		cb()
+	
+	},
+	'tsum',
+	'depsum',
+	'eslsum',
+	'checkOverallValidation',
+) //<
 
-// // Define a default task (runs when you just type `gulp`)
-// gulp.task('default', gulp.series('lint'));
-
-// // Optional: Watch for changes and lint automatically
-// function watchFiles() {
-//     log('Watching files for changes...');
-//     gulp.watch(filesToLint, gulp.series('lint'));
-// }
-
-// gulp.task('watch', watchFiles);
-
-// // Export tasks for potential programmatic use (optional)
-
-// //--------------------------------------------------------<<
-// export { lint, watchFiles as watch };
+gulp.task('default', validate)

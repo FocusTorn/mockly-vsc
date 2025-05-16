@@ -11,25 +11,25 @@ import type { IWindowNamespace } from './IWindowNamespace.ts'
 
 export interface IWindowModule {
 
-    // ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
-    // │  Properties                                                                                      │
-    // └──────────────────────────────────────────────────────────────────────────────────────────────────┘
-    readonly window: IWindowNamespace
+	// ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+	// │  Properties                                                                                      │
+	// └──────────────────────────────────────────────────────────────────────────────────────────────────┘
+	readonly window: IWindowNamespace
 
-    // ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
-    // │  Methods                                                                                         │
-    // └──────────────────────────────────────────────────────────────────────────────────────────────────┘
-    reset: () => Promise<void>
+	// ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+	// │  Methods                                                                                         │
+	// └──────────────────────────────────────────────────────────────────────────────────────────────────┘
+	reset: () => Promise<void>
 
-    // ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
-    // │  Internal                                                                                        │
-    // └──────────────────────────────────────────────────────────────────────────────────────────────────┘
-    readonly _outputChannelService: IOutputChannelService
+	// ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+	// │  Internal                                                                                        │
+	// └──────────────────────────────────────────────────────────────────────────────────────────────────┘
+	readonly _outputChannelService: IOutputChannelService
 
-    readonly _terminalService: ITerminalService
+	readonly _terminalService: ITerminalService
 
-    readonly _textEditorService: ITextEditorService
+	readonly _textEditorService: ITextEditorService
 
-    readonly _userInteractionService: IUserInteractionService
+	readonly _userInteractionService: IUserInteractionService
 
 }
