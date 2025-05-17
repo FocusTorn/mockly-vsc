@@ -1,7 +1,7 @@
 // ESLint & Imports -->>
 
 //= ViTest ====================================================================================================
-import { describe, it, expect, beforeEach } from 'vitest'
+import { describe, it, expect, beforeEach, afterEach } from 'vitest' // Added afterEach
 import { Buffer } from 'node:buffer'
 
 //= VSCODE TYPES & MOCKED INTERNALS ===========================================================================
@@ -12,27 +12,34 @@ import type { FileSystemError } from '../../src/_vscCore/vscFileSystemError'
 import type { INodeFsService, IMockDirent } from '../../src/modules/nodeFs/_interfaces/INodeFsService'
 import type { IFileSystemStateService } from '../../src/modules/fileSystem/_interfaces/IFileSystemStateService'
 import type { IUriService } from '../../src/modules/fileSystem/_interfaces/IUriService'
+import type { IVSCodeAPISimulatorService } from '../../src/core/_interfaces/IVSCodeAPISimulatorService'
 
 //= IMPLEMENTATIONS ===========================================================================================
 import { setupNodeFsTests } from './_setup'
 
 //--------------------------------------------------------------------------------------------------------------<<
 
-describe('NodeFsService - Read Operations', () => {
+describe('NodeFsService - Read Operations', () => { //>
 	// SETUP -->>
 	const setup = setupNodeFsTests()
 	let nodeFsService: INodeFsService
 	let vfsStateService: IFileSystemStateService
 	let uriService: IUriService
+	let simulator: IVSCodeAPISimulatorService // Added simulator
 
-	beforeEach(async () => {
+	beforeEach(async () => { //>
 		nodeFsService = setup.nodeFsService
 		vfsStateService = setup.vfsStateService
 		uriService = setup.uriService
+		simulator = setup.simulator // Assign simulator
 		// Ensure VFS is clean before each test in this describe block
-		await vfsStateService.clear()
+		// simulator.reset() in the main _setup.ts already handles clearing VFSStateService via FileSystemModule.reset()
+		// However, an explicit clear here ensures this specific suite starts pristine if needed,
+		// but it might be redundant if _setup.ts's reset is comprehensive.
+		// For now, relying on _setup.ts's reset.
+		// await vfsStateService.clear() // Potentially redundant, relying on global setup
 	
-	})
+	}) //<
 
 	//-----------------------------------------------------------------------------------<<
 
@@ -93,6 +100,8 @@ describe('NodeFsService - Read Operations', () => {
 			expect(stats.size).toBe(Buffer.from(content).byteLength)
 			expect(stats.mtime).toBe(now)
 			expect(stats.ctime).toBe(now - 1000)
+			expect(stats.isFile()).toBe(true)
+			expect(stats.isDirectory()).toBe(false)
 		
 		}) //<
 
@@ -109,6 +118,8 @@ describe('NodeFsService - Read Operations', () => {
 			expect(stats.type).toBe(FileType.Directory)
 			expect(stats.size).toBe(0) // Directories have size 0 in this mock
 			expect(stats.mtime).toBe(now)
+			expect(stats.isFile()).toBe(false)
+			expect(stats.isDirectory()).toBe(true)
 		
 		}) //<
 
@@ -225,7 +236,7 @@ describe('NodeFsService - Read Operations', () => {
 	}) //<
 
 	describe('readdirSync()', () => { //>
-		beforeEach(async () => {
+		beforeEach(async () => { //>
 			// Setup a common directory structure for readdir tests
 			await vfsStateService.addFolder(uriService.file('/test/readdir_dir'))
 			await vfsStateService.addFile(uriService.file('/test/readdir_dir/file1.txt'), { content: 'f1' })
@@ -233,7 +244,7 @@ describe('NodeFsService - Read Operations', () => {
 			await vfsStateService.addFolder(uriService.file('/test/readdir_dir/subdir'))
 			await vfsStateService.addFile(uriService.file('/test/readdir_dir/subdir/nested.js'), { content: 'n1' })
 		
-		})
+		}) //<
 
 		it('should return an array of names by default', () => { //>
 			// Arrange
@@ -299,6 +310,120 @@ describe('NodeFsService - Read Operations', () => {
 				expect((e as any).code).toMatch(/ENOTDIR|FileNotADirectory/)
 			
 			}
+		
+		}) //<
+	
+	}) //<
+
+	describe('Path Mode Interactions (Win32 Mode)', () => { //>
+		// SETUP -->>
+		const winFsStructure = {
+			'/c/Users/TestUser/Documents/': null,
+			'/c/Users/TestUser/Documents/file1.txt': 'content1',
+			'/c/Users/TestUser/Desktop/': null,
+			'/c/Users/TestUser/Desktop/image.png': 'content2',
+			'/d/Projects/MyProject/': null,
+			'/d/Projects/MyProject/source.js': 'content3',
+		}
+		let originalPathMode: 'posix' | 'win32'
+
+		beforeEach(async () => { //>
+			originalPathMode = simulator.path.getMode()
+			simulator.path.setMode('win32')
+			// Ensure VFS is clean and populated for these specific tests
+			// simulator.reset() in the main _setup.ts clears VFS.
+			// We populate it here after setting the mode.
+			await simulator.vfs.populate(winFsStructure)
+		
+		}) //<
+
+		afterEach(async () => { //>
+			simulator.path.setMode(originalPathMode) // Restore original path mode
+			// simulator.reset() will be called by the main _setup.ts afterEach,
+			// which will also reset path mode to posix.
+		
+		}) //<
+		//-----------------------------------------------------------------------------------<<
+
+		it('existsSync should correctly find files/folders using Windows-style paths', () => { //>
+			// Arrange
+			const winPathFile = 'C:\\Users\\TestUser\\Documents\\file1.txt'
+			const winPathFolder = 'D:\\Projects\\MyProject'
+			const winPathNonExistent = 'C:\\NonExistent\\path.txt'
+
+			// Act
+			const resultFile = nodeFsService.existsSync(winPathFile)
+			const resultFolder = nodeFsService.existsSync(winPathFolder)
+			const resultNonExistent = nodeFsService.existsSync(winPathNonExistent)
+
+			// Assert
+			expect(resultFile, `existsSync for ${winPathFile}`).toBe(true)
+			expect(resultFolder, `existsSync for ${winPathFolder}`).toBe(true)
+			expect(resultNonExistent, `existsSync for ${winPathNonExistent}`).toBe(false)
+		
+		}) //<
+
+		it('statSync should correctly stat files/folders using Windows-style paths', () => { //>
+			// Arrange
+			const winPathFile = 'C:\\Users\\TestUser\\Documents\\file1.txt'
+			const winPathFolder = 'D:\\Projects\\MyProject'
+
+			// Act
+			const statsFile = nodeFsService.statSync(winPathFile)
+			const statsFolder = nodeFsService.statSync(winPathFolder)
+
+			// Assert
+			expect(statsFile.isFile(), `isFile for ${winPathFile}`).toBe(true)
+			expect(statsFile.isDirectory(), `isDirectory for ${winPathFile}`).toBe(false)
+			expect(statsFile.size).toBe(Buffer.from('content1').byteLength)
+
+			expect(statsFolder.isFile(), `isFile for ${winPathFolder}`).toBe(false)
+			expect(statsFolder.isDirectory(), `isDirectory for ${winPathFolder}`).toBe(true)
+		
+		}) //<
+
+		it('statSync should throw ENOENT for non-existent Windows-style paths', () => { //>
+			// Arrange
+			const winPathNonExistent = 'C:\\Windows\\System32\\non_existent.dll'
+			// Act & Assert
+			expect(() => nodeFsService.statSync(winPathNonExistent)).toThrowError(/ENOENT|FileNotFound/)
+		
+		}) //<
+
+		it('readFileSync should correctly read files using Windows-style paths', () => { //>
+			// Arrange
+			const winPathFile = 'D:\\Projects\\MyProject\\source.js'
+			const expectedContent = 'content3'
+
+			// Act
+			const buffer = nodeFsService.readFileSync(winPathFile)
+			const stringContent = nodeFsService.readFileSync(winPathFile, 'utf-8')
+
+
+			// Assert
+			expect(buffer).toBeInstanceOf(Buffer)
+			expect(buffer.toString('utf8')).toBe(expectedContent)
+			expect(stringContent).toBe(expectedContent)
+		
+		}) //<
+
+		it('readdirSync should correctly list directory contents using Windows-style paths', () => { //>
+			// Arrange
+			const winPathFolder = 'C:\\Users\\TestUser\\Documents'
+			const expectedEntries = ['file1.txt'] // Only file1.txt is directly in Documents
+
+			// Act
+			const entries = nodeFsService.readdirSync(winPathFolder)
+			const entriesWithTypes = nodeFsService.readdirSync(winPathFolder, { withFileTypes: true })
+
+			// Assert
+			expect(entries).toEqual(expect.arrayContaining(expectedEntries))
+			expect(entries.length).toBe(expectedEntries.length)
+
+			expect(entriesWithTypes.length).toBe(expectedEntries.length)
+			const file1Dirent = entriesWithTypes.find(e => e.name === 'file1.txt')
+			expect(file1Dirent).toBeDefined()
+			expect(file1Dirent?.isFile()).toBe(true)
 		
 		}) //<
 	

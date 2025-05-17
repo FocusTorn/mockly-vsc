@@ -306,7 +306,8 @@ export class FileSystemService implements IFileSystemService {
 		}
 		catch (e) {
 			if ((e as FileSystemError)?.code === 'FileNotFound' && (e as any).uri?.toString() === source.toString()) {
-				throw this.utils.createFileSystemError('FileNotFound', source, `Source file not found: ${source.toString()}`)
+				// MODIFIED: Use the default message format which includes the code "FileNotFound"
+				throw this.utils.createFileSystemError('FileNotFound', source)
 			
 			}
 			if ((e as any).code && !(e instanceof (await import('../../../_vscCore/vscFileSystemError.ts')).FileSystemError)) {
@@ -318,7 +319,7 @@ export class FileSystemService implements IFileSystemService {
 		}
 	
 	} //<
-
+    
 	async createDirectory(uri: vt.Uri): Promise<void> { //>
 		this.utils.log(LogLevel.Info, `FileSystemService.createDirectory called for: ${uri.toString()}`)
 		let stats: vt.FileStat | null = null
@@ -337,10 +338,12 @@ export class FileSystemService implements IFileSystemService {
 		if (stats) {
 			if (stats.type === FileType.Directory) {
 				this.utils.log(LogLevel.Debug, `createDirectory: Directory already exists, doing nothing: ${uri.toString()}`)
+				// MODIFIED: Return if directory already exists (VS Code behavior)
 			
 			}
 			else {
-				throw this.utils.createFileSystemError('FileExists', uri, `Path exists but is not a directory: ${uri.toString()}`)
+				// Path exists but is a file, this is an error as per VS Code docs
+				throw this.utils.createFileSystemError('FileExists', uri) // MODIFIED: Throw FileExists
 			
 			}
 		
@@ -367,7 +370,7 @@ export class FileSystemService implements IFileSystemService {
 		}
 	
 	} //<
-
+    
 	isWritableFileSystem(scheme: string): boolean | undefined { //>
 		if (scheme === 'file' || scheme === 'untitled') {
 			return true

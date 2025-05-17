@@ -26,10 +26,10 @@ import type {
 	TreeItemCollapsibleState,
 	UIKind,
 	EndOfLine,
-	LogLevel, // Added LogLevel here for the new method signature
-	TextEditorRevealType, // ADDED
-	ExtensionKind, // ADDED
-	ConfigurationTarget, // ADDED
+	LogLevel,
+	TextEditorRevealType,
+	ExtensionKind,
+	ConfigurationTarget,
 } from '../../_vscCore/vscEnums.ts'
 import type { FileSystemError } from '../../_vscCore/vscFileSystemError.ts'
 
@@ -48,7 +48,7 @@ import type { IFileSystemModule } from '../../modules/fileSystem/_interfaces/IFi
 import type { IWindowModule } from '../../modules/window/_interfaces/IWindowModule.ts'
 import type { IWorkspaceModule } from '../../modules/workspace/_interfaces/IWorkspaceModule.ts'
 import type { INodeFsService } from '../../modules/nodeFs/_interfaces/INodeFsService.ts'
-import type { IFileSystemStructure } from '../../modules/fileSystem/_interfaces/IFileSystemStateService.ts'
+import type { IFileSystemStructure } from '../../modules/fileSystem/_interfaces/IVfsPopulationService.ts' // MODIFIED path
 
 //--------------------------------------------------------------------------------------------------------------<<
 
@@ -67,7 +67,7 @@ export interface IVSCodeAPISimulatorService {
 	readonly env: IEnvNamespace
 
 	// Core VSCode Types & Classes (re-exported for convenience)
-	readonly Uri: IUriService // Use the correct service interface type
+	readonly Uri: IUriService
 	readonly Position: typeof Position
 	readonly Range: typeof Range
 	readonly Selection: typeof Selection
@@ -93,10 +93,10 @@ export interface IVSCodeAPISimulatorService {
 	readonly TreeItemCollapsibleState: typeof TreeItemCollapsibleState
 	readonly UIKind: typeof UIKind
 	readonly EndOfLine: typeof EndOfLine
-	readonly LogLevel: typeof LogLevel // Expose LogLevel enum itself if needed by consumers
-	readonly TextEditorRevealType: typeof TextEditorRevealType // ADDED
-	readonly ExtensionKind: typeof ExtensionKind // ADDED
-	readonly ConfigurationTarget: typeof ConfigurationTarget // ADDED
+	readonly LogLevel: typeof LogLevel
+	readonly TextEditorRevealType: typeof TextEditorRevealType
+	readonly ExtensionKind: typeof ExtensionKind
+	readonly ConfigurationTarget: typeof ConfigurationTarget
 
 	// Version
 	readonly version: string
@@ -107,14 +107,14 @@ export interface IVSCodeAPISimulatorService {
 	readonly _commandsModule: ICommandsModule
 	readonly _extensionsModule: IExtensionsModule
 	readonly _envModule: IEnvModule
-	readonly _fileSystemModule: IFileSystemModule
+	readonly _fileSystemModule: IFileSystemModule // This still exposes the module which now contains _vfsPopulationService
 
 	// Public Path Service Accessor (for test helpers)
 	readonly path: IMockNodePathService
 	readonly nodePathService: IMockNodePathService
 	readonly nodeFsService: INodeFsService
-	readonly vfs: IVSCodeAPISimulatorVFSHelpers // New property
+	readonly vfs: IVSCodeAPISimulatorVFSHelpers
 
 	reset: () => Promise<void>
-	setLogLevel: (level: LogLevel | string) => void // New method signature
+	setLogLevel: (level: LogLevel | string) => void
 }

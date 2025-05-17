@@ -119,18 +119,14 @@ describe('CoreUtilitiesService', () => {
 		
 		}) //<
 
-		it('should default to LogLevel.Info', () => { //>
+		it('should reflect the LogLevel set by test setup (Warning)', () => { //>
 			// Assert
-			// Note: setupCoreTests sets it to Warning by default for tests.
-			// We'll re-initialize a fresh instance for this specific check if needed,
-			// or acknowledge the setup's default. For now, let's test setLogLevel.
-			// This test is more about the initial state of a newly created service,
-			// which is harder to test here without direct instantiation.
-			// We'll rely on testing setLogLevel and getLogLevel.
-			expect(utilsService.getLogLevel()).toBe(LogLevel.Warning) // As per setupCoreTests
+			// Note: setupCoreTests sets the LogLevel to Warning for each test.
+			// This test verifies that the service reflects that setting.
+			expect(utilsService.getLogLevel()).toBe(LogLevel.Warning)
 		
 		}) //<
-
+        
 		it('setLogLevel should update the current log level and getLogLevel should reflect it', () => { //>
 			// Act
 			utilsService.setLogLevel(LogLevel.Debug)

@@ -41,7 +41,7 @@ class NotImplementedError extends Error {
 @singleton()
 export class CoreUtilitiesService implements ICoreUtilitiesService {
 
-	private currentLogLevel: LogLevel = LogLevel.Info
+	private currentLogLevel: LogLevel = LogLevel.Warning // MODIFIED: Default to Warning
 
 	constructor(
 		@inject('IEventBusService') private eventBus: IEventBusService,
@@ -229,8 +229,8 @@ export class CoreUtilitiesService implements ICoreUtilitiesService {
 		}
 	
 	} //<
-	
-    createNotImplementedError( //>
+
+	createNotImplementedError( //>
 		featureName?: string,
 	): Error {
 		const message = featureName

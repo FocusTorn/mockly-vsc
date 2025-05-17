@@ -11,6 +11,7 @@ import type { ICoreUtilitiesService } from '../../../core/_interfaces/ICoreUtili
 import type { IFileSystemService } from '../_interfaces/IFileSystemService.ts'
 import type { IUriService } from '../_interfaces/IUriService.ts'
 import type { IFileSystemStateService } from '../_interfaces/IFileSystemStateService.ts'
+import type { IVfsPopulationService } from '../_interfaces/IVfsPopulationService.ts' // ADDED
 
 //= IMPLEMENTATION TYPES ======================================================================================
 import type { IFileSystemModule } from '../_interfaces/IFileSystemModule.ts'
@@ -29,17 +30,20 @@ export class FileSystemModule implements IFileSystemModule {
 	readonly fs: IFileSystemService
 	readonly Uri: IUriService
 	readonly _fileSystemStateService: IFileSystemStateService
+	readonly _vfsPopulationService: IVfsPopulationService // ADDED
 
 	constructor(
 		@inject('ICoreUtilitiesService') private utils: ICoreUtilitiesService,
 		@inject('IFileSystemService') fileSystemService: IFileSystemService,
 		@inject('IUriService') uriService: IUriService,
 		@inject('IFileSystemStateService') fileSystemStateService: IFileSystemStateService,
+		@inject('IVfsPopulationService') vfsPopulationService: IVfsPopulationService, // ADDED
 	) {
 		this.utils.log(LogLevel.Debug, 'FileSystemModule initializing...')
 		this.fs = fileSystemService
 		this.Uri = uriService
 		this._fileSystemStateService = fileSystemStateService
+		this._vfsPopulationService = vfsPopulationService // ADDED
 		this.utils.log(LogLevel.Debug, 'FileSystemModule initialized.')
 	
 	}
@@ -54,16 +58,13 @@ export class FileSystemModule implements IFileSystemModule {
 	async reset(): Promise<void> { //>
 		this.utils.log(LogLevel.Info, 'Resetting FileSystemModule state...')
 
-		// Delegate reset to the encapsulated internal services
-		// The IFileSystemService itself should have a reset/clear method for its VFS.
-		await this.fs._clear() // This will call _fileSystemStateService.clear()
-
-		// UriService and MockNodePathService are typically stateless or have simple state
-		// that might not need explicit reset beyond DI container clearing instances.
-		// If they do have resettable state, add their reset calls here.
+		await this.fs._clear()
+		// VfsPopulationService is typically stateless beyond its dependencies,
+		// or its state is implicitly reset when FileSystemStateService is reset.
+		// If VfsPopulationService had its own direct state, a reset call would be added here.
 
 		this.utils.log(LogLevel.Debug, 'FileSystemModule reset complete.')
 	
 	} //<
-    
+
 }

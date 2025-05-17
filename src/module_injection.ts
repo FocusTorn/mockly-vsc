@@ -23,6 +23,8 @@ import type { IExtensionsService } from './modules/extensions/_interfaces/IExten
 import type { IFileSystemModule } from './modules/fileSystem/_interfaces/IFileSystemModule.ts'
 import type { IFileSystemService } from './modules/fileSystem/_interfaces/IFileSystemService.ts'
 import type { IFileSystemStateService } from './modules/fileSystem/_interfaces/IFileSystemStateService.ts'
+import type { IVfsTreeManagerService } from './modules/fileSystem/_interfaces/IVfsTreeManagerService.ts'
+import type { IVfsPopulationService } from './modules/fileSystem/_interfaces/IVfsPopulationService.ts' // ADDED
 import type { IMockNodePathService } from './modules/nodePath/_interfaces/IMockNodePathService.ts'
 import type { IUriService } from './modules/fileSystem/_interfaces/IUriService.ts'
 import type { IWindowModule } from './modules/window/_interfaces/IWindowModule.ts'
@@ -53,6 +55,8 @@ import { ExtensionsService } from './modules/extensions/services/extensions.serv
 import { FileSystemModule } from './modules/fileSystem/implementations/fileSystem.module.ts'
 import { FileSystemService } from './modules/fileSystem/services/fileSystem.service.ts'
 import { FileSystemStateService } from './modules/fileSystem/services/fileSystemState.service.ts'
+import { VfsTreeManagerService } from './modules/fileSystem/services/VfsTreeManager.service.ts'
+import { VfsPopulationService } from './modules/fileSystem/services/VfsPopulationService.ts' // ADDED
 import { NodePathService } from './modules/nodePath/services/nodePath.service.ts'
 import { UriService } from './modules/fileSystem/services/uri.service.ts'
 import { WindowModule } from './modules/window/implementations/window.module.ts'
@@ -85,6 +89,8 @@ container.registerSingleton<IMockNodePathService>('IMockNodePathService', NodePa
 // │  FILE SYSTEM                                                                                     │
 // └──────────────────────────────────────────────────────────────────────────────────────────────────┘
 
+container.registerSingleton<IVfsTreeManagerService>('IVfsTreeManagerService', VfsTreeManagerService)
+container.registerSingleton<IVfsPopulationService>('IVfsPopulationService', VfsPopulationService) // ADDED
 container.registerSingleton<IFileSystemStateService>('IFileSystemStateService', FileSystemStateService)
 container.registerSingleton<IUriService>('IUriService', UriService)
 container.registerSingleton<IFileSystemService>('IFileSystemService', FileSystemService)
@@ -102,7 +108,6 @@ container.registerSingleton<INodeFsService>('INodeFsService', NodeFsService)
 
 container.registerSingleton<IWorkspaceStateService>('IWorkspaceStateService', WorkspaceStateService)
 container.registerSingleton<ITextDocumentService>('ITextDocumentService', TextDocumentService)
-// FileSystemUtilityService registration removed
 
 container.registerSingleton<IWorkspaceNamespace>('IWorkspaceNamespace', WorkspaceNamespace)
 container.registerSingleton<IWorkspaceModule>('IWorkspaceModule', WorkspaceModule)
