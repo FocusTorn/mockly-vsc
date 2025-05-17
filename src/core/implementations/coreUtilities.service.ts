@@ -199,24 +199,29 @@ export class CoreUtilitiesService implements ICoreUtilitiesService {
 		message?: string,
 	): Error {
 		const uri = typeof path === 'string' ? this.uriService.file(this.pathService.normalize(path)) : path
-		const errorMessage = message || `${code}: ${uri.toString()}`
+		
+		// If a custom message is provided, use it. Otherwise, pass the URI for default formatting by FileSystemError static methods.
+		const messageOrUriForStaticMethod = message || uri
 
 		switch (code) {
 			case 'FileNotFound':
-				return FileSystemError.FileNotFound(uri)
+				return FileSystemError.FileNotFound(messageOrUriForStaticMethod)
 			case 'FileExists':
-				return FileSystemError.FileExists(uri)
+				return FileSystemError.FileExists(messageOrUriForStaticMethod)
 			case 'FileNotADirectory':
-				return FileSystemError.FileNotADirectory(uri)
+				return FileSystemError.FileNotADirectory(messageOrUriForStaticMethod)
 			case 'FileIsADirectory':
-				return FileSystemError.FileIsADirectory(uri)
+				return FileSystemError.FileIsADirectory(messageOrUriForStaticMethod)
 			case 'NoPermissions':
-				return FileSystemError.NoPermissions(uri)
+				return FileSystemError.NoPermissions(messageOrUriForStaticMethod)
 			case 'Unavailable':
-				return FileSystemError.Unavailable(uri)
+				return FileSystemError.Unavailable(messageOrUriForStaticMethod)
 			default:
 			{
-				const error = new Error(errorMessage)
+				// For unknown codes, construct a generic error using the custom message if available,
+				// or the default format if not.
+				const errorMessageForDefault = message || `${code}: ${uri.toString()}`
+				const error = new Error(errorMessageForDefault)
                 ;(error as any).code = code
 				return error
 			
@@ -224,8 +229,8 @@ export class CoreUtilitiesService implements ICoreUtilitiesService {
 		}
 	
 	} //<
-
-	createNotImplementedError( //>
+	
+    createNotImplementedError( //>
 		featureName?: string,
 	): Error {
 		const message = featureName

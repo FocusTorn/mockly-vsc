@@ -130,7 +130,7 @@ export class VSCodeAPISimulatorService implements IVSCodeAPISimulatorService {
 		}
 
 		this.utils.log(LogLevel.Debug, 'VSCodeAPISimulatorService initialized.') // MODIFIED: Use LogLevel directly
-
+	
 	} //<
 
 	// ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
@@ -207,11 +207,11 @@ export class VSCodeAPISimulatorService implements IVSCodeAPISimulatorService {
 		this.eventBus.reset()
 
 		this.utils.log(LogLevel.Debug, 'VSCodeAPISimulatorService reset complete.') // MODIFIED: Use LogLevel directly
-
+	
 	} //<
 
-	setLogLevel(newLevel: LogLevel | string): void { //> MODIFIED: Parameter name changed
-		this.utils.log(LogLevel.Info, `VSCodeAPISimulatorService.setLogLevel called with: ${newLevel}`) // MODIFIED: Use LogLevel directly
+	setLogLevel(newLevel: LogLevel | string): void { //>
+		this.utils.log(LogLevel.Info, `VSCodeAPISimulatorService.setLogLevel called with: ${newLevel}`)
 		let targetLevel: LogLevel | undefined
 
 		if (typeof newLevel === 'string') {
@@ -221,7 +221,9 @@ export class VSCodeAPISimulatorService implements IVSCodeAPISimulatorService {
 				case 'trace': targetLevel = LogLevel.Trace; break
 				case 'debug': targetLevel = LogLevel.Debug; break
 				case 'info': targetLevel = LogLevel.Info; break
-				case 'warning': targetLevel = LogLevel.Warning; break
+				case 'warn': // Handles "Warn" -> "warn"
+				case 'warning': // Handles "Warning" -> "warning"
+					targetLevel = LogLevel.Warning; break
 				case 'error': targetLevel = LogLevel.Error; break
 				default:
 					this.utils.warn(`VSCodeAPISimulatorService.setLogLevel: Invalid log level string '${newLevel}'. No change will be made.`)

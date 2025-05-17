@@ -1,6 +1,6 @@
 {
     "name": "mockly-vsc",
-    "version": "1.0.0",
+    "version": "1.0.2",
     "description": "Core library for directly mocking VSCode extension in ViTest.",
     "license": "MIT",
     "author": "New Reality Designs",
@@ -44,7 +44,7 @@
         "yalc": "yalc publish --push",
         "prepublishOnly": "npm run build",
         "bundle": "node ./build/ESBuild/esbuildDual.config.mjs",
-        "build": "npm run gulp:validate && npm run clean && npm run bundle && npm run build:types",
+        "build": "npm run gulp:validate && npm run Utility:Increment_Version && npm run clean && npm run bundle && npm run build:types",
         "build:types": "tsc --emitDeclarationOnly --outDir dist",
         "build:dev": "npm run clean && node ./esbuild.config.mjs --dev",
         "gulp:validate": "gulp validate --silent",

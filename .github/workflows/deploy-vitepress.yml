@@ -2,14 +2,14 @@ name: Release Package and Deploy VitePress Site
 
 on:
   push:
-    branches: [ master ] # Your default branch
+    branches: [master] # Your default branch
   workflow_dispatch:
 
 permissions:
   contents: write # Crucial for semantic-release to create tags, releases, and commit files
-  pages: write    # For GitHub Pages deployment
+  pages: write # For GitHub Pages deployment
   id-token: write # For GitHub Pages deployment
-  actions: read   # Optional, for some plugins
+  actions: read # Optional, for some plugins
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }} # Ensures sequential runs for the same branch
@@ -29,16 +29,12 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0 # Fetches all history for all tags and branches
-          # Persist credentials for @semantic-release/git to push
-          # Note: The GITHUB_TOKEN env var for the semantic-release step is usually preferred for API auth
-          # but this ensures git push commands from @semantic-release/git also work.
-          # If using a PAT for checkout: token:   $ {{ secrets.GH_TOKEN }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '23' # As per your package.json
-          cache: 'npm'
+          cache: npm
 
       - name: Install dependencies
         run: npm ci
@@ -46,8 +42,8 @@ jobs:
       - name: Semantic Release
         id: semantic
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }} # Use the PAT for GitHub operations
-        #   NPM_TOKEN: ${{ secrets.NPM_TOKEN }}   # Use the NPM token for publishing (if applicable)
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN || '' }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: npx semantic-release
         # To ensure subsequent jobs run even if no new release is made:
         # continue-on-error: true # Then check steps.semantic.outputs.new_release_published in dependent jobs
@@ -68,7 +64,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '18'
-          cache: 'npm'
+          cache: npm
 
       - name: Install dependencies
         run: npm ci
