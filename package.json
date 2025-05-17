@@ -1,6 +1,6 @@
 {
     "name": "mockly-vsc",
-    "version": "1.0.6",
+    "version": "1.0.1",
     "description": "Core library for directly mocking VSCode extension in ViTest.",
     "license": "MIT",
     "author": "New Reality Designs",

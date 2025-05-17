@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/FocusTorn/mockly-vsc/compare/v1.0.0...v1.0.1) (2025-05-17)
+
+
+### Bug Fixes
+
+* **core:** Fix error propagation ([cec2195](https://github.com/FocusTorn/mockly-vsc/commit/cec21952f3f5bc37e4c4f34ec13700df4ce2c1b4))
+
 # 1.0.0 (2025-05-17)
 
 
